@@ -19,9 +19,9 @@ class DatabaseSeeder extends Seeder
          *
          */
 
-        // $this->call(DataCategoriesSeeder::class);
-        // $this->call(DataProductsSeeder::class);
-        // $this->call(DataPaymentMethodsSeeder::class);
+        $this->call(DataCategoriesSeeder::class);
+        $this->call(DataProductsSeeder::class);
+        $this->call(DataPaymentMethodsSeeder::class);
         //$this->call(NewSeeder::class);
     }
 }
