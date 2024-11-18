@@ -1,9 +1,9 @@
 
 $(document).ready(function() {
-    const mp = new MercadoPago('TEST-43619ea9-0d2d-4976-afba-ba9a8f261549'); // Reemplaza con tu llave pública de Mercado Pago
+    const mp = new MercadoPago('TEST-43619ea9-0d2d-4976-afba-ba9a8f261549', { locale: 'es-PE', debug: true }); // Reemplaza con tu llave pública de Mercado Pago
 
     const cardForm = mp.cardForm({
-        amount: '100.00', // Cambia por el monto de la transacción
+        amount: '1.00', // Cambia por el monto de la transacción
         autoMount: true,
         form: {
             id: 'checkoutForm', // Este ID debe coincidir con el del formulario

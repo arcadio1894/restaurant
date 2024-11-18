@@ -185,7 +185,7 @@
                             <div class="mb-3">
                                 <label for="installments">Cuotas</label>
                                 <select class="form-control" name="installments" id="installments" >
-                                    <option value="" disabled selected>Seleccione cuotas</option>
+                                    <option value="" selected>Seleccione cuotas</option>
                                 </select>
                             </div>
 
@@ -193,7 +193,7 @@
                             <div class="mb-3">
                                 <label for="issuer">Banco Emisor</label>
                                 <select class="form-control" name="issuer" id="issuer" >
-                                    <option value="" disabled selected>Seleccione el banco</option>
+                                    <option value="" selected>Seleccione el banco</option>
                                 </select>
                             </div>
 
