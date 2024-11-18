@@ -1,0 +1,272 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\CheckoutRequest;
+use App\Models\Address;
+use App\Models\Cart;
+use App\Models\CartDetail;
+use App\Models\Order;
+use App\Models\OrderDetail;
+use App\Models\PaymentMethod;
+use App\Models\Product;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use MercadoPago\Payment;
+use MercadoPago\SDK;
+
+class CartController extends Controller
+{
+    public function __construct()
+    {
+        SDK::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN'));
+    }
+
+    public function manage(Request $request)
+    {
+        $user = Auth::user();
+        $product_id = $request->input('product_id');
+
+        // Verificar si el usuario tiene un carrito pendiente
+        $cart = Cart::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->first();
+
+        if (!$cart) {
+            // No existe un carrito pendiente; verificamos si hay uno en proceso
+            $processingCart = Cart::where('user_id', $user->id)
+                ->where('status', 'processing')
+                ->first();
+
+            if ($processingCart) {
+                return response()->json(['message' => 'Ya tienes un carrito en proceso.'], 403);
+            }
+
+            // Si no hay en proceso, creamos uno nuevo
+            $cart = Cart::create([
+                'user_id' => $user->id,
+                'status' => 'pending',
+            ]);
+        }
+
+        // Verificar si el producto ya está en el carrito
+        $cartDetail = $cart->details()->where('product_id', $product_id)->first();
+
+        if (!$cartDetail) {
+            // Agregar el producto al carrito si no existe
+            $producto = Product::find($product_id);
+            $cart->details()->create([
+                'product_id' => $product_id,
+                'quantity' => 1,
+                'price' => $producto->unit_price,
+                'subtotal' => $producto->unit_price*1
+            ]);
+        }
+
+        //TODO: Agregue uno mas si le doy aun producto que existe
+
+        return response()->json(['redirect' => route('cart.show')]);
+    }
+
+    public function show()
+    {
+        $user = Auth::user();
+
+        $cart = Cart::with('details.product')->where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->first();
+        return view('product.cart', compact('cart'));
+    }
+
+    public function updateQuantity(Request $request)
+    {
+        $detail = CartDetail::find($request->detail_id);
+
+        if ($detail) {
+            $detail->quantity = $request->quantity;
+            $detail->subtotal = $detail->quantity * $detail->product->unit_price;
+            $detail->save();
+
+            // Recalcular subtotal, taxes y total del carrito
+            $cart = $detail->cart;
+            $subtotalCart = $cart->subtotal_cart;
+            $taxesCart = $cart->taxes_cart;
+            $totalCart = $cart->total_cart;
+
+            return response()->json([
+                'success' => true,
+                'subtotal_cart' => number_format($subtotalCart, 2),
+                'taxes_cart' => number_format($taxesCart, 2),
+                'total_cart' => number_format($totalCart, 2),
+                'detail_subtotal' => number_format($detail->subtotal, 2)
+            ]);
+        }
+
+        return response()->json(['success' => false], 400);
+    }
+
+    public function checkout()
+    {
+        $user = Auth::user();
+
+        $cart = Cart::with('details.product')->where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->first();
+
+        $payment_methods = PaymentMethod::active()->get();
+
+        if (!$cart || $cart->details->isEmpty()) {
+            return redirect()->route('home');
+        }
+
+        $defaultAddress = Address::where('user_id', Auth::id())
+            ->where('is_default', true)
+            ->first();
+
+        return view('product.checkout', compact('cart', 'payment_methods', 'defaultAddress'));
+    }
+
+    public function pagar( CheckoutRequest $request )
+    {
+        DB::beginTransaction();
+
+        try {
+            // Validar los datos y guardarlos
+            $validatedData = $request->validated();
+
+            $shippingAddressId = null;
+
+            // Verificar si 'save-info' está marcado como "on"
+            if ($request->has('save-info') && $request->input('save-info') === 'on') {
+                $isDefault = true;
+                $existingDefaultAddress = Address::where('user_id', auth()->id())->where('is_default', true)->first();
+                if ($existingDefaultAddress) {
+                    $isDefault = false;
+                }
+
+                // Crear la nueva dirección
+                $address = Address::create([
+                    'user_id' => auth()->id(),
+                    'type' => 'shipping',
+                    'phone' => $validatedData['phone'],
+                    'first_name' => $validatedData['first_name'],
+                    'last_name' => $validatedData['last_name'],
+                    'address_line' => $validatedData['address'],
+                    'reference' => $request->input('reference', ''),
+                    'city' => '',
+                    'state' => '',
+                    'postal_code' => '',
+                    'country' => '',
+                    'is_default' => $isDefault
+                ]);
+
+                $shippingAddressId = $address->id;
+            }
+
+            $cart = Cart::findOrFail($validatedData['cart_id']);
+            $totalAmount = $cart->total_cart;
+
+            // Crear la orden
+            $order = Order::create([
+                'user_id' => auth()->id(),
+                'shipping_address_id' => $shippingAddressId,
+                'billing_address_id' => $shippingAddressId,
+                'total_amount' => $totalAmount,
+                'status' => 'created',
+                'payment_method_id' => $validatedData['paymentMethod']
+            ]);
+
+            // Crear los detalles de la orden basados en el carrito
+            foreach ($cart->details as $cartItem) {
+                OrderDetail::create([
+                    'order_id' => $order->id,
+                    'product_id' => $cartItem->product_id,
+                    'quantity' => $cartItem->quantity,
+                    'price' => $cartItem->price,
+                    'subtotal' => $cartItem->quantity * $cartItem->price
+                ]);
+            }
+
+            $cart->status = 'processing';
+            $cart->save();
+
+            $method_payment = PaymentMethod::find($validatedData['paymentMethod']);
+
+            // Selección del método de pago
+            switch ($method_payment->code) {
+                case 'mercado_pago':
+                    // Procesar pago con Mercado Pago
+                    $payment = new Payment();
+                    $payment->transaction_amount = $totalAmount;
+                    $payment->token = $request->input('token');
+                    $payment->description = "Compra en tienda";
+                    $payment->installments = 1;
+                    $payment->payer = ["email" => $validatedData['email']];
+                    $payment->payment_method_id = "visa";
+
+                    $payment->save();
+
+                    if ($payment->status == 'approved') {
+                        $order->status = 'paid';
+                        $cart->status = 'completed';
+                        $cart->save();
+                        $order->save();
+                        DB::commit();
+
+                        return response()->json(['success' => true, 'message' => 'Pago con Mercado Pago exitoso']);
+                    } else {
+                        DB::rollBack();
+                        return response()->json(['success' => false, 'message' => 'Pago con Mercado Pago rechazado']);
+                    }
+
+                case 'pos':
+                    // Lógica para pago POS (Ej. Marca la orden como pagada con POS)
+                    //$order->status = 'paid';
+                    //$order->save();
+                    //$cart->status = 'proc';
+                    //$cart->save();
+                    DB::commit();
+
+                    return response()->json(['success' => true, 'message' => 'Pago realizado con POS']);
+
+                case 'efectivo':
+                    // Lógica para pago en efectivo
+                    //$order->status = 'processing';  // Se puede manejar como pendiente hasta que se reciba el pago físico
+                    //$order->save();
+                    DB::commit();
+
+                    return response()->json(['success' => true, 'message' => 'Orden creada. Pago en efectivo pendiente']);
+
+                case 'yape_plin':
+                    // Lógica para pago con Yape o Plin
+                    $operationCode = $request->input('operationCode');
+                    if ($operationCode) {
+                        //$order->status = 'paid';
+                        //$order->save();
+                        //$cart->status = 'completed';
+                        //$cart->save();
+                        DB::commit();
+
+                        return response()->json(['success' => true, 'message' => 'Pago realizado con Yape/Plin']);
+                    } else {
+                        DB::rollBack();
+                        return response()->json(['success' => false, 'message' => 'Falta el código de operación para Yape/Plin']);
+                    }
+
+                default:
+                    DB::rollBack();
+                    return response()->json(['success' => false, 'message' => 'Método de pago no válido']);
+            }
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Ocurrió un error al procesar el checkout. Inténtelo nuevamente.',
+                'error' => $e->getMessage(),
+            ], 420);
+        }
+    }
+}
