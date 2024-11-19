@@ -149,7 +149,7 @@ $(document).ready(function() {
                 }
 
                 // Extrae los datos del formulario de tarjeta
-                console.log(cardForm.getCardFormData());
+                console.log(cardForm);
                 const { token, issuerId, paymentMethodId } = cardForm.getCardFormData();
                 console.log({ token, issuerId, paymentMethodId });
 
