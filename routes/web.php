@@ -47,6 +47,6 @@ Route::get('/checkout', [CartController::class, 'checkout'])->middleware('auth')
 Route::post('/checkout/pagar', [CartController::class, 'pagar'])->name('checkout.pagar');
 
 
-Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
-Route::get('/payment/failure', [PaymentController::class, 'failure'])->name('payment.failure');
-Route::get('/payment/pending', [PaymentController::class, 'pending'])->name('payment.pending');
+Route::get('/payment/success', [CartController::class, 'success'])->name('payment.success');
+Route::get('/payment/failure', [CartController::class, 'failure'])->name('payment.failure');
+Route::get('/payment/pending', [CartController::class, 'pending'])->name('payment.pending');

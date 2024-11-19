@@ -181,11 +181,24 @@
                                 <input type="email" class="form-control" name="cardholderEmail" id="cardholderEmail" placeholder="Email" required />
                             </div>
 
+                        <div class="mb-3">
+                            <label for="identificationType">Tipo de documento</label>
+                            <select class="form-control" name="identificationType" id="identificationType">
+                                <option value="DNI" selected>DNI</option>
+                                <option value="RUC">RUC</option>
+                                <option value="CE">Carné de extranjería</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="identificationNumber">Número de documento</label>
+                            <input type="text" class="form-control" name="identificationNumber" id="identificationNumber" placeholder="Número de documento" required />
+                        </div>
+
                             <!-- Campo para cuotas -->
                             <div class="mb-3">
                                 <label for="installments">Cuotas</label>
                                 <select class="form-control" name="installments" id="installments" >
-                                    <option value="" selected>Seleccione cuotas</option>
+                                    <option value="">Seleccione cuotas</option>
                                 </select>
                             </div>
 
@@ -193,7 +206,7 @@
                             <div class="mb-3">
                                 <label for="issuer">Banco Emisor</label>
                                 <select class="form-control" name="issuer" id="issuer" >
-                                    <option value="" selected>Seleccione el banco</option>
+                                    <option value="">Seleccione el banco</option>
                                 </select>
                             </div>
 

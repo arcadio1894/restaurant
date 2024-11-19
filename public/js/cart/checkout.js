@@ -14,7 +14,9 @@ $(document).ready(function() {
             cardExpirationYear: { id: 'cardExpirationYear', placeholder: 'AA' },
             securityCode: { id: 'securityCode', placeholder: 'CVV' },
             installments: { id: 'installments', placeholder: 'Cuotas' },
-            issuer: { id: 'issuer', placeholder: 'Banco' }
+            issuer: { id: 'issuer', placeholder: 'Banco' },
+            identificationType: { id: 'identificationType', placeholder: 'Tipo de documento' },
+            identificationNumber: { id: 'identificationNumber', placeholder: 'Número de documento' }
         },
         callbacks: {
             onFormMounted: error => {
@@ -23,22 +25,18 @@ $(document).ready(function() {
             onSubmit: event => {
                 event.preventDefault();
                 const formData = cardForm.getCardFormData();
+                console.log(formData);
 
                 if (!formData.token) {
                     toastr.error('No se pudo generar el token. Verifica los datos ingresados.', 'Error');
                     return;
                 }
 
-                if (!formData.installments || !formData.issuerId) {
-                    toastr.error('Por favor selecciona cuotas y banco.', 'Error');
-                    return;
-                }
-
                 // Envía los datos al backend
                 submitFormAjax({
                     token: formData.token,
-                    installments: formData.installments,
-                    issuerId: formData.issuerId,
+                    installments: formData.installments || '1',
+                    issuerId: formData.issuerId || 'default',
                     paymentMethodId: formData.paymentMethodId
                 });
             }
@@ -151,7 +149,9 @@ $(document).ready(function() {
                 }
 
                 // Extrae los datos del formulario de tarjeta
+                console.log(cardForm.getCardFormData());
                 const { token, issuerId, paymentMethodId } = cardForm.getCardFormData();
+                console.log({ token, issuerId, paymentMethodId });
 
                 if (!token) {
                     toastr.error('No se pudo generar el token. Verifica los datos ingresados.', 'Error');
