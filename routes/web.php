@@ -47,6 +47,7 @@ Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])-
 Route::get('/checkout', [CartController::class, 'checkout'])->middleware('auth')->name('cart.checkout');
 Route::post('/checkout/pagar', [CartController::class, 'pagar'])->name('checkout.pagar');
 Route::post('/checkout/crear-preferencia', [CartController::class, 'crearPreferencia'])->name('checkout.crearPreferencia');
+Route::delete('/cart/delete-detail/{id}', [CartController::class, 'deleteDetail'])->name('cart.detail.delete');
 
 Route::get('/payment/success', [CartController::class, 'success'])->name('payment.success');
 Route::get('/payment/failure', [CartController::class, 'failure'])->name('payment.failure');

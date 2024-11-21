@@ -64,14 +64,14 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <text class="h6">S/ {{ $detail->subtotal }}</text> <br />
-                                                <small class="text-muted text-nowrap"> S/ {{ $detail->product->unit_price }} / per item </small>
+                                                <small class="text-muted text-nowrap"> S/ {{ $detail->product->unit_price }} / por item </small>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-md-2">
                                         <div class="float-md-end">
-                                            <a href="#!" data-material_id="{{ $detail->product->id }}" class="btn btn-light border icon-hover-primary"><i class="fas fa-heart fa-lg text-secondary"></i></a>
-                                            <a href="#" data-material_id="{{ $detail->product->id }}" class="btn btn-light border text-danger icon-hover-danger"> <i class="fas fa-trash fa-lg text-secondary"></i></a>
+                                            {{--<a href="#!" data-material_id="{{ $detail->product->id }}" class="btn btn-light border icon-hover-primary"><i class="fas fa-heart fa-lg text-secondary"></i></a>--}}
+                                            <button type="button" data-delete_item data-detail_id="{{ $detail->id }}" class="btn btn-light border text-danger icon-hover-danger"> <i class="fas fa-trash fa-lg text-secondary"></i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -86,46 +86,44 @@
 
                         </div>
 
-                        @if($cart && $cart->details->isNotEmpty())
+                        {{--@if($cart && $cart->details->isNotEmpty())
                             <div class="border-top pt-4 mx-4 mb-4">
                                 <p><i class="fas fa-truck text-muted fa-lg"></i> Entrega gratuita en 1-2 semanas</p>
                                 <p class="text-muted">
                                     Lorem ipsum dolor sit amet, consectetur adipisicing elit...
                                 </p>
                             </div>
-                        @endif
+                        @endif--}}
                     </div>
                 </div>
                 <!-- cart -->
                 <!-- summary -->
 
                 <div class="col-lg-3">
-                    @if($cart && $cart->details->isNotEmpty())
+                    {{--@if($cart && $cart->details->isNotEmpty())
                     <div class="card mb-3 border shadow-0">
                         <div class="card-body">
 
-                            {{--<form>--}}
-                                <div class="form-group">
-                                    <label class="form-label">Have coupon?</label>
-                                    <div class="input-group">
-                                        <input type="text" class="form-control border" name="" placeholder="Coupon code" />
-                                        <button class="btn btn-light border">Apply</button>
-                                    </div>
+                            <div class="form-group">
+                                <label class="form-label">Have coupon?</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control border" name="" placeholder="Coupon code" />
+                                    <button class="btn btn-light border">Apply</button>
                                 </div>
-                            {{--</form>--}}
+                            </div>
 
                         </div>
                     </div>
-                    @endif
+                    @endif--}}
                     @if($cart && $cart->details->isNotEmpty())
                         <div class="card shadow-0 border">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between">
-                                    <p class="mb-2">Total price:</p>
+                                    <p class="mb-2">Precio Total:</p>
                                     <p class="mb-2" id="subtotal_cart">S/ {{ number_format($cart->subtotal_cart, 2) }}</p>
                                 </div>
                                 <div class="d-flex justify-content-between">
-                                    <p class="mb-2">Discount:</p>
+                                    <p class="mb-2">Descuento:</p>
                                     <p class="mb-2 text-success">S/ {{ number_format(0, 2) }}</p>
                                 </div>
                                 <div class="d-flex justify-content-between">
@@ -139,8 +137,8 @@
                                 </div>
 
                                 <div class="mt-3">
-                                    <a href="{{ route('cart.checkout') }}" class="btn btn-success w-100 shadow-0 mb-2"> Make Purchase </a>
-                                    <a href="{{ route('home') }}" class="btn btn-light w-100 border mt-2"> Back to shop </a>
+                                    <a href="{{ route('cart.checkout') }}" class="btn btn-success w-100 shadow-0 mb-2"> Completar la compra </a>
+                                    <a href="{{ route('home') }}" class="btn btn-light w-100 border mt-2"> Seguir comprando </a>
                                 </div>
                             </div>
                         </div>

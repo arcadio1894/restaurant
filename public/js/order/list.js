@@ -256,6 +256,7 @@ function renderDataTable(data) {
     clone.querySelector("[data-total]").innerHTML = data.total;
     clone.querySelector("[data-method]").innerHTML = data.method;
     clone.querySelector("[data-state]").innerHTML = data.state;
+    clone.querySelector("[data-data_payment]").innerHTML = data.data_payment;
 
     var botones = clone.querySelector("[data-buttons]");
 

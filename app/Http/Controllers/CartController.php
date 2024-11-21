@@ -191,14 +191,14 @@ class CartController extends Controller
                 ]);
             }
 
-            $cart->status = 'processing';
+            $cart->status = 'completed';
             $cart->save();
 
             $method_payment = PaymentMethod::find($validatedData['paymentMethod']);
 
             // Selección del método de pago
             switch ($method_payment->code) {
-                case 'mercado_pago':
+                /*case 'mercado_pago':
                     // Procesar pago con Mercado Pago
                     $payment = new Payment();
                     $payment->transaction_amount = $totalAmount;
@@ -221,7 +221,7 @@ class CartController extends Controller
                     } else {
                         DB::rollBack();
                         return response()->json(['success' => false, 'message' => 'Pago con Mercado Pago rechazado']);
-                    }
+                    }*/
 
                 case 'pos':
                     // Lógica para pago POS (Ej. Marca la orden como pagada con POS)
@@ -231,15 +231,15 @@ class CartController extends Controller
                     //$cart->save();
                     DB::commit();
 
-                    return response()->json(['success' => true, 'message' => 'Pago realizado con POS']);
+                    return response()->json(['success' => true, 'message' => 'Pago realizado con POS', 'redirect_url' => route('home')]);
 
                 case 'efectivo':
                     // Lógica para pago en efectivo
-                    //$order->status = 'processing';  // Se puede manejar como pendiente hasta que se reciba el pago físico
-                    //$order->save();
+                    $order->payment_amount = $request->input('cashAmount');
+                    $order->save();
                     DB::commit();
 
-                    return response()->json(['success' => true, 'message' => 'Orden creada. Pago en efectivo pendiente']);
+                    return response()->json(['success' => true, 'message' => 'Orden creada. Pago en efectivo pendiente', 'redirect_url' => route('home')]);
 
                 case 'yape_plin':
                     // Lógica para pago con Yape o Plin
@@ -249,9 +249,11 @@ class CartController extends Controller
                         //$order->save();
                         //$cart->status = 'completed';
                         //$cart->save();
+                        $order->payment_code = $request->input('operationCode');
+                        $order->save();
                         DB::commit();
 
-                        return response()->json(['success' => true, 'message' => 'Pago realizado con Yape/Plin']);
+                        return response()->json(['success' => true, 'message' => 'Pago realizado con Yape/Plin', 'redirect_url' => route('home')]);
                     } else {
                         DB::rollBack();
                         return response()->json(['success' => false, 'message' => 'Falta el código de operación para Yape/Plin']);
@@ -314,5 +316,72 @@ class CartController extends Controller
     {
         // Lógica para pagos pendientes
         return view('pagos.pendiente', ['data' => $request->all()]);
+    }
+
+    public function deleteDetail($id)
+    {
+        DB::beginTransaction(); // Iniciar la transacción
+
+        try {
+            // Buscar el detalle del carrito
+            $detail = CartDetail::findOrFail($id);
+
+            // Obtener el carrito asociado
+            $cart = $detail->cart;
+
+            // Eliminar el detalle
+            $detail->delete();
+
+            // Verificar si quedan detalles en el carrito
+            if ($cart->details()->count() === 0) {
+                // Si no quedan detalles, eliminar el carrito
+                $cart->delete();
+
+                DB::commit(); // Confirmar la transacción
+
+                return response()->json([
+                    'status' => 'cart_deleted', // Indica que el carrito fue eliminado
+                    'message' => 'El carrito está vacío y fue eliminado.',
+                ]);
+            }
+
+            // Calcular los nuevos totales del carrito
+            /*$subtotal = $cart->details->sum(function ($d) {
+                return $d->subtotal;
+            });
+
+            $taxes = $subtotal * 0.18; // Ejemplo: suponiendo un 18% de impuestos
+            $total = $subtotal + $taxes;
+            $count = $cart->details->count();*/
+
+            $subtotalCart = $cart->subtotal_cart;
+            $taxesCart = $cart->taxes_cart;
+            $totalCart = $cart->total_cart;
+
+            DB::commit(); // Confirmar la transacción
+
+            // Retornar una respuesta indicando que el detalle fue eliminado
+            return response()->json([
+                'status' => 'detail_deleted',
+                'message' => 'El detalle fue eliminado.',
+                'cart' => [
+                    'subtotal' => number_format($subtotalCart, 2),
+                    'taxes' => number_format($taxesCart, 2),
+                    'total' => number_format($totalCart, 2),
+                    'count' => $cart->details->count(),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack(); // Revertir la transacción en caso de error
+
+            // Registrar el error (opcional, para monitoreo)
+            //\Log::error('Error al eliminar el detalle del carrito: ' . $e->getMessage());
+
+            // Retornar una respuesta de error
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Ocurrió un error al eliminar el detalle del carrito. Intenta de nuevo más tarde.',
+            ], 500);
+        }
     }
 }

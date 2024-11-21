@@ -66,7 +66,7 @@
                             <input type="text" class="form-control" id="firstName" name="first_name" placeholder=""
                                    value="{{ $defaultAddress ? $defaultAddress->first_name : '' }}" required>
                             <div class="invalid-feedback">
-                                Valid first name is required.
+                                Sus nombres son obligatorios.
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -74,7 +74,7 @@
                             <input type="text" class="form-control" id="lastName" name="last_name" placeholder=""
                                    value="{{ $defaultAddress ? $defaultAddress->last_name : '' }}" required>
                             <div class="invalid-feedback">
-                                Valid last name is required.
+                                Sus apellidos son obligatorios.
                             </div>
                         </div>
                     </div>
@@ -88,7 +88,7 @@
                             <input type="text" class="form-control" id="phone" name="phone" placeholder=""
                                    value="{{ $defaultAddress ? $defaultAddress->phone : '' }}" required>
                             <div class="invalid-feedback" style="width: 100%;">
-                                Your phone is required.
+                                Su teléfono es obligatorio.
                             </div>
                         </div>
                     </div>
@@ -98,7 +98,7 @@
                         <input type="text" class="form-control" id="address" name="address" placeholder="1234 Main St"
                                value="{{ $defaultAddress ? $defaultAddress->address_line : '' }}" required>
                         <div class="invalid-feedback">
-                            Please enter your shipping address.
+                            Por favor ingrese su dirección de envío.
                         </div>
                     </div>
 
@@ -110,8 +110,8 @@
 
                     <hr class="mb-4">
                     <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="save-info" name="save-info" >
-                        <label class="custom-control-label" for="save-info">Save this information for next time</label>
+                        <input type="checkbox" class="custom-control-input" id="save-info" name="save-info" checked>
+                        <label class="custom-control-label" for="save-info">Guardar esta información.</label>
                     </div>
                     <hr class="mb-4">
 
@@ -143,7 +143,7 @@
                     </div>
 
                     <!-- Sección para método de pago Mercado Pago -->
-                    <div id="mercado_pago-section" style="display: none; margin-top: 15px;">
+                    {{--<div id="mercado_pago-section" style="display: none; margin-top: 15px;">
 
                             <input type="hidden" name="cart_id" value="{{ $cart->id }}">
                             <!-- Información del titular de la tarjeta -->
@@ -214,7 +214,7 @@
                             <!-- Token de tarjeta -->
                             <input type="hidden" name="token" id="token" />
 
-                    </div>
+                    </div>--}}
                     <hr class="mb-4">
                     <button class="btn btn-primary btn-lg btn-block button-submit" type="button" id="btn-submit">PAGAR</button>
                 </form>
@@ -226,7 +226,7 @@
 
 @section('scripts')
     <script src="{{ asset('plugins/select2/js/select2.full.min.js') }}"></script>
-    <script src="https://sdk.mercadopago.com/js/v2"></script>
+    {{--<script src="https://sdk.mercadopago.com/js/v2"></script>--}}
     {{--<script>
         $(function () {
             //Initialize Select2 Elements

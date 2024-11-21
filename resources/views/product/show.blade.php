@@ -67,13 +67,13 @@
                                     4.5
                                 </span>
                             </div>
-                            <span class="text-muted"><i class="fas fa-shopping-basket fa-sm mx-1 pl-2"></i>154 orders</span>
+                            {{--<span class="text-muted"><i class="fas fa-shopping-basket fa-sm mx-1 pl-2"></i>154 orders</span>--}}
                             <span class="text-success ms-2 pl-2"> In stock</span>
                         </div>
 
                         <div class="mb-3">
                             <span class="h5">S/. {{ $product->unit_price }}</span>
-                            <span class="text-muted">/per unit</span>
+                            <span class="text-muted">/ por unidad</span>
                         </div>
 
                         <p>

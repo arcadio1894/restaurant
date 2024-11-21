@@ -1,4 +1,4 @@
-const mp = new MercadoPago('TEST-43619ea9-0d2d-4976-afba-ba9a8f261549', { locale: 'es-PE', debug: true }); // Reemplaza con tu llave pública de Mercado Pago
+/*const mp = new MercadoPago('TEST-43619ea9-0d2d-4976-afba-ba9a8f261549', { locale: 'es-PE', debug: true }); // Reemplaza con tu llave pública de Mercado Pago
 
 const cardForm = mp.cardForm({
     amount: '1.00', // Cambia por el monto de la transacción
@@ -39,7 +39,7 @@ const cardForm = mp.cardForm({
             });
         }
     }
-});
+});*/
 
 $(document).ready(function() {
 
@@ -56,14 +56,14 @@ $(document).ready(function() {
         } else if (selectedMethod === 'yape_plin') {
             $('#yape-section').show();
             $('#operationCode').val("");
-        }  else if (selectedMethod === 'mercado_pago') {
+        }  /*else if (selectedMethod === 'mercado_pago') {
             $('#mercado_pago-section').show();
             $('#cardExpirationMonth').val("");
             $('#cardExpirationYear').val("");
             $('#securityCode').val("");
             $('#cardholderName').val("");
             $('#cardholderEmail').val("");
-        }
+        }*/
     });
     // Al hacer clic en el botón de enviar
     $('#btn-submit').on('click', function(event) {
@@ -84,8 +84,9 @@ $(document).ready(function() {
             } else if (selectedMethod === 'method_efectivo') {
                 // Validar si el monto ingresado es mayor a cero
                 let cashAmount = $('#cashAmount').val();
-
+                console.log(cashAmount);
                 if (parseFloat(cashAmount) > 0 || cashAmount !== "" ) {
+                    console.log('Enviamos formulario');
                     submitFormAjax({ cashAmount: cashAmount });
                 } else {
                     //alert('Por favor, ingrese un monto válido en efectivo.');

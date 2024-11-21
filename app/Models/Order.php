@@ -20,7 +20,9 @@ class Order extends Model
         'billing_address_id',
         'total_amount',
         'status',
-        'payment_method_id'
+        'payment_method_id',
+        'payment_amount',
+        'payment_code'
     ];
 
     public function user()
@@ -41,6 +43,21 @@ class Order extends Model
     public function payment_method()
     {
         return $this->belongsTo(PaymentMethod::class);
+    }
+
+    // Accesor para obtener el pago o codigo yape
+    public function getDataPaymentAttribute()
+    {
+        switch ($this->payment_method->code) {
+            case 'pos':
+                return "";
+            case 'efectivo':
+                return "S/. ".number_format($this->payment_amount, 2);
+            case 'yape_plin':
+                return $this->payment_code;
+            default:
+                return 0;
+        }
     }
 
     // Accesor para obtener el estado en español

@@ -15,7 +15,7 @@ class OrderController extends Controller
     {
         $user = Auth::user();
         // Obtiene los pedidos con paginación (10 pedidos por página, puedes ajustarlo)
-        $orders = Order::where('user_id', $user->id)->get();
+        $orders = Order::where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
 
         // Retorna la vista con los pedidos paginados
         return view('order.index', compact('orders'));
@@ -92,6 +92,7 @@ class OrderController extends Controller
                 "total" => $order->total_amount,
                 "method" => ($order->payment_method_id == null) ? 'Sin método de pago':$order->payment_method->name ,
                 "state" => $order->status_name,
+                "data_payment" => $order->data_payment,
             ]);
         }
 

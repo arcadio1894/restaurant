@@ -200,6 +200,7 @@
                     <th>Fecha</th>
                     <th>Total</th>
                     <th>Metodo de Pago</th>
+                    <th>Dato de Pago</th>
                     <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
@@ -260,6 +261,7 @@
             <td data-date></td>
             <td data-total></td>
             <td data-method></td>
+            <td data-data_payment></td>
             <td data-state></td>
             <td data-buttons></td>
         </tr>
@@ -267,7 +269,7 @@
 
     <template id="item-table-empty">
         <tr>
-            <td colspan="6" align="center">No se ha encontrado ningún dato</td>
+            <td colspan="7" align="center">No se ha encontrado ningún dato</td>
         </tr>
     </template>
 
