@@ -33,4 +33,9 @@ class WelcomeController extends Controller
     {
         return view('welcome.about');
     }
+
+    public function goToDashboard()
+    {
+        return view('welcome.dashboard');
+    }
 }

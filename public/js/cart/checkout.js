@@ -1,47 +1,47 @@
+const mp = new MercadoPago('TEST-43619ea9-0d2d-4976-afba-ba9a8f261549', { locale: 'es-PE', debug: true }); // Reemplaza con tu llave pública de Mercado Pago
+
+const cardForm = mp.cardForm({
+    amount: '1.00', // Cambia por el monto de la transacción
+    autoMount: true,
+    form: {
+        id: 'checkoutForm', // Este ID debe coincidir con el del formulario
+        cardholderName: { id: 'cardholderName', placeholder: 'Nombre del titular' },
+        cardholderEmail: { id: 'cardholderEmail', placeholder: 'Correo electrónico' },
+        cardNumber: { id: 'cardNumber', placeholder: 'Número de tarjeta' },
+        cardExpirationMonth: { id: 'cardExpirationMonth', placeholder: 'MM' },
+        cardExpirationYear: { id: 'cardExpirationYear', placeholder: 'AA' },
+        securityCode: { id: 'securityCode', placeholder: 'CVV' },
+        installments: { id: 'installments', placeholder: 'Cuotas' },
+        issuer: { id: 'issuer', placeholder: 'Banco' },
+        identificationType: { id: 'identificationType', placeholder: 'Tipo de documento' },
+        identificationNumber: { id: 'identificationNumber', placeholder: 'Número de documento' }
+    },
+    callbacks: {
+        onFormMounted: error => {
+            if (error) console.warn('Error al montar formulario:', error);
+        },
+        onSubmit: event => {
+            event.preventDefault();
+            const formData = cardForm.getCardFormData();
+            console.log(formData);
+
+            if (!formData.token) {
+                toastr.error('No se pudo generar el token. Verifica los datos ingresados.', 'Error');
+                return;
+            }
+
+            // Envía los datos al backend
+            submitFormAjax({
+                token: formData.token,
+                installments: formData.installments || '1',
+                issuerId: formData.issuerId || 'default',
+                paymentMethodId: formData.paymentMethodId
+            });
+        }
+    }
+});
 
 $(document).ready(function() {
-    const mp = new MercadoPago('TEST-43619ea9-0d2d-4976-afba-ba9a8f261549', { locale: 'es-PE', debug: true }); // Reemplaza con tu llave pública de Mercado Pago
-
-    const cardForm = mp.cardForm({
-        amount: '1.00', // Cambia por el monto de la transacción
-        autoMount: true,
-        form: {
-            id: 'checkoutForm', // Este ID debe coincidir con el del formulario
-            cardholderName: { id: 'cardholderName', placeholder: 'Nombre del titular' },
-            cardholderEmail: { id: 'cardholderEmail', placeholder: 'Correo electrónico' },
-            cardNumber: { id: 'cardNumber', placeholder: 'Número de tarjeta' },
-            cardExpirationMonth: { id: 'cardExpirationMonth', placeholder: 'MM' },
-            cardExpirationYear: { id: 'cardExpirationYear', placeholder: 'AA' },
-            securityCode: { id: 'securityCode', placeholder: 'CVV' },
-            installments: { id: 'installments', placeholder: 'Cuotas' },
-            issuer: { id: 'issuer', placeholder: 'Banco' },
-            identificationType: { id: 'identificationType', placeholder: 'Tipo de documento' },
-            identificationNumber: { id: 'identificationNumber', placeholder: 'Número de documento' }
-        },
-        callbacks: {
-            onFormMounted: error => {
-                if (error) console.warn('Error al montar formulario:', error);
-            },
-            onSubmit: event => {
-                event.preventDefault();
-                const formData = cardForm.getCardFormData();
-                console.log(formData);
-
-                if (!formData.token) {
-                    toastr.error('No se pudo generar el token. Verifica los datos ingresados.', 'Error');
-                    return;
-                }
-
-                // Envía los datos al backend
-                submitFormAjax({
-                    token: formData.token,
-                    installments: formData.installments || '1',
-                    issuerId: formData.issuerId || 'default',
-                    paymentMethodId: formData.paymentMethodId
-                });
-            }
-        }
-    });
 
     $('.payment-method').on('change', function() {
         let selectedMethod = $(this).data('code');
@@ -136,7 +136,7 @@ $(document).ready(function() {
                 }
             } else if (selectedMethod === 'method_mercado_pago') {
 
-                // Validar si los campos necesarios tienen valores
+                /*// Validar si los campos necesarios tienen valores
                 const installments = $('#installments').val();
                 const issuer = $('#issuer').val();
 
@@ -154,7 +154,7 @@ $(document).ready(function() {
                 console.log({ token, issuerId, paymentMethodId });
 
                 if (!token) {
-                    toastr.error('No se pudo generar el token. Verifica los datos ingresados.', 'Error');
+                    toastr.error('No se pudo generar el token. Verifica los datos ingresados Erorr.', 'Error');
                     return;
                 }
 
@@ -174,7 +174,25 @@ $(document).ready(function() {
                     installments: $('#installments').val(),
                     issuerId: issuerId,
                     paymentMethodId: paymentMethodId
-                });
+                });*/
+                /*$.ajax({
+                    url: '/crear-preferencia',
+                    method: 'POST',
+                    success: function(data) {
+                        const mp = new MercadoPago('APP_USR-39c9eccc-78c3-42fc-b730-f1ddab6d5f39', {
+                            locale: 'es-PE'
+                        });
+                        mp.checkout({
+                            preference: {
+                                id: data.id
+                            },
+                            autoOpen: true // Abre el checkout automáticamente
+                        });
+                    },
+                    error: function(error) {
+                        console.error('Error al crear la preferencia:', error);
+                    }
+                });*/
 
             }
         }

@@ -69,6 +69,12 @@
                             <li class="nav-item @yield('about-active')">
                                 <a class="nav-link" href="{{ route('about') }}">Nosotros</a>
                             </li>
+
+                            @auth
+                                <li class="nav-item @yield('orders-active')">
+                                    <a class="nav-link" href="{{ route('orders.index') }}">Pedidos</a>
+                                </li>
+                            @endauth
                         </ul>
                         <div class="user_option">
                             @if (Route::has('login'))
@@ -165,9 +171,13 @@
                                     </g>
                                         </svg>
                             </a>
-                            <a href="" class="order_online">
-                                Order Online
-                            </a>
+                                @auth
+                                    @if( Auth::user()->is_admin )
+                                        <a href="{{ route('dashboard.principal') }}" class="order_online">
+                                            Dashboard
+                                        </a>
+                                    @endif
+                                @endauth
                         </div>
                     </div>
                 </nav>
@@ -234,7 +244,7 @@
             @yield('content')
         </main>
     </div>--}}
-<section class="food_section">
+<section class="">
     <div class="container">
         <div class="heading_container heading_center pt-5">
             <h2>

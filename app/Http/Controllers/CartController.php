@@ -13,14 +13,17 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use MercadoPago\Item;
 use MercadoPago\Payment;
+use MercadoPago\Preference;
 use MercadoPago\SDK;
 
 class CartController extends Controller
 {
     public function __construct()
     {
-        SDK::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN'));
+        //SDK::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN'));
+        SDK::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN_PRO'));
     }
 
     public function manage(Request $request)
@@ -268,5 +271,48 @@ class CartController extends Controller
                 'error' => $e->getMessage(),
             ], 420);
         }
+    }
+
+    public function crearPreferencia()
+    {
+        // Crea un objeto de preferencia
+        $preference = new Preference();
+
+        // Crea un ítem en la preferencia
+        $item = new Item();
+        $item->title = 'Mi producto';
+        $item->quantity = 1;
+        $item->unit_price = 100.00;
+        $preference->items = array($item);
+
+        // URL de retorno
+        $preference->back_urls = array(
+            "success" => "https://www.fuegoymasa.com/pago-exitoso",
+            "failure" => "https://www.fuegoymasa.com/pago-fallido",
+            "pending" => "https://www.fuegoymasa.com/pago-pendiente"
+        );
+        $preference->auto_return = "approved";
+
+        $preference->save();
+
+        return response()->json(['id' => $preference->id]);
+    }
+
+    public function pagoExitoso(Request $request)
+    {
+        // Lógica para pagos exitosos
+        return view('pagos.exitoso', ['data' => $request->all()]);
+    }
+
+    public function pagoFallido(Request $request)
+    {
+        // Lógica para pagos fallidos
+        return view('pagos.fallido', ['data' => $request->all()]);
+    }
+
+    public function pagoPendiente(Request $request)
+    {
+        // Lógica para pagos pendientes
+        return view('pagos.pendiente', ['data' => $request->all()]);
     }
 }

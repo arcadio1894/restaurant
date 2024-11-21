@@ -31,7 +31,7 @@
                         </a>
                     </div>
                     <div class="d-flex justify-content-center mb-3">
-                        <a data-fslightbox="mygalley" class="border mx-1 rounded-2 item-thumb" target="_blank" data-type="image" href="https://mdbcdn.b-cdn.net/img/bootstrap-ecommerce/items/detail1/big1.webp">
+                        {{--<a data-fslightbox="mygalley" class="border mx-1 rounded-2 item-thumb" target="_blank" data-type="image" href="https://mdbcdn.b-cdn.net/img/bootstrap-ecommerce/items/detail1/big1.webp">
                             <img width="60" height="60" class="rounded-2" src="https://mdbcdn.b-cdn.net/img/bootstrap-ecommerce/items/detail1/big1.webp" />
                         </a>
                         <a data-fslightbox="mygalley" class="border mx-1 rounded-2 item-thumb" target="_blank" data-type="image" href="https://mdbcdn.b-cdn.net/img/bootstrap-ecommerce/items/detail1/big2.webp">
@@ -45,7 +45,7 @@
                         </a>
                         <a data-fslightbox="mygalley" class="border mx-1 rounded-2 item-thumb" target="_blank" data-type="image" href="https://mdbcdn.b-cdn.net/img/bootstrap-ecommerce/items/detail1/big.webp">
                             <img width="60" height="60" class="rounded-2" src="https://mdbcdn.b-cdn.net/img/bootstrap-ecommerce/items/detail1/big.webp" />
-                        </a>
+                        </a>--}}
                     </div>
                     <!-- thumbs-wrap.// -->
                     <!-- gallery-wrap .end// -->
@@ -98,8 +98,6 @@
 
                         <div class="row mb-2">
                             <div class="col-md-4 col-6">
-                                <label class="mb-2"> Size</label>
-                                <br>
                                 <select class="form-select border border-secondary" style="height: 35px;">
                                     <option>Small</option>
                                     <option>Medium</option>
@@ -108,7 +106,7 @@
                             </div>
                             <!-- col.// -->
                             <div class="col-md-4 col-6 mb-3">
-                                <label class="mb-2 d-block">Quantity</label>
+                                {{--<label class="mb-2 d-block">Quantity</label>
                                 <div class="input-group mb-3" style="width: 170px;">
                                     <button class="btn btn-white border border-secondary px-3" type="button" id="button-addon1" data-mdb-ripple-color="dark">
                                         <i class="fas fa-minus"></i>
@@ -117,11 +115,12 @@
                                     <button class="btn btn-white border border-secondary" type="button" id="button-addon2" data-mdb-ripple-color="dark">
                                         <i class="fas fa-plus"></i>
                                     </button>
-                                </div>
+                                </div>--}}
+                                <a href="{{ route('cart.show') }}" class="btn btn-primary shadow-0"> <i class="me-1 fa fa-shopping-basket"></i> Add to cart </a>
+
                             </div>
                         </div>
                         {{--<a href="#" class="btn btn-warning shadow-0"> Buy now </a>--}}
-                        <a href="#" class="btn btn-primary shadow-0"> <i class="me-1 fa fa-shopping-basket"></i> Add to cart </a>
                         {{--<a href="#" class="btn btn-light border border-secondary icon-hover"> <i class="me-1 fa fa-heart"></i> Save </a>--}}
                     </div>
                 </main>
@@ -130,7 +129,7 @@
     </section>
     <!-- content -->
 
-    <section class="bg-light border-top py-4">
+    {{--<section class="bg-light border-top py-4">
         <div class="container">
             <div class="row gx-4">
                 <div class="col-lg-8 mb-4">
@@ -279,5 +278,5 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section>--}}
 @endsection

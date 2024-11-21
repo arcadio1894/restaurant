@@ -6,6 +6,7 @@ use App\Http\Controllers\WelcomeController;
 use \Illuminate\Support\Facades\Auth;
 use \App\Http\Controllers\ProductController;
 use \App\Http\Controllers\CartController;
+use \App\Http\Controllers\OrderController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -45,8 +46,29 @@ Route::get('/carrito', [CartController::class, 'show'])->middleware('auth')->nam
 Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])->middleware('auth')->name('cart.updateQuantity');
 Route::get('/checkout', [CartController::class, 'checkout'])->middleware('auth')->name('cart.checkout');
 Route::post('/checkout/pagar', [CartController::class, 'pagar'])->name('checkout.pagar');
-
+Route::post('/checkout/crear-preferencia', [CartController::class, 'crearPreferencia'])->name('checkout.crearPreferencia');
 
 Route::get('/payment/success', [CartController::class, 'success'])->name('payment.success');
 Route::get('/payment/failure', [CartController::class, 'failure'])->name('payment.failure');
 Route::get('/payment/pending', [CartController::class, 'pending'])->name('payment.pending');
+
+Route::get('/pago-exitoso', [CartController::class, 'pagoExitoso'])->name('pago.exitoso');
+Route::get('/pago-fallido', [CartController::class, 'pagoFallido'])->name('pago.fallido');
+Route::get('/pago-pendiente', [CartController::class, 'pagoPendiente'])->name('pago.pendiente');
+
+Route::get('/pedidos', [OrderController::class, 'index'])->name('orders.index');
+Route::get('/get/orders/{page}', [OrderController::class, 'getOrders']);
+
+
+Route::middleware('auth')->group(function (){
+    Route::prefix('dashboard')->group(function (){
+        Route::get('/principal', [WelcomeController::class, 'goToDashboard'])->name('dashboard.principal');
+
+    // TODO: Rutas de Orders (Pedidos Admin)
+        Route::get('/listado/pedidos/', [OrderController::class, 'indexAdmin'])
+            ->name('orders.list');
+        Route::get('/get/data/orders/{numberPage}', [OrderController::class, 'getOrdersAdmin']);
+        Route::post('/change/order/state/{order}/{state}', [OrderController::class, 'changeIOrderState']);
+
+    });
+});

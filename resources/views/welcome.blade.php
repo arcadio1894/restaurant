@@ -42,7 +42,7 @@
             <header class="header_section">
                 <div class="container">
                     <nav class="navbar navbar-expand-lg custom_nav-container ">
-                        <a class="navbar-brand" href="index.html">
+                        <a class="navbar-brand" href="{{ url('/') }}">
                             <span>
                               Fuego y Masa
                             </span>
@@ -63,6 +63,11 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('about') }}">Nosotros</a>
                                 </li>
+                                @auth
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ route('orders.index') }}">Pedidos</a>
+                                    </li>
+                                @endauth
                             </ul>
                             <div class="user_option">
                                 @if (Route::has('login'))
@@ -141,9 +146,13 @@
                                         </g>
                                     </svg>
                                 </a>
-                                <a href="" class="order_online">
-                                    Order Online
-                                </a>
+                                @auth
+                                    @if( Auth::user()->is_admin )
+                                    <a href="{{ route('dashboard.principal') }}" class="order_online">
+                                        Dashboard
+                                    </a>
+                                    @endif
+                                @endauth
                             </div>
                         </div>
                     </nav>
@@ -166,7 +175,7 @@
                                                 Disfruta de una pizza ligera llena de frescura. Margarita del Campo realza la esencia de la albahaca fresca sobre una capa de queso derretido y salsa de tomate, en un bocado que celebra lo natural.
                                             </p>
                                             <div class="btn-box">
-                                                <a href="" class="btn1">
+                                                <a href="{{ route('product.show', [1]) }}" class="btn1">
                                                     Order Now
                                                 </a>
                                             </div>
@@ -187,7 +196,7 @@
                                                 Una explosión de sabores tropicales. La Aloha Suprema combina el clásico jamón y piña con el toque único del durazno dulce y la intensidad de la aceituna verde. Un festín para los sentidos en cada rebanada, que lleva la experiencia hawaiana a nuevas alturas.
                                             </p>
                                             <div class="btn-box">
-                                                <a href=""  class="btn1">
+                                                <a href="{{ route('product.show', [2]) }}"  class="btn1">
                                                     Order Now
                                                 </a>
                                             </div>
@@ -208,7 +217,7 @@
                                                 Fusión perfecta de lo intenso y lo fresco. Chorizo del Huerto une el chorizo ahumado con aceitunas verdes sobre una base de salsa de tomate y queso, creando un bocado lleno de sabor y un toque de frescura en cada mordisco.
                                             </p>
                                             <div class="btn-box">
-                                                <a href="" class="btn1">
+                                                <a href="{{ route('product.show', [3]) }}" class="btn1">
                                                     Order Now
                                                 </a>
                                             </div>
@@ -237,7 +246,7 @@
             <div class="offer_container">
                 <div class="container ">
                     <div class="row">
-                        <div class="col-md-6  ">
+                        <div class="col-md-6 offset-sm-3">
                             <div class="box ">
                                 <div class="img-box">
                                     <img src="{{ asset('landing/images/o1.jpg') }}" alt="">
@@ -307,7 +316,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6  ">
+                        {{--<div class="col-md-6  ">
                             <div class="box ">
                                 <div class="img-box">
                                     <img src="{{ asset('landing/images/o2.jpg') }}" alt="">
@@ -376,7 +385,7 @@
                                     </a>
                                 </div>
                             </div>
-                        </div>
+                        </div>--}}
                     </div>
                 </div>
             </div>
