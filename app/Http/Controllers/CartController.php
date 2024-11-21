@@ -23,7 +23,7 @@ class CartController extends Controller
     public function __construct()
     {
         //SDK::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN'));
-        SDK::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN_PRO'));
+        /*SDK::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN_PRO'));*/
     }
 
     public function manage(Request $request)
