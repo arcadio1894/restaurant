@@ -525,7 +525,7 @@
 
 <!-- AdminLTE App -->
 <script src="{{ asset('admin/dist/js/adminlte.min.js') }}"></script>
-<script src="{{ asset('/js/layout/admin2.js') }}"></script>
+{{--<script src="{{ asset('/js/layout/admin2.js') }}"></script>--}}
 
 @yield('scripts')
 
