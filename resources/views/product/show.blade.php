@@ -80,6 +80,10 @@
                             {{ $product->description }}
                         </p>
 
+                        <p>
+                            {{ $product->ingredients }}
+                        </p>
+
                         {{--<div class="row">
                             <dt class="col-3">Type:</dt>
                             <dd class="col-9">Regular</dd>
