@@ -7,6 +7,7 @@ use \Illuminate\Support\Facades\Auth;
 use \App\Http\Controllers\ProductController;
 use \App\Http\Controllers\CartController;
 use \App\Http\Controllers\OrderController;
+use \App\Http\Controllers\TelegramController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -74,3 +75,5 @@ Route::middleware('auth')->group(function (){
 
     });
 });
+
+Route::get('/telegram/send', [TelegramController::class, 'sendMessage']);

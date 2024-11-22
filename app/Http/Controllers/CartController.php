@@ -230,6 +230,15 @@ class CartController extends Controller
                     //$order->save();
                     //$cart->status = 'proc';
                     //$cart->save();
+                    $data = [
+                        'nameUser' => $order->user->name,
+                        'dateOperation' => $order->created_at->format('d M Y, g:i a'),
+                        'order' => "ORDEN - ".$order->id
+                    ];
+
+                    $telegramController = new TelegramController();
+                    $telegramController->sendNotification('process', $data);
+
                     DB::commit();
 
                     return response()->json(['success' => true, 'message' => 'Pago realizado con POS', 'redirect_url' => route('home')]);
@@ -238,6 +247,16 @@ class CartController extends Controller
                     // Lógica para pago en efectivo
                     $order->payment_amount = $request->input('cashAmount');
                     $order->save();
+
+                    $data = [
+                        'nameUser' => $order->user->name,
+                        'dateOperation' => $order->created_at->format('d M Y, g:i a'),
+                        'order' => "ORDEN - ".$order->id
+                    ];
+
+                    $telegramController = new TelegramController();
+                    $telegramController->sendNotification('process', $data);
+
                     DB::commit();
 
                     return response()->json(['success' => true, 'message' => 'Orden creada. Pago en efectivo pendiente', 'redirect_url' => route('home')]);
@@ -252,6 +271,16 @@ class CartController extends Controller
                         //$cart->save();
                         $order->payment_code = $request->input('operationCode');
                         $order->save();
+
+                        $data = [
+                            'nameUser' => $order->user->name,
+                            'dateOperation' => $order->created_at->format('d M Y, g:i a'),
+                            'order' => "ORDEN - ".$order->id
+                        ];
+
+                        $telegramController = new TelegramController();
+                        $telegramController->sendNotification('process', $data);
+
                         DB::commit();
 
                         return response()->json(['success' => true, 'message' => 'Pago realizado con Yape/Plin', 'redirect_url' => route('home')]);
