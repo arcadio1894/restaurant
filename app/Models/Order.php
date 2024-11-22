@@ -45,6 +45,11 @@ class Order extends Model
         return $this->belongsTo(PaymentMethod::class);
     }
 
+    public function details()
+    {
+        return $this->hasMany(OrderDetail::class);
+    }
+
     // Accesor para obtener el pago o codigo yape
     public function getDataPaymentAttribute()
     {

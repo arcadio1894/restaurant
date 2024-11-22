@@ -70,6 +70,7 @@ Route::middleware('auth')->group(function (){
             ->name('orders.list');
         Route::get('/get/data/orders/{numberPage}', [OrderController::class, 'getOrdersAdmin']);
         Route::post('/change/order/state/{order}/{state}', [OrderController::class, 'changeIOrderState']);
+        Route::get('/orders/{orderId}/details', [OrderController::class, 'getOrderDetails']);
 
     });
 });

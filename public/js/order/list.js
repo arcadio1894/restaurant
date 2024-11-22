@@ -28,6 +28,8 @@ $(document).ready(function () {
     $(document).on('click', '[data-enviando]', changeStatusOrder);
     $(document).on('click', '[data-completado]', changeStatusOrder);
 
+    $(document).on('click', '[data-ver_detalles]', showDetails);
+
 });
 
 var $formDelete;
@@ -37,6 +39,79 @@ var $formDecimals;
 
 var $permissions;
 var $modalDetraction;
+
+function showDetails() {
+    const orderId = $(this).data('id');
+
+    // Realizar una solicitud AJAX para obtener los detalles del pedido
+    $.ajax({
+        url: `/dashboard/orders/${orderId}/details`,
+        method: 'GET',
+        success: function (response) {
+            if (response.details) {
+                // Generar dinámicamente el contenido del modal
+                let content = '';
+                response.details.forEach((detail, index) => {
+                    content += `
+                        <div class="mb-4">
+                            <h6><strong>Pizza:</strong> ${detail.pizza_name} | ${detail.type} (${detail.size})</h6>
+                            <p><strong>Ingredientes:</strong> </p>
+                            <p>${detail.ingredients}</p>
+                        </div>
+                        <hr />
+                    `;
+                });
+
+                // Insertar el contenido generado en el modal
+                $('#order-details-content').html(content);
+
+                // Mostrar el modal
+                $('#orderDetailsModal').modal('show');
+            } else {
+                //alert('No se encontraron detalles para este pedido.');
+                toastr.error('No se encontraron detalles para este pedido.', 'Error', {
+                    "closeButton": true,
+                    "debug": false,
+                    "newestOnTop": false,
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "preventDuplicates": false,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "2000",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                });
+
+            }
+        },
+        error: function (xhr) {
+            console.error('Error:', xhr.responseText);
+            //alert('Ocurrió un error al obtener los detalles del pedido.');
+            toastr.error('Ocurrió un error al obtener los detalles del pedido.', 'Error', {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "2000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            });
+        }
+    });
+}
 
 function changeStatusOrder() {
     var order_id = $(this).data('id');
@@ -261,6 +336,8 @@ function renderDataTable(data) {
     var botones = clone.querySelector("[data-buttons]");
 
     var cloneBtnActive = activateTemplate('#template-active');
+    cloneBtnActive.querySelector("[data-ver_detalles]").setAttribute("data-id", data.id);
+
     cloneBtnActive.querySelector("[data-recibido]").setAttribute("data-id", data.id);
     cloneBtnActive.querySelector("[data-cocinando]").setAttribute("data-id", data.id);
     cloneBtnActive.querySelector("[data-enviando]").setAttribute("data-id", data.id);

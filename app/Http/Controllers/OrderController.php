@@ -125,6 +125,26 @@ class OrderController extends Controller
         return response()->json(['message' => 'Cambio de estado realizado con éxito'], 200);
     }
 
+    public function getOrderDetails($orderId)
+    {
+        $order = Order::with(['details.productType.type', 'details.product'])->find($orderId);
+
+        if (!$order) {
+            return response()->json(['error' => 'Pedido no encontrado'], 404);
+        }
+
+        $details = $order->details->map(function ($detail) {
+            return [
+                'pizza_name' => $detail->product->full_name,
+                'type' => $detail->productType->type->name,
+                'size' => ($detail->productType->type->size == null) ? 'N/A': $detail->productType->type->size,
+                'ingredients' => ($detail->product->ingredients == null) ? 'N/A':$detail->product->ingredients,
+            ];
+        });
+
+        return response()->json(['details' => $details], 200);
+    }
+
     public function store(Request $request)
     {
         //

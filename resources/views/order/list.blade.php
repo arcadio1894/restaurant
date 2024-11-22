@@ -274,11 +274,28 @@
     </template>
 
     <template id="template-active">
+        <button data-ver_detalles data-id="" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Detalles"><i class="fas fa-list-ol"></i></button>
+
         <button data-recibido data-id="" data-state="created" data-state_name="RECIBIDO" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Recibido"><i class="far fa-file-alt"></i></button>
         <button data-cocinando data-id="" data-state="processing" data-state_name="COCINANDO" class="btn btn-outline-info btn-sm" data-toggle="tooltip" data-placement="top" title="Cocinando"><i class="fas fa-fire"></i></button>
         <button data-enviando data-id="" data-state="shipped" data-state_name="ENVIADO" class="btn btn-outline-warning btn-sm" data-toggle="tooltip" data-placement="top" title="Enviando"><i class="fa fa-truck"></i></button>
         <button data-completado data-id="" data-state="completed" data-state_name="COMPLETADO" class="btn btn-outline-success btn-sm" data-toggle="tooltip" data-placement="top" title="Completado"><i class="fas fa-home"></i></button>
     </template>
+
+    <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderDetailsModalLabel">Detalles del Pedido</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Aquí se cargarán los detalles dinámicamente -->
+                    <div id="order-details-content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 @endsection
 
