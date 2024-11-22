@@ -185,6 +185,7 @@ class CartController extends Controller
                 OrderDetail::create([
                     'order_id' => $order->id,
                     'product_id' => $cartItem->product_id,
+                    'product_type_id' => $cartItem->product_type_id,
                     'quantity' => $cartItem->quantity,
                     'price' => $cartItem->price,
                     'subtotal' => $cartItem->quantity * $cartItem->price
