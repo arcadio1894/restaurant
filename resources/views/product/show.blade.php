@@ -62,7 +62,7 @@
                                 <i class="fa fa-star"></i>
                                 <i class="fa fa-star"></i>
                                 <i class="fa fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
+                                <i class="fas fa-star-half"></i>
                                 <span class="ms-1">
                                     4.5
                                 </span>
@@ -72,7 +72,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <span class="h5">S/. {{ $product->unit_price }}</span>
+                            <span class="h5">S/. <span id="product-price">{{ isset($defaultProductType->price) ? $defaultProductType->price : $product->unit_price }}</span></span>
                             <span class="text-muted">/ por unidad</span>
                         </div>
 
@@ -98,10 +98,14 @@
 
                         <div class="row mb-2">
                             <div class="col-md-4 col-6">
-                                <select class="form-select border border-secondary" style="height: 35px;">
-                                    <option>Small</option>
-                                    <option>Medium</option>
-                                    <option>Large</option>
+                                <select id="pizza-type-select" class="form-select border border-secondary" style="height: 35px;">
+                                    @foreach($productTypes as $productType)
+                                        <option value="{{ $productType->id }}"
+                                                data-price="{{ $productType->price }}"
+                                                {{ $productType->is_default ? 'selected' : '' }}>
+                                            {{ $productType->type->name }} ({{ $productType->type->size }})
+                                        </option>
+                                    @endforeach
                                 </select>
                             </div>
                             <!-- col.// -->
@@ -116,8 +120,14 @@
                                         <i class="fas fa-plus"></i>
                                     </button>
                                 </div>--}}
-                                <a href="{{ route('cart.show') }}" class="btn btn-primary shadow-0"> <i class="me-1 fa fa-shopping-basket"></i> Add to cart </a>
-
+                                <a href="#"
+                                   class="btn btn-primary shadow-0"
+                                   id="add-to-cart-btn"
+                                   data-product-id="{{ $product->id }}"
+                                   data-auth-check-url="{{ route('auth.check') }}"
+                                   data-add-cart-url="{{ route('cart.manage') }}">
+                                    <i class="me-1 fa fa-shopping-basket"></i> Agregar
+                                </a>
                             </div>
                         </div>
                         {{--<a href="#" class="btn btn-warning shadow-0"> Buy now </a>--}}
@@ -279,4 +289,8 @@
             </div>
         </div>
     </section>--}}
+@endsection
+
+@section('scripts')
+    <script src="{{ asset('js/product/show.js') }}?v={{ time() }}"></script>
 @endsection

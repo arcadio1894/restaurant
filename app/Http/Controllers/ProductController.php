@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Type;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -40,8 +41,15 @@ class ProductController extends Controller
 
     public function show($id)
     {
-        $product = Product::find($id);
-        return view('product.show', compact('product'));
+        $product = Product::findOrFail($id);
+
+        // Obtener los tipos relacionados al producto
+        $productTypes = $product->productTypes()->with('type')->get();
+
+        // Obtener el tipo por defecto
+        $defaultProductType = $productTypes->where('is_default', true)->first();
+
+        return view('product.show', compact('product', 'productTypes', 'defaultProductType'));
     }
 
     /**

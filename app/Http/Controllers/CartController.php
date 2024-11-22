@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\PaymentMethod;
 use App\Models\Product;
+use App\Models\ProductType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -30,6 +31,7 @@ class CartController extends Controller
     {
         $user = Auth::user();
         $product_id = $request->input('product_id');
+        $product_type_id = $request->input('product_type_id'); // Tipo de producto
 
         // Verificar si el usuario tiene un carrito pendiente
         $cart = Cart::where('user_id', $user->id)
@@ -37,37 +39,35 @@ class CartController extends Controller
             ->first();
 
         if (!$cart) {
-            // No existe un carrito pendiente; verificamos si hay uno en proceso
-            $processingCart = Cart::where('user_id', $user->id)
-                ->where('status', 'processing')
-                ->first();
-
-            if ($processingCart) {
-                return response()->json(['message' => 'Ya tienes un carrito en proceso.'], 403);
-            }
-
-            // Si no hay en proceso, creamos uno nuevo
+            // Crear un nuevo carrito si no existe uno pendiente
             $cart = Cart::create([
                 'user_id' => $user->id,
                 'status' => 'pending',
             ]);
         }
 
-        // Verificar si el producto ya está en el carrito
-        $cartDetail = $cart->details()->where('product_id', $product_id)->first();
+        // Verificar si el producto con el mismo tipo ya está en el carrito
+        $cartDetail = $cart->details()
+            ->where('product_id', $product_id)
+            ->where('product_type_id', $product_type_id)
+            ->first();
 
-        if (!$cartDetail) {
-            // Agregar el producto al carrito si no existe
-            $producto = Product::find($product_id);
+        if ($cartDetail) {
+            // Si existe, aumentar la cantidad
+            $cartDetail->quantity += 1;
+            $cartDetail->subtotal = $cartDetail->quantity * $cartDetail->price;
+            $cartDetail->save();
+        } else {
+            // Si no existe, agregar un nuevo detalle
+            $product = Product::find($product_id);
             $cart->details()->create([
                 'product_id' => $product_id,
+                'product_type_id' => $product_type_id,
                 'quantity' => 1,
-                'price' => $producto->unit_price,
-                'subtotal' => $producto->unit_price*1
+                'price' => ProductType::find($product_type_id)->price, // Obtener el precio desde ProductType
+                'subtotal' => ProductType::find($product_type_id)->price * 1, // Calcular el subtotal
             ]);
         }
-
-        //TODO: Agregue uno mas si le doy aun producto que existe
 
         return response()->json(['redirect' => route('cart.show')]);
     }

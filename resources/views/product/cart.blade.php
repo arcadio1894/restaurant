@@ -44,7 +44,12 @@
                                                 <img src="{{ asset('images/products/'.$detail->product->image) }}" class="border rounded me-3" style="width: 96px; height: 96px;" />
                                                 <div class="">
                                                     <a href="#" class="nav-link">{{ $detail->product->full_name }}</a>
-                                                    {{--<p class="text-muted">Yellow, Jeans</p>--}}
+                                                    <p class="text-muted ml-3">
+                                                        Tipo: {{ $detail->productType->type->name }}
+                                                        @if($detail->productType->type && $detail->productType->type->size)
+                                                            ( {{ $detail->productType->type->size }} )
+                                                        @endif
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -64,7 +69,7 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <text class="h6">S/ {{ $detail->subtotal }}</text> <br />
-                                                <small class="text-muted text-nowrap"> S/ {{ $detail->product->unit_price }} / por item </small>
+                                                <small class="text-muted text-nowrap"> S/ {{ $detail->productType->price }} / por item </small>
                                             </div>
                                         </div>
                                     </div>

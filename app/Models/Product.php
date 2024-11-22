@@ -22,4 +22,9 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class)->withTrashed();
     }
+
+    public function productTypes()
+    {
+        return $this->hasMany(ProductType::class);
+    }
 }
