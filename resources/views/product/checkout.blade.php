@@ -46,14 +46,12 @@
                     </li>
                 </ul>
 
-                {{--<form class="card p-2">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Promo code">
-                        <div class="input-group-append">
-                            <button type="submit" class="btn btn-secondary">Redeem</button>
-                        </div>
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Promo code">
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-secondary">Redeem</button>
                     </div>
-                </form>--}}
+                </div>
             </div>
             <div class="col-md-6 order-md-1">
                 <h4 class="mb-3">Dirección de envío</h4>

@@ -418,6 +418,32 @@
                         </ul>
                     </li>
 
+                    <li class="nav-header">MANTENEDORES</li>
+                    <li class="nav-item has-treeview @yield('openProducts')">
+                        <a href="#" class="nav-link @yield('activeProducts')">
+                            <i class="nav-icon fas fa-pizza-slice"></i>
+                            <p>
+                                Productos
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{route('products.list')}}" class="nav-link @yield('activeListProducts')">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Listar productos</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{route('product.create')}}" class="nav-link @yield('activeLCreateProducts')">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Crear productos</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+
                     {{--@canany('list_report')
                         <li class="nav-header">REPORTES</li>
                     @endcanany

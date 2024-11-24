@@ -29,7 +29,7 @@
 
                                 </p>
                                 <div class="options">
-                                    <h6>S/.{{ $product->unit_price }}</h6>
+                                    <h6>S/. {{ $product->price_default }}</h6>
                                     {{--<a href="{{ route('product.show', ['id' => $product->id]) }}"
                                                    data-auth-check-url="{{ route('auth.check') }}"
                                                    onclick="event.preventDefault(); checkAuthentication({{ $product->id }}, this);">

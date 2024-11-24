@@ -66,12 +66,25 @@ Route::middleware('auth')->group(function (){
     Route::prefix('dashboard')->group(function (){
         Route::get('/principal', [WelcomeController::class, 'goToDashboard'])->name('dashboard.principal');
 
-    // TODO: Rutas de Orders (Pedidos Admin)
+        // TODO: Rutas de Orders (Pedidos Admin)
         Route::get('/listado/pedidos/', [OrderController::class, 'indexAdmin'])
             ->name('orders.list');
         Route::get('/get/data/orders/{numberPage}', [OrderController::class, 'getOrdersAdmin']);
         Route::post('/change/order/state/{order}/{state}', [OrderController::class, 'changeIOrderState']);
         Route::get('/orders/{orderId}/details', [OrderController::class, 'getOrderDetails']);
+
+        // TODO: Rutas de Mantenedor de Productos (Productos Admin)
+        Route::get('/listado/productos/', [ProductController::class, 'indexAdmin'])
+            ->name('products.list');
+        Route::get('/get/data/products/{numberPage}', [ProductController::class, 'getDataProducts']);
+        Route::get('/crear/producto/', [ProductController::class, 'create'])
+            ->name('product.create');
+        Route::post('/save/product/', [ProductController::class, 'store'])
+            ->name('product.store');
+        Route::get('/editar/producto/', [ProductController::class, 'edit'])
+            ->name('product.edit');
+        Route::post('/update/product/', [ProductController::class, 'update'])
+            ->name('product.update');
 
     });
 });
