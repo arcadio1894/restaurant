@@ -81,7 +81,7 @@
                         </p>
 
                         <p>
-                            {{ $product->ingredients }}
+                            {!! nl2br($product->ingredients) !!}
                         </p>
 
                         {{--<div class="row">

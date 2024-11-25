@@ -120,7 +120,7 @@ class ProductController extends Controller
                 'description' => $request->get('description'),
                 'full_name' => $request->get('full_name'),
                 'unit_price' => $request->get('unit_price'),
-                'category_id' => $request->get('category_id'),
+                'category_id' => $request->get('category'),
                 'ingredients' => $request->get('ingredients'),
                 'enable_status' => 1
             ]);
@@ -148,15 +148,14 @@ class ProductController extends Controller
 
             //$mat = $material;
             // TODO: Guardar las promociones
-            $types = $request->input('types', []);
-            $priceTypes = $request->input('priceTypes', []);
-
-            $isFirst = true;
+            $types = $request->input('type', []);
+            $priceTypes = $request->input('productPrice', []);
+            $defaultType = $request->input('defaultType');
 
             foreach ($types as $typeId => $value) {
                 // Verificamos si el checkbox fue marcado
                 if (isset($value)) {
-                    // Obtenemos el porcentaje correspondiente
+                    // Obtenemos el precio correspondiente
                     $priceType = isset($priceTypes[$typeId]) ? $priceTypes[$typeId] : null;
 
                     // Guardamos la información en la base de datos
@@ -164,10 +163,8 @@ class ProductController extends Controller
                         'product_id' => $product->id,
                         'type_id' => $typeId,
                         'price' => $priceType,
-                        'default' => $isFirst,
+                        'default' => ($typeId == $defaultType), // Solo el seleccionado será default
                     ]);
-
-                    $isFirst = false;
                 }
             }
             DB::commit();
@@ -189,9 +186,13 @@ class ProductController extends Controller
             ->get()
             ->keyBy('type_id')
             ->map(function($item) {
-                return $item->price;
+                return [
+                    'price' => $item->price,
+                    'default' => $item->default,
+                ];
             })
             ->toArray();
+        //dd($priceTypes);
 
         return view('product.edit', compact('product', 'categories', 'types', 'priceTypes'));
 
@@ -209,7 +210,7 @@ class ProductController extends Controller
             $product->full_name = $request->get('full_name');
             $product->description = $request->get('description');
             $product->unit_price = $request->get('unit_price');
-            $product->category_id = $request->get('category_id');
+            $product->category_id = $request->get('category');
             $product->ingredients = $request->get('ingredients');
             $product->save();
 
@@ -229,21 +230,20 @@ class ProductController extends Controller
             }
 
             // TODO: Guardar las promociones
-            $old_discounts = ProductType::where('product_id',$product->id)->get();
-            foreach ( $old_discounts as $discount )
+            $old_productTypes = ProductType::where('product_id',$product->id)->get();
+            foreach ( $old_productTypes as $old_productType )
             {
-                $discount->delete();
+                $old_productType->delete();
             }
 
-            $types = $request->input('types', []);
-            $priceTypes = $request->input('priceTypes', []);
-
-            $isFirst = true;
+            $types = $request->input('type', []);
+            $priceTypes = $request->input('productPrice', []);
+            $defaultType = $request->input('defaultType');
 
             foreach ($types as $typeId => $value) {
                 // Verificamos si el checkbox fue marcado
                 if (isset($value)) {
-                    // Obtenemos el porcentaje correspondiente
+                    // Obtenemos el precio correspondiente
                     $priceType = isset($priceTypes[$typeId]) ? $priceTypes[$typeId] : null;
 
                     // Guardamos la información en la base de datos
@@ -251,10 +251,8 @@ class ProductController extends Controller
                         'product_id' => $product->id,
                         'type_id' => $typeId,
                         'price' => $priceType,
-                        'default' => $isFirst,
+                        'default' => ($typeId == $defaultType), // Solo el seleccionado será default
                     ]);
-
-                    $isFirst = false;
                 }
             }
 

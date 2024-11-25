@@ -33,8 +33,8 @@ class StoreProductRequest extends FormRequest
 
             'image.image' => 'La :attribute debe ser un formato de imagen correcto',
 
-            'category_id.exists' => 'El :attribute no existe en la base de datos.',
-            'category_id.required' => 'La :attribute es obligatoria.',
+            'category.exists' => 'El :attribute no existe en la base de datos.',
+            'category.required' => 'La :attribute es obligatoria.',
 
         ];
     }
