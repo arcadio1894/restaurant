@@ -106,7 +106,7 @@
                                     @foreach($productTypes as $productType)
                                         <option value="{{ $productType->id }}"
                                                 data-price="{{ $productType->price }}"
-                                                {{ $productType->is_default ? 'selected' : '' }}>
+                                                {{ $productType->default ? 'selected' : '' }}>
                                             {{ $productType->type->name }} ({{ $productType->type->size }})
                                         </option>
                                     @endforeach

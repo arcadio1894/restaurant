@@ -8,6 +8,7 @@ use \App\Http\Controllers\ProductController;
 use \App\Http\Controllers\CartController;
 use \App\Http\Controllers\OrderController;
 use \App\Http\Controllers\TelegramController;
+use \App\Http\Controllers\CouponController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -86,6 +87,22 @@ Route::middleware('auth')->group(function (){
         Route::post('/update/product/', [ProductController::class, 'update'])
             ->name('product.update');
 
+        // Mostrar listado de cupones
+        Route::get('/coupons', [CouponController::class, 'index'])
+            ->name('coupons.index');
+        Route::get('/get/data/coupons', [CouponController::class, 'getDataCoupons']);
+        Route::get('/coupons/create', [CouponController::class, 'create'])
+            ->name('coupons.create');
+        Route::post('/coupons', [CouponController::class, 'store'])
+            ->name('coupons.store');
+        Route::get('/coupons/{coupon}', [CouponController::class, 'show'])
+            ->name('coupons.show');
+        Route::get('/coupons/{coupon}/edit', [CouponController::class, 'edit'])
+            ->name('coupons.edit');
+        Route::put('/coupons/{coupon}', [CouponController::class, 'update'])
+            ->name('coupons.update');
+        Route::delete('/coupons/{coupon}', [CouponController::class, 'destroy'])
+            ->name('coupons.destroy');
     });
 });
 

@@ -419,6 +419,29 @@
                     </li>
 
                     <li class="nav-header">MANTENEDORES</li>
+                    <li class="nav-item has-treeview @yield('openCoupons')">
+                        <a href="#" class="nav-link @yield('activeCoupons')">
+                            <i class="nav-icon fas fa-ticket-alt"></i>
+                            <p>
+                                Cupones
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{route('coupons.index')}}" class="nav-link @yield('activeListCoupons')">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Listar cupones</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{route('coupons.create')}}" class="nav-link @yield('activeLCreateCoupons')">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Crear cupones</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                     <li class="nav-item has-treeview @yield('openProducts')">
                         <a href="#" class="nav-link @yield('activeProducts')">
                             <i class="nav-icon fas fa-pizza-slice"></i>

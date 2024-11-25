@@ -14,6 +14,67 @@ class CouponController extends Controller
         return view('coupons.index', compact('coupons'));
     }
 
+    public function getDataProducts(Request $request, $pageNumber = 1)
+    {
+        $perPage = 10;
+        $name = $request->input('name');
+
+        $query = Coupon::orderBy('id');
+
+        // Aplicar filtros si se proporcionan
+        if ($name != "") {
+            // Convertir la cadena de búsqueda en un array de palabras clave
+            $keywords = explode(' ', $name);
+
+            // Construir la consulta para buscar todas las palabras clave en el campo full_name
+            $query->where(function ($query) use ($keywords) {
+                foreach ($keywords as $keyword) {
+                    $query->where('name', 'LIKE', '%' . $keyword . '%');
+                }
+            });
+
+            // Asegurarse de que todas las palabras clave estén presentes en la descripción
+            foreach ($keywords as $keyword) {
+                $query->where('name', 'LIKE', '%' . $keyword . '%');
+            }
+        }
+
+        $totalFilteredRecords = $query->count();
+        $totalPages = ceil($totalFilteredRecords / $perPage);
+
+        $startRecord = ($pageNumber - 1) * $perPage + 1;
+        $endRecord = min($totalFilteredRecords, $pageNumber * $perPage);
+
+        $coupons = $query->skip(($pageNumber - 1) * $perPage)
+            ->take($perPage)
+            ->get();
+
+        $array = [];
+
+        foreach ( $coupons as $product )
+        {
+            array_push($array, [
+                "id" => $product->id,
+                "nombre" => $product->name,
+                "descripcion" => $product->description,
+                "precio" => $product->amount,
+                "porcentage" => $product->percentage,
+                "estado" => $coupons->status,
+            ]);
+        }
+
+        $pagination = [
+            'currentPage' => (int)$pageNumber,
+            'totalPages' => (int)$totalPages,
+            'startRecord' => $startRecord,
+            'endRecord' => $endRecord,
+            'totalRecords' => $totalFilteredRecords,
+            'totalFilteredRecords' => $totalFilteredRecords
+        ];
+
+        return ['data' => $array, 'pagination' => $pagination];
+    }
+
     public function create()
     {
         return view('coupons.create');
