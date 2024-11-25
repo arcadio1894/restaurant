@@ -320,10 +320,16 @@
                     Horarios
                 </h4>
                 <p>
-                    Lunes a Domingo
+                    Lunes a Viernes
                 </p>
                 <p>
-                    4.00 Pm -11.30 Pm
+                    6.30 Pm -11.30 Pm
+                </p>
+                <p>
+                    Sábados y Domingos
+                </p>
+                <p>
+                    1.30 Pm -11.30 Pm
                 </p>
             </div>
         </div>

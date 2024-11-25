@@ -499,11 +499,19 @@
                             Horarios
                         </h4>
                         <p>
-                            Lunes a Domingo
+                            Lunes a Viernes
                         </p>
                         <p>
-                            5:30 PM - 11:30 PM
+                            6:30 PM - 11:30 PM
                         </p>
+                        
+                        <p>
+                            Sábados y Domingos
+                        </p>
+                        <p>
+                            1.30 Pm -11.30 Pm
+                        </p>
+                        
                     </div>
                 </div>
                 <div class="footer-info">
