@@ -546,3 +546,8 @@ function renderNextPage($numberPage) {
     clone.querySelector("[data-item]").setAttribute('data-item', $numberPage);
     $("#pagination").append(clone);
 }
+
+function activateTemplate(id) {
+    var t = document.querySelector(id);
+    return document.importNode(t.content, true);
+}

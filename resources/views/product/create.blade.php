@@ -132,7 +132,7 @@
                         @foreach( $types as $type )
                         <div class="form-group clearfix">
                             <div class="icheck-success d-inline">
-                                <input type="radio" id="radioPrimary{{$type->id}}" name="defaultType"><label for="radioPrimary{{$type->id}}"></label>
+                                <input type="radio" id="radioPrimary{{$type->id}}" name="defaultType" value="{{$type->id}}"><label for="radioPrimary{{$type->id}}"></label>
                             </div>
                             <div class="icheck-primary d-inline">
                                 <input type="checkbox" name="type[{{$type->id}}]" id="checkboxPrimary{{$type->id}}">

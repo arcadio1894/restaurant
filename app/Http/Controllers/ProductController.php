@@ -152,6 +152,10 @@ class ProductController extends Controller
             $priceTypes = $request->input('productPrice', []);
             $defaultType = $request->input('defaultType');
 
+            if (!$defaultType) {
+                return response()->json(['message' => 'El tipo por defecto no se seleccionó.'], 422);
+            }
+
             foreach ($types as $typeId => $value) {
                 // Verificamos si el checkbox fue marcado
                 if (isset($value)) {
