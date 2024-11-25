@@ -273,12 +273,12 @@
                               Trujillo
                             </span>
                         </a>
-                        <a href="">
-                            <i class="fa fa-phone" aria-hidden="true"></i>
-                            <span>
-                              Call  921 867 035
-                            </span>
-                        </a>
+                        <a href="https://wa.me/51906343258?text=Hola%20FUEGO%20Y%20MASA,%20quiero%20comprar%20una%20pizza.%20%F0%9F%8D%95" target="_blank">
+                                    <i class="fab fa-whatsapp" aria-hidden="true"></i>
+                                    <span>
+                                        Whatsapp  906-343-258
+                                    </span>
+                                </a>
                         <a href="">
                             <i class="fa fa-envelope" aria-hidden="true"></i>
                             <span>
