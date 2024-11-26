@@ -6,11 +6,13 @@ use App\Http\Requests\CheckoutRequest;
 use App\Models\Address;
 use App\Models\Cart;
 use App\Models\CartDetail;
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\ProductType;
+use App\Models\UserCoupon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -170,6 +172,42 @@ class CartController extends Controller
             $cart = Cart::findOrFail($validatedData['cart_id']);
             $totalAmount = $cart->total_cart;
 
+            // Verificar el cupón
+            $couponName = $request->input('coupon_name');
+            $coupon = Coupon::where('name', $couponName)->first();
+
+            $discountAmount = 0;
+
+            if ($coupon) {
+                // Verificar si el cupón ya ha sido utilizado por el usuario
+                $userCoupon = UserCoupon::where('user_id', auth()->id())
+                    ->where('coupon_id', $coupon->id)
+                    ->first();
+
+                if ($userCoupon) {
+                    DB::rollBack();
+                    return response()->json(['success' => false, 'message' => 'El cupón ya ha sido utilizado.']);
+                }
+
+                // Lógica para calcular el descuento
+                if ($coupon->type == 'total') {
+                    if ($coupon->amount != 0) {
+                        $discountAmount = $coupon->amount;
+                    } elseif ($coupon->percentage != 0) {
+                        $discountAmount = ($coupon->percentage / 100) * $cart->total_cart;
+                    }
+                } elseif ($coupon->type == 'detail') {
+                    // Lógica para aplicar el descuento al detalle con mayor monto
+                    $maxDetail = $cart->details()->orderByDesc('subtotal')->first();
+
+                    if ($coupon->amount != 0) {
+                        $discountAmount = $coupon->amount;
+                    } elseif ($coupon->percentage != 0) {
+                        $discountAmount = ($coupon->percentage / 100) * $maxDetail->subtotal;
+                    }
+                }
+            }
+
             // Crear la orden
             $order = Order::create([
                 'user_id' => auth()->id(),
@@ -194,6 +232,17 @@ class CartController extends Controller
 
             $cart->status = 'completed';
             $cart->save();
+
+            // Guardamos la relación del cupón con el usuario, solo si se aplicó
+            if ($coupon) {
+                UserCoupon::create([
+                    'user_id' => auth()->id(),
+                    'coupon_id' => $coupon->id,
+                    'discount_amount' => $discountAmount,
+                    'order_id' => $order->id, // Asociar al pedido
+                ]);
+            }
+
 
             $method_payment = PaymentMethod::find($validatedData['paymentMethod']);
 
@@ -303,6 +352,81 @@ class CartController extends Controller
                 'error' => $e->getMessage(),
             ], 420);
         }
+    }
+
+    public function applyCoupon(Request $request)
+    {
+        $code = $request->input('code');
+        $cartId = $request->input('cart_id');
+
+        // Validar que el carrito exista
+        $cart = Cart::find($cartId);
+        if (!$cart) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El carrito no existe.',
+            ]);
+        }
+
+        // Buscar el cupón
+        $coupon = Coupon::where('name', $code)->where('status', 'active')->first();
+
+        if (!$coupon) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El código de promoción no es válido o está inactivo.',
+            ]);
+        }
+
+        $userCoupon = UserCoupon::where('user_id', auth()->id())
+            ->where('coupon_id', $coupon->id)
+            ->first();
+
+        if ($userCoupon) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El cupón ya ha sido utilizado.',
+            ]);
+        }
+
+        $total = $cart->total_cart;
+        $discount = 0;
+
+        if ($coupon->type == 'total') {
+            // Si el cupón aplica al total
+            if ($coupon->amount != 0) {
+                $discount = $coupon->amount;
+            } elseif ($coupon->percentage != 0) {
+                $discount = $total * ($coupon->percentage / 100);
+            }
+        } elseif ($coupon->type == 'detail') {
+            // Si el cupón aplica a un detalle
+            $maxDetail = $cart->details->sortByDesc('subtotal')->first();
+
+            if ($maxDetail) {
+                if ($coupon->amount != 0) {
+                    $discount = $coupon->amount;
+                } elseif ($coupon->percentage != 0) {
+                    $discount = $maxDetail->subtotal * ($coupon->percentage / 100);
+                }
+            }
+        }
+
+        // Si el descuento es mayor que el total, ajustamos el descuento
+        if ($discount > $total) {
+            $discount = $total;
+        }
+
+        $newTotal = $total - $discount;
+
+        return response()->json([
+            'success' => true,
+            'code_name' => $coupon->name,
+            'discount_display' => '-S/ ' . number_format($discount, 2),
+            'new_total' => number_format($newTotal, 2),
+            'message' => 'Código aplicado. No borre el código.',
+            'coupon_id' => $coupon->id,
+        ]);
     }
 
     public function crearPreferencia()

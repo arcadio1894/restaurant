@@ -99,6 +99,21 @@ class Order extends Model
 
     public function getFormattedDateAttribute()
     {
-        return Carbon::parse($this->created_at)->isoFormat('DD/MM/YYYY [a las] h:mm A');
+        return Carbon::parse($this->created_at)->addMinutes(40)->isoFormat('DD/MM/YYYY [a las] h:mm A');
+    }
+
+    public function getAmountPayAttribute()
+    {
+        // Obtener el descuento aplicado, si existe
+        $userCoupon = UserCoupon::where('order_id', $this->id)->first();
+
+        // Verificar si hay un descuento aplicado
+        if ($userCoupon) {
+            // Si existe un descuento, restar el discount_amount del total
+            return number_format($this->total_amount - $userCoupon->discount_amount, 2, '.', '');
+        }
+
+        // Si no hay descuento, devolver el total sin cambios
+        return number_format($this->total_amount, 2, '.', '');
     }
 }

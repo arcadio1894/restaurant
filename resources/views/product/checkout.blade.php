@@ -10,7 +10,11 @@
     <link href="{{ asset('css/checkout/form-validation.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
-
+    <style>
+        .hidden {
+            display: none !important; /* Asegura que sobreescriba cualquier estilo */
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -33,31 +37,32 @@
                         <span class="text-muted">S/ {{ $detail->subtotal }}</span>
                     </li>
                     @endforeach
-                    {{--<li class="list-group-item d-flex justify-content-between bg-light">
+                    <li id="info_code" class="list-group-item d-flex justify-content-between bg-light hidden" style="display: none;">
                         <div class="text-success">
                             <h6 class="my-0">Código de promoción</h6>
-                            <small>EXAMPLECODE</small>
+                            <small id="name_code">EXAMPLECODE</small>
                         </div>
-                        <span class="text-success">-$5</span>
-                    </li>--}}
+                        <span class="text-success" id="amount_code">-$5</span>
+                    </li>
                     <li class="list-group-item d-flex justify-content-between">
                         <span>Total </span>
-                        <strong>S/ {{ $cart->total_cart }}</strong>
+                        <strong id="total_amount">S/ {{ $cart->total_cart }}</strong>
                     </li>
                 </ul>
 
-                {{--<div class="input-group">
-                    <input type="text" class="form-control" placeholder="Promo code">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Código de Promocíon">
                     <div class="input-group-append">
-                        <button type="submit" class="btn btn-secondary">Redeem</button>
+                        <button type="button" id="btn-promo_code" class="btn btn-secondary">Aplicar</button>
                     </div>
-                </div>--}}
+                </div>
             </div>
             <div class="col-md-6 order-md-1">
                 <h4 class="mb-3">Dirección de envío</h4>
                 <form class="needs-validation" novalidate id="checkoutForm">
                     @csrf
                     <input type="hidden" name="cart_id" value="{{ $cart->id }}">
+                    <input type="hidden" name="coupon_name" id="coupon_name" value="">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="firstName">Nombres</label>
@@ -241,6 +246,6 @@
         })
     </script>--}}
     <script src="{{ asset('js/cart/cart.js') }}"></script>
-    <script src="{{ asset('js/cart/checkout.js') }}"></script>
+    <script src="{{ asset('js/cart/checkout.js') }}?v={{ time() }}"></script>
 
 @endsection

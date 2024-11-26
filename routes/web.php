@@ -51,6 +51,8 @@ Route::post('/checkout/pagar', [CartController::class, 'pagar'])->name('checkout
 Route::post('/checkout/crear-preferencia', [CartController::class, 'crearPreferencia'])->name('checkout.crearPreferencia');
 Route::delete('/cart/delete-detail/{id}', [CartController::class, 'deleteDetail'])->name('cart.detail.delete');
 
+Route::get('/apply-coupon', [CartController::class, 'applyCoupon'])->name('apply.coupon');
+
 Route::get('/payment/success', [CartController::class, 'success'])->name('payment.success');
 Route::get('/payment/failure', [CartController::class, 'failure'])->name('payment.failure');
 Route::get('/payment/pending', [CartController::class, 'pending'])->name('payment.pending');

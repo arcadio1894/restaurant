@@ -14,7 +14,8 @@ class Coupon extends Model
         'description',
         'status',
         'amount',
-        'percentage'
+        'percentage',
+        'type'
     ];
 
     // Accesor para verificar si el cupón está activo

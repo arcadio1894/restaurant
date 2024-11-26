@@ -94,10 +94,11 @@
                 <article class="card">
                     <header class="card-header text-center"><strong>{{ $order->status_name }}</strong> </header>
                     <div class="card-body">
-                        <h6 class="text-center">Order ID: #{{ $order->id }}</h6>
+                        <h6 class="text-center">PEDIDO ID: #{{ $order->id }}</h6>
                         <article class="card">
                             <div class="card-body row">
-                                <div class="col"> <strong>Fecha:</strong> <br> {{ $order->formatted_date }} </div>
+                                <div class="col"> <strong>Tu pedido llegará aproximadamente:</strong> <br> {{ $order->formatted_date }} </div>
+                                <div class="col"> <strong>Monto a pagar:</strong> <br> S/. {{ $order->amount_pay }} </div>
                             </div>
                         </article>
                         <div class="track">

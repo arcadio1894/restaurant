@@ -43,6 +43,110 @@ const cardForm = mp.cardForm({
 
 $(document).ready(function() {
 
+    // Ocultamos inicialmente el li del código de promoción
+    $('#info_code').addClass('hidden'); // Ocultar
+
+    // Acción al presionar el botón "Aplicar"
+    $('#btn-promo_code').click(function () {
+        $('#info_code').addClass('hidden'); // Ocultar
+        $('#coupon_name').val("");
+        const promoCode = $('input[placeholder="Código de Promocíon"]').val();
+        const cartId = $('input[name="cart_id"]').val(); // Obtenemos el cart_id
+
+        if (promoCode.trim() === '') {
+            //alert('Por favor, ingrese un código de promoción.');
+            toastr.error('Por favor, ingrese un código de promoción.', 'Éxito',
+                {
+                    "closeButton": true,
+                    "debug": false,
+                    "newestOnTop": false,
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "preventDuplicates": false,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "2000",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                });
+            return;
+        }
+
+        // Realizamos la solicitud al servidor para validar el código
+        $.get('/apply-coupon', { code: promoCode, cart_id: cartId }, function (response) {
+            if (response.success) {
+                // Si el código es válido, actualizamos los elementos
+                $('#info_code').removeClass('hidden'); // Mostrar
+                $('#name_code').text(response.code_name); // Nombre del código
+                $('#amount_code').text(response.discount_display); // Monto de descuento
+                $('#total_amount').text(`S/ ${response.new_total}`); // Nuevo total
+                $('#coupon_name').val(response.code_name); // Nombre del código
+                toastr.success(response.message, 'Éxito',
+                    {
+                        "closeButton": true,
+                        "debug": false,
+                        "newestOnTop": false,
+                        "progressBar": true,
+                        "positionClass": "toast-top-right",
+                        "preventDuplicates": false,
+                        "onclick": null,
+                        "showDuration": "300",
+                        "hideDuration": "1000",
+                        "timeOut": "2000",
+                        "extendedTimeOut": "1000",
+                        "showEasing": "swing",
+                        "hideEasing": "linear",
+                        "showMethod": "fadeIn",
+                        "hideMethod": "fadeOut"
+                    });
+            } else {
+                toastr.error(response.message, 'Error',
+                    {
+                        "closeButton": true,
+                        "debug": false,
+                        "newestOnTop": false,
+                        "progressBar": true,
+                        "positionClass": "toast-top-right",
+                        "preventDuplicates": false,
+                        "onclick": null,
+                        "showDuration": "300",
+                        "hideDuration": "1000",
+                        "timeOut": "2000",
+                        "extendedTimeOut": "1000",
+                        "showEasing": "swing",
+                        "hideEasing": "linear",
+                        "showMethod": "fadeIn",
+                        "hideMethod": "fadeOut"
+                    });
+                //alert(response.message); // Mostramos el mensaje de error
+            }
+        }).fail(function () {
+            //alert('Ocurrió un error al procesar el código de promoción.');
+            toastr.error('Ocurrió un error al procesar el código de promoción.', 'Éxito',
+                {
+                    "closeButton": true,
+                    "debug": false,
+                    "newestOnTop": false,
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "preventDuplicates": false,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "2000",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                });
+        });
+    });
+
     $('.payment-method').on('change', function() {
         let selectedMethod = $(this).data('code');
 
