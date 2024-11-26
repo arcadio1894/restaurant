@@ -51,9 +51,9 @@ class CouponController extends Controller
 
         $array = [];
 
-        foreach ( $coupons as $product )
+        foreach ( $coupons as $coupon )
         {
-            if ( $coupons->status == 'active' )
+            if ( $coupon->status == 'active' )
             {
                 $stateText = '<span class="badge bg-success">Activo</span>';
             } else {
@@ -61,13 +61,13 @@ class CouponController extends Controller
             }
 
             array_push($array, [
-                "id" => $product->id,
-                "nombre" => $product->name,
-                "descripcion" => $product->description,
-                "precio" => $product->amount,
-                "porcentage" => $product->percentage,
+                "id" => $coupon->id,
+                "nombre" => $coupon->name,
+                "descripcion" => $coupon->description,
+                "precio" => $coupon->amount,
+                "porcentaje" => $coupon->percentage,
                 "estado" => $stateText,
-                "state" => $coupons->status
+                "status" => $coupon->status
             ]);
         }
 

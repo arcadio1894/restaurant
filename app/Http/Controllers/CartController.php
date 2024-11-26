@@ -290,7 +290,7 @@ class CartController extends Controller
 
                     DB::commit();
 
-                    return response()->json(['success' => true, 'message' => 'Pago realizado con POS', 'redirect_url' => route('home')]);
+                    return response()->json(['success' => true, 'message' => 'Pago realizado con POS', 'redirect_url' => route('orders.index')]);
 
                 case 'efectivo':
                     // Lógica para pago en efectivo
@@ -308,7 +308,7 @@ class CartController extends Controller
 
                     DB::commit();
 
-                    return response()->json(['success' => true, 'message' => 'Orden creada. Pago en efectivo pendiente', 'redirect_url' => route('home')]);
+                    return response()->json(['success' => true, 'message' => 'Orden creada. Pago en efectivo pendiente', 'redirect_url' => route('orders.index')]);
 
                 case 'yape_plin':
                     // Lógica para pago con Yape o Plin
@@ -332,7 +332,7 @@ class CartController extends Controller
 
                         DB::commit();
 
-                        return response()->json(['success' => true, 'message' => 'Pago realizado con Yape/Plin', 'redirect_url' => route('home')]);
+                        return response()->json(['success' => true, 'message' => 'Pago realizado con Yape/Plin', 'redirect_url' => route('orders.index')]);
                     } else {
                         DB::rollBack();
                         return response()->json(['success' => false, 'message' => 'Falta el código de operación para Yape/Plin']);

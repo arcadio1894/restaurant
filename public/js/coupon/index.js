@@ -252,7 +252,6 @@ function renderDataCoupons(data, activeColumns) {
     var dataQuotes = data.data;
     var pagination = data.pagination;
 
-    $("#header-table").html('');
     $("#body-table").html('');
     $("#pagination").html('');
     $("#textPagination").html('');
@@ -311,7 +310,7 @@ function renderDataTable(data, activeColumns) {
     var clone = document.querySelector('#item-table').content.cloneNode(true);
 
     // Llenar los datos en cada celda según el objeto de datos
-    clone.querySelector("[data-codigo]").innerHTML = data.codigo;
+    clone.querySelector("[data-codigo]").innerHTML = data.id;
     clone.querySelector("[data-nombre]").innerHTML = data.nombre;
     clone.querySelector("[data-descripcion]").innerHTML = data.descripcion;
     clone.querySelector("[data-precio]").innerHTML = data.precio;

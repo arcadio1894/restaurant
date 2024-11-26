@@ -92,7 +92,7 @@ class OrderController extends Controller
                 "code" => "ORDEN - ".$order->id,
                 "date" => ($order->created_at != null) ? $order->formatted_date : "",
                 "phone" => $direccion->phone,
-                "total" => $order->total_amount,
+                "total" => $order->amount_pay,
                 "method" => ($order->payment_method_id == null) ? 'Sin método de pago':$order->payment_method->name ,
                 "state" => $order->status_name,
                 "data_payment" => $order->data_payment,

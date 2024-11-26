@@ -219,7 +219,7 @@
 
                     </div>--}}
                     <hr class="mb-4">
-                    <button class="btn btn-primary btn-lg btn-block button-submit" type="button" id="btn-submit">PAGAR</button>
+                    <button class="btn btn-primary btn-lg btn-block button-submit" type="button" id="btn-submit">COMPRAR</button>
                 </form>
             </div>
         </div>
