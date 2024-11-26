@@ -270,20 +270,20 @@
                         <a href="">
                             <i class="fa fa-map-marker" aria-hidden="true"></i>
                             <span>
-                              Trujillo
-                            </span>
+                                        Trujillo
+                                    </span>
                         </a>
                         <a href="https://wa.me/51906343258?text=Hola%20FUEGO%20Y%20MASA,%20quiero%20comprar%20una%20pizza.%20%F0%9F%8D%95" target="_blank">
-                                    <i class="fab fa-whatsapp" aria-hidden="true"></i>
-                                    <span>
+                            <i class="fab fa-whatsapp" aria-hidden="true"></i>
+                            <span>
                                         Whatsapp  906-343-258
                                     </span>
-                                </a>
-                        <a href="">
+                        </a>
+                        <a href="mailto:fuegoymasaperu@gmail.com" target="_blank">
                             <i class="fa fa-envelope" aria-hidden="true"></i>
                             <span>
-                              fuegoymasaperu@gmail.com
-                            </span>
+                                        fuegoymasaperu@gmail.com
+                                    </span>
                         </a>
                     </div>
                 </div>
@@ -297,20 +297,22 @@
                         Encendemos la pasión en cada creación, con ingredientes frescos y dedicación, para llevar calidad y sabor a cada mesa.
                     </p>
                     <div class="footer_social">
-                        <a href="">
-                            <i class="fab fa-facebook-f"></i>
+                        <a href="https://www.facebook.com/people/Fuego-y-Masa/61568065745757/" target="_blank">
+                            <i class="fab fa-facebook"></i>
                         </a>
-                        <a href="">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="">
+                        <a href=" https://www.linkedin.com/company/fuego-y-masa" target="_blank">
                             <i class="fab fa-linkedin-in"></i>
                         </a>
-                        <a href="">
+                        <a href="https://www.instagram.com/fuegoymasaperu/" target="_blank">
                             <i class="fab fa-instagram"></i>
                         </a>
-                        <a href="">
-                            <i class="fab fa-pinterest-p"></i>
+                        <a href="https://wa.me/51906343258?text=Hola%20FUEGO%20Y%20MASA,%20quiero%20comprar%20una%20pizza.%20%F0%9F%8D%95" target="_blank">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="https://www.tiktok.com/@fuegoymasa" target="_blank">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="enable-background:new 0 0 456.029 456.029;padding: 7px;">
+                                <path d="M448,209.2c-5.4,0.5-10.8,0.8-16.2,0.8c-55.3,0-102.4-36.2-118.8-85.5v204c0,65.4-53,118.4-118.4,118.4c-65.4,0-118.4-53-118.4-118.4c0-63.1,49.3-114.6,111.4-118.2v62.6c-27.3,3.4-48.4,26.7-48.4,55.6c0,30.8,25,55.8,55.8,55.8c30.8,0,55.8-25,55.8-55.8V0h62.6c8.5,59,58.6,104.7,118.4,104.7V209.2z"/>
+                            </svg>
                         </a>
                     </div>
                 </div>
@@ -323,8 +325,9 @@
                     Lunes a Viernes
                 </p>
                 <p>
-                    6.30 Pm -11.30 Pm
+                    6:30 PM - 11:30 PM
                 </p>
+
                 <p>
                     Sábados y Domingos
                 </p>

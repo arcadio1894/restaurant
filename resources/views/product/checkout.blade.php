@@ -98,7 +98,7 @@
 
                     <div class="mb-3">
                         <label for="address">Dirección</label>
-                        <input type="text" class="form-control" id="address" name="address" placeholder="1234 Main St"
+                        <input type="text" class="form-control" id="address" name="address" placeholder="Av. Larco 333"
                                value="{{ $defaultAddress ? $defaultAddress->address_line : '' }}" required>
                         <div class="invalid-feedback">
                             Por favor ingrese su dirección de envío.
@@ -107,15 +107,15 @@
 
                     <div class="mb-3">
                         <label for="address2">Referencia <span class="text-muted">(Optional)</span></label>
-                        <input type="text" class="form-control" id="reference" name="reference" placeholder="Apartment or suite"
+                        <input type="text" class="form-control" id="reference" name="reference" placeholder="Al costado de Ittsa"
                                value="{{ $defaultAddress ? $defaultAddress->reference : '' }}">
                     </div>
 
-                    <hr class="mb-4">
+                    {{--<hr class="mb-4">
                     <div class="custom-control custom-checkbox">
                         <input type="checkbox" class="custom-control-input" id="save-info" name="save-info" checked>
                         <label class="custom-control-label" for="save-info">Guardar esta información.</label>
-                    </div>
+                    </div>--}}
                     <hr class="mb-4">
 
                     <h4 class="mb-3">Método de pago</h4>
