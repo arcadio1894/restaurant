@@ -63,9 +63,9 @@
                             <li class="nav-item @yield('inicio-active')">
                                 <a class="nav-link" href="{{ url('/') }}">Inicio <span class="sr-only">(current)</span></a>
                             </li>
-                            {{--<li class="nav-item @yield('menu-active')">
-                                <a class="nav-link" href="{{ route('menu') }}">Menu</a>
-                            </li>--}}
+                            <li class="nav-item @yield('menu-active')">
+                                <a class="nav-link" href="{{ route('home') }}">Menu</a>
+                            </li>
                             <li class="nav-item @yield('about-active')">
                                 <a class="nav-link" href="{{ route('about') }}">Nosotros</a>
                             </li>

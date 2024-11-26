@@ -33,25 +33,25 @@
                         <span class="text-muted">S/ {{ $detail->subtotal }}</span>
                     </li>
                     @endforeach
-                    <li class="list-group-item d-flex justify-content-between bg-light">
+                    {{--<li class="list-group-item d-flex justify-content-between bg-light">
                         <div class="text-success">
-                            <h6 class="my-0">Promo code</h6>
+                            <h6 class="my-0">Código de promoción</h6>
                             <small>EXAMPLECODE</small>
                         </div>
                         <span class="text-success">-$5</span>
-                    </li>
+                    </li>--}}
                     <li class="list-group-item d-flex justify-content-between">
                         <span>Total </span>
                         <strong>S/ {{ $cart->total_cart }}</strong>
                     </li>
                 </ul>
 
-                <div class="input-group">
+                {{--<div class="input-group">
                     <input type="text" class="form-control" placeholder="Promo code">
                     <div class="input-group-append">
                         <button type="submit" class="btn btn-secondary">Redeem</button>
                     </div>
-                </div>
+                </div>--}}
             </div>
             <div class="col-md-6 order-md-1">
                 <h4 class="mb-3">Dirección de envío</h4>
@@ -133,7 +133,7 @@
                     <div id="yape-section" style="display: none; margin-top: 15px;">
                         <p>Escanee el código QR para pagar con Yape o Plin:</p>
                         <div class="text-center">
-                            <img src="{{ asset('images/checkout/qr_yape.png') }}" alt="QR para Yape/Plin" style="width: 200px;">
+                            <img src="{{ asset('images/checkout/qr_yape.jpg') }}" alt="QR para Yape/Plin" style="width: 200px;">
                         </div>
                         <br>
                         <label for="operationCode">Código de operación</label>

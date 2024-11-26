@@ -143,42 +143,11 @@
     </form>
     <!--end::Form-->
 
-    <div class="row mt-3">
-        <div class="col-md-2 custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-            <input type="checkbox" checked data-column="codigo" class="custom-control-input" id="customSwitch1">
-            <label class="custom-control-label" for="customSwitch1">Código</label>
-        </div>
-        <div class="col-md-2 custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-            <input type="checkbox" checked data-column="nombre" class="custom-control-input" id="customSwitch2">
-            <label class="custom-control-label" for="customSwitch2">Nombre</label>
-        </div>
-        <div class="col-md-2 custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-            <input type="checkbox" checked data-column="descripcion" class="custom-control-input" id="customSwitch3">
-            <label class="custom-control-label" for="customSwitch3">Descripcion</label>
-        </div>
-        <div class="col-md-2 custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-            <input type="checkbox" checked data-column="precio" class="custom-control-input" id="customSwitch4">
-            <label class="custom-control-label" for="customSwitch4">Precio</label>
-        </div>
-        <div class="col-md-2 custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-            <input type="checkbox" checked data-column="categoria" class="custom-control-input" id="customSwitch5">
-            <label class="custom-control-label" for="customSwitch5">Categoría</label>
-        </div>
-        <div class="col-md-2 custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-            <input type="checkbox" checked data-column="ingredientes" class="custom-control-input" id="customSwitch6">
-            <label class="custom-control-label" for="customSwitch6">Ingredientes</label>
-        </div>
-        <div class="col-md-2 custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-            <input type="checkbox" checked data-column="imagen" class="custom-control-input" id="customSwitch7">
-            <label class="custom-control-label" for="customSwitch7">Imagen</label>
-        </div>
-    </div>
-
     <!--begin::Toolbar-->
     <div class="d-flex flex-wrap flex-stack pb-2">
         <!--begin::Title-->
         <div class="d-flex flex-wrap align-items-center my-1">
-            <h3 class="fw-bolder me-5 my-1"><span id="numberItems"></span> Productos
+            <h3 class="fw-bolder me-5 my-1"><span id="numberItems"></span> Cupones
                 <span class="text-gray-400 fs-6">por fecha de creación ↓ </span>
             </h3>
         </div>
@@ -192,7 +161,15 @@
         <div class="table-responsive">
             <table class="table table-bordered letraTabla table-hover table-sm mb-5">
                 <thead id="header-table">
-
+                    <tr class="normal-title">
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Porcentaje</th>
+                        <th>Estado</th>
+                        <th></th>
+                    </tr>
                 </thead>
                 <tbody id="body-table">
 
@@ -214,16 +191,7 @@
     <!--end::Tab Content-->
 
     <template id="item-header">
-        <tr class="normal-title">
-            <th data-column="codigo" data-codigo>Código</th>
-            <th data-column="nombre" data-nombre>Nombre</th>
-            <th data-column="descripcion" data-descripcion>Descripción</th>
-            <th data-column="precio" data-precio>Precio</th>
-            <th data-column="categoria" data-categoria>Categoría</th>
-            <th data-column="ingredientes" data-ingredientes>Ingredientes</th>
-            <th data-column="imagen" data-imagen>Imagen</th>
-            <th></th>
-        </tr>
+
     </template>
 
     <template id="previous-page">
@@ -258,18 +226,15 @@
 
     <template id="item-table">
         <tr>
-            <td data-column="codigo" data-codigo>Código</td>
-            <td data-column="nombre" data-nombre>Nombre</td>
-            <td data-column="descripcion" data-descripcion>Descripción</td>
-            <td data-column="precio" data-precio>Precio</td>
-            <td data-column="categoria" data-categoria>Categoría</td>
-            <td data-column="ingredientes" data-ingredientes>Ingredientes</td>
-            <td data-column="imagen" data-imagen>
-                <button data-ver_imagen data-src="" data-image="" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Imagen"><i class="fa fa-image"></i></button>
-            </td>
+            <td data-column="codigo" data-codigo></td>
+            <td data-column="nombre" data-nombre></td>
+            <td data-column="descripcion" data-descripcion></td>
+            <td data-column="precio" data-precio></td>
+            <td data-column="porcentaje" data-porcentaje></td>
+            <td data-column="estado" data-estado></td>
             <td>
-                <a data-editar_product href="{{--'+document.location.origin+ '/dashboard/editar/material/'+item.id+'--}}" class="btn btn-outline-warning btn-sm" data-toggle="tooltip" data-placement="top" title="Editar"><i class="fa fa-pen"></i> </a>
-                <button data-deshabilitar data-delete="{{--'+item.id+'--}}" data-description="{{--'+item.full_description+'--}}" class="btn btn-outline-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Deshabilitar"><i class="fas fa-bell-slash"></i> </button>
+                <a data-editar_coupon href="" class="btn btn-outline-warning btn-sm" data-toggle="tooltip" data-placement="top" title="Editar"><i class="fa fa-pen"></i> </a>
+                <button data-deshabilitar data-delete="" data-description="" data-state class="btn btn-outline-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Cambiar estado"><i class="fas fa-bell-slash"></i> </button>
             </td>
         </tr>
     </template>
@@ -305,22 +270,6 @@
         </div>
     {{--@endcan--}}
 
-    <div id="modalImage" class="modal fade" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Visualización de la imagen</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                </div>
-                <div class="modal-body">
-                    <img id="image-document" src="" alt="" width="80%">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
 
 @section('plugins')
@@ -350,6 +299,6 @@
 
         })
     </script>
-    <script src="{{ asset('js/product/indexV2.js') }}"></script>
+    <script src="{{ asset('js/coupon/index.js') }}"></script>
 
 @endsection

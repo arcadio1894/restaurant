@@ -2,31 +2,14 @@ $(document).ready(function () {
     /*$permissions = JSON.parse($('#permissions').val());*/
     //console.log($permissions);
 
-    $('.custom-control-input').change(function() {
-        updateData();
-    });
-
-
-    // Variable para almacenar los nombres clave de los checkboxes activos
-    var activeColumns = getActiveColumns();
-
     // Función para obtener y mostrar los datos iniciales
     function initData() {
-        activeColumns = getActiveColumns();
-        console.log(activeColumns);
-        getDataProducts(1, activeColumns);
-    }
-
-    // Función para obtener y mostrar los datos con los checkboxes actuales
-    function updateData() {
-        activeColumns = getActiveColumns();
-        getDataProducts(1, activeColumns);
+        getDataProducts(1);
     }
 
     // Función para obtener y mostrar los datos con los checkboxes activos y criterios de búsqueda
     function showDataSearch() {
-        activeColumns = getActiveColumns();
-        getDataProducts(1, activeColumns);
+        getDataProducts(1);
     }
 
     // Evento al cargar la página
@@ -45,16 +28,10 @@ $(document).ready(function () {
         selector: '[data-toggle="tooltip"]'
     });
 
-    $('#btn-export').on('click', exportExcel);
-
-    $modalImage = $('#modalImage');
-
     $formDelete = $('#formDelete');
     $formDelete.on('submit', disableMaterial);
     $modalDelete = $('#modalDelete');
     $(document).on('click', '[data-delete]', openModalDisable);
-
-    $(document).on('click', '[data-image]', showImage);
 
 
 });
@@ -63,15 +40,6 @@ var $formDelete;
 var $modalDelete;
 var $modalImage;
 var $permissions;
-
-// Función para obtener los nombres clave de los checkboxes activos
-function getActiveColumns() {
-    var activeColumns = [];
-    $('input[type="checkbox"]:checked').each(function() {
-        activeColumns.push($(this).data('column'));
-    });
-    return activeColumns;
-}
 
 function openModalDisable() {
     var material_id = $(this).data('delete');
@@ -186,131 +154,27 @@ function disableMaterial() {
     });
 }
 
-function showImage() {
-    var path = $(this).data('src');
-    $('#image-document').attr('src', path);
-    $modalImage.modal('show');
-}
-
-function exportExcel() {
-    var start  = $('#start').val();
-    var end  = $('#end').val();
-    var startDate   = moment(start, "DD/MM/YYYY");
-    var endDate     = moment(end, "DD/MM/YYYY");
-
-    console.log(start);
-    console.log(end);
-    console.log(startDate);
-    console.log(endDate);
-
-    if ( start == '' || end == '' )
-    {
-        console.log('Sin fechas');
-        $.confirm({
-            icon: 'fas fa-file-excel',
-            theme: 'modern',
-            closeIcon: true,
-            animation: 'zoom',
-            type: 'green',
-            title: 'No especificó fechas',
-            content: 'Si no hay fechas se descargará todos los ingresos',
-            buttons: {
-                confirm: {
-                    text: 'DESCARGAR',
-                    action: function (e) {
-                        //$.alert('Descargado igual');
-                        console.log(start);
-                        console.log(end);
-
-                        var query = {
-                            start: start,
-                            end: end
-                        };
-
-                        $.alert('Descargando archivo ...');
-
-                        var url = "/dashboard/exportar/reporte/egresos/proveedores/?" + $.param(query);
-
-                        window.location = url;
-
-                    },
-                },
-                cancel: {
-                    text: 'CANCELAR',
-                    action: function (e) {
-                        $.alert("Exportación cancelada.");
-                    },
-                },
-            },
-        });
-    } else {
-        console.log('Con fechas');
-        console.log(JSON.stringify(start));
-        console.log(JSON.stringify(end));
-
-        var query = {
-            start: start,
-            end: end
-        };
-
-        toastr.success('Descargando archivo ...', 'Éxito',
-            {
-                "closeButton": true,
-                "debug": false,
-                "newestOnTop": false,
-                "progressBar": true,
-                "positionClass": "toast-top-right",
-                "preventDuplicates": false,
-                "onclick": null,
-                "showDuration": "300",
-                "hideDuration": "2000",
-                "timeOut": "2000",
-                "extendedTimeOut": "1000",
-                "showEasing": "swing",
-                "hideEasing": "linear",
-                "showMethod": "fadeIn",
-                "hideMethod": "fadeOut"
-            });
-
-        var url = "/dashboard/exportar/reporte/egresos/proveedores/?" + $.param(query);
-
-        window.location = url;
-
-    }
-
-}
-
-/*function showDataSearch() {
-    getDataMaterials(1)
-}*/
-
 function showData() {
     //event.preventDefault();
     var numberPage = $(this).attr('data-item');
-    console.log(numberPage);
-    var activeColumns = getActiveColumns();
-    getDataProducts(numberPage, activeColumns)
+    getDataProducts(numberPage)
 }
 
-function getDataProducts($numberPage, $activeColumns) {
+function getDataProducts($numberPage) {
     $('[data-toggle="tooltip"]').tooltip('dispose').tooltip({
         selector: '[data-toggle="tooltip"]'
     });
 
-    var full_name = $('#full_name').val();
-    var category = $('#category').val();
-    var code = $('#code').val();
+    var name = $('#full_name').val();
 
-    $.get('/dashboard/get/data/products/'+$numberPage, {
-        full_name:full_name,
-        category: category,
-        code:code,
+    $.get('/dashboard/get/data/coupons/'+$numberPage, {
+        name:name,
     }, function(data) {
         if ( data.data.length == 0 )
         {
-            renderDataProductsEmpty(data);
+            renderDataCouponsEmpty(data);
         } else {
-            renderDataProducts(data, $activeColumns);
+            renderDataCoupons(data);
         }
 
 
@@ -368,7 +232,7 @@ function getDataProducts($numberPage, $activeColumns) {
         });
 }
 
-function renderDataProductsEmpty(data) {
+function renderDataCouponsEmpty(data) {
     var dataAccounting = data.data;
     var pagination = data.pagination;
     console.log(dataAccounting);
@@ -377,14 +241,14 @@ function renderDataProductsEmpty(data) {
     $("#body-table").html('');
     $("#pagination").html('');
     $("#textPagination").html('');
-    $("#textPagination").html('Mostrando '+pagination.startRecord+' a '+pagination.endRecord+' de '+pagination.totalFilteredRecords+' productos');
+    $("#textPagination").html('Mostrando '+pagination.startRecord+' a '+pagination.endRecord+' de '+pagination.totalFilteredRecords+' cupones');
     $('#numberItems').html('');
     $('#numberItems').html(pagination.totalFilteredRecords);
 
     renderDataTableEmpty();
 }
 
-function renderDataProducts(data, activeColumns) {
+function renderDataCoupons(data, activeColumns) {
     var dataQuotes = data.data;
     var pagination = data.pagination;
 
@@ -395,8 +259,6 @@ function renderDataProducts(data, activeColumns) {
     $("#textPagination").html('Mostrando '+pagination.startRecord+' a '+pagination.endRecord+' de '+pagination.totalFilteredRecords+' productos.');
     $('#numberItems').html('');
     $('#numberItems').html(pagination.totalFilteredRecords);
-
-    renderDataTableHeader(activeColumns);
 
     for (let j = 0; j < dataQuotes.length ; j++) {
         renderDataTable(dataQuotes[j], activeColumns);
@@ -445,52 +307,21 @@ function renderDataTableEmpty() {
     $("#body-table").append(clone);
 }
 
-function renderDataTableHeader(activeColumns) {
-    var cloneHeader = document.querySelector('#item-header').content.cloneNode(true);
-    var headerRow = cloneHeader.querySelector('tr');
-
-    headerRow.querySelectorAll('[data-column]').forEach(function(column) {
-        var columnName = column.dataset.column;
-        if (activeColumns.includes(columnName)) {
-            column.style.display = 'table-cell';
-        } else {
-            column.style.display = 'none';
-        }
-    });
-
-    $("#header-table").append(cloneHeader);
-
-}
-
 function renderDataTable(data, activeColumns) {
     var clone = document.querySelector('#item-table').content.cloneNode(true);
-
-    // Iterar sobre cada columna en el cuerpo de la tabla y mostrar u ocultar según los checkboxes activos
-    clone.querySelectorAll('[data-column]').forEach(function(column) {
-        var columnName = column.dataset.column;
-        if (activeColumns.includes(columnName)) {
-            column.style.display = 'table-cell';
-        } else {
-            column.style.display = 'none';
-        }
-    });
 
     // Llenar los datos en cada celda según el objeto de datos
     clone.querySelector("[data-codigo]").innerHTML = data.codigo;
     clone.querySelector("[data-nombre]").innerHTML = data.nombre;
     clone.querySelector("[data-descripcion]").innerHTML = data.descripcion;
     clone.querySelector("[data-precio]").innerHTML = data.precio;
-    clone.querySelector("[data-categoria]").innerHTML = data.categoria;
-    clone.querySelector("[data-ingredientes]").innerHTML = data.ingredientes;
-
-    let url_image = document.location.origin + '/images/products/' + data.image;
-    clone.querySelector("[data-ver_imagen]").setAttribute("data-src", url_image);
-    clone.querySelector("[data-ver_imagen]").setAttribute("data-image", data.id);
+    clone.querySelector("[data-porcentaje]").innerHTML = data.porcentaje;
+    clone.querySelector("[data-estado]").innerHTML = data.estado;
 
     // Configurar enlaces y botones según los permisos y datos
     /*if ($.inArray('update_material', $permissions) !== -1) {*/
-        let url = document.location.origin + '/dashboard/editar/producto/' + data.id;
-        clone.querySelector("[data-editar_product]").setAttribute("href", url);
+        let url = document.location.origin + '/dashboard/coupons/' + data.id+'/edit/';
+        clone.querySelector("[data-editar_coupon]").setAttribute("href", url);
     /*} else {
         let element = clone.querySelector("[data-editar_material]");
         if (element) {
@@ -501,6 +332,7 @@ function renderDataTable(data, activeColumns) {
     /*if ($.inArray('enable_material', $permissions) !== -1) {*/
         clone.querySelector("[data-deshabilitar]").setAttribute("data-delete", data.id);
         clone.querySelector("[data-deshabilitar]").setAttribute("data-description", data.nombre);
+        clone.querySelector("[data-deshabilitar]").setAttribute("data-state", data.state);
     /*} else {
         let element = clone.querySelector("[data-deshabilitar]");
         if (element) {

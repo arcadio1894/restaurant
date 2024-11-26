@@ -435,7 +435,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{route('coupons.create')}}" class="nav-link @yield('activeLCreateCoupons')">
+                                <a href="{{route('coupons.create')}}" class="nav-link @yield('activeCreateCoupons')">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Crear cupones</p>
                                 </a>

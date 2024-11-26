@@ -1,19 +1,19 @@
 @extends('layouts.admin')
 
-@section('openProducts')
+@section('openCoupons')
     menu-open
 @endsection
 
-@section('activeProducts')
+@section('activeCoupons')
     active
 @endsection
 
-@section('activeLCreateProducts')
+@section('activeCreateCoupons')
     active
 @endsection
 
 @section('title')
-    Productos
+    Cupones
 @endsection
 
 @section('styles-plugins')
@@ -38,7 +38,7 @@
 @endsection
 
 @section('page-title')
-    <h5 class="card-title">Crear nuevo producto</h5>
+    <h5 class="card-title">Crear nuevo cupón</h5>
 @endsection
 
 @section('page-breadcrumb')
@@ -47,7 +47,7 @@
             <a href="{{ route('dashboard.principal') }}"><i class="fa fa-home"></i> Dashboard</a>
         </li>
         <li class="breadcrumb-item">
-            <a href="{{ route('products.list') }}"><i class="fa fa-archive"></i> Productos</a>
+            <a href="{{ route('coupons.index') }}"><i class="fa fa-archive"></i> Cupón</a>
         </li>
         <li class="breadcrumb-item"><i class="fa fa-plus-circle"></i> Nuevo</li>
     </ol>
@@ -56,101 +56,37 @@
 @section('content')
     <form id="formCreate" class="form-horizontal" data-url="{{ route('product.store') }}" enctype="multipart/form-data">
         @csrf
-        <div class="row">
-            <div class="col-md-8">
-                <div class="card card-success">
-                    <div class="card-header">
-                        <h3 class="card-title">Datos generales</h3>
 
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
-                                <i class="fas fa-minus"></i></button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group row">
-                            <div class="col-md-12">
-                                <label for="full_name">Nombre completo <span class="right badge badge-danger">(*)</span></label>
-                                <input type="text" class="form-control rounded-0" id="full_name" name="full_name" >
-                            </div>
-
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-md-7">
-                                <label for="description">Descripción <span class="right badge badge-danger">(*)</span></label>
-                                <textarea id="description" name="description" class="form-control"></textarea>
-                            </div>
-                            <div class="col-md-5">
-                                <label for="category">Categorías <span class="right badge badge-danger">(*)</span></label>
-                                <select id="category" name="category" class="form-control select2" style="width: 100%;">
-                                    <option></option>
-                                    @foreach( $categories as $category )
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                    @endforeach
-                                </select>
-
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-md-8">
-                                <label for="image">Imagen <span class="right badge badge-danger">(*)</span></label>
-                                <input type="file" id="image" name="image" class="form-control">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label for="unit_price">Precio Referencial </label>
-                                <input type="number" id="unit_price" name="unit_price" class="form-control" placeholder="0.00" min="0" value="0" step="0.01" pattern="^\d+(?:\.\d{1,2})?$" onblur="
-                                    this.style.borderColor=/^\d+(?:\.\d{1,2})?$/.test(this.value)?'':'red'
-                                    ">
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-md-12">
-                                <label for="observations">Ingredientes </label>
-                                <textarea class="textarea_ingredients" id="ingredients" name="ingredients" placeholder="Place some text here"
-                                          style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- /.card-body -->
-                </div>
-                <!-- /.card -->
-            </div>
-            <div class="col-md-4">
-                <!-- /.card -->
-                <div class="card card-primary">
-                    <div class="card-header">
-                        <h3 class="card-title">Tipos de Productos</h3>
-
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
-                                <i class="fas fa-minus"></i></button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        @foreach( $types as $type )
-                        <div class="form-group clearfix">
-                            <div class="icheck-success d-inline">
-                                <input type="radio" id="radioPrimary{{$type->id}}" name="defaultType" value="{{$type->id}}"><label for="radioPrimary{{$type->id}}"></label>
-                            </div>
-                            <div class="icheck-primary d-inline">
-                                <input type="checkbox" name="type[{{$type->id}}]" id="checkboxPrimary{{$type->id}}">
-                                <label for="checkboxPrimary{{$type->id}}">
-                                    {{$type->name}} - ( {{ $type->size }} )
-                                </label>
-                                <input type="number" class="form-control form-control-sm d-inline ml-2" style="width: 70px;" id="productPrice{{$type->id}}" name="productPrice[{{$type->id}}]" value="{{ $type->price }}" min="0" >
-
-                            </div>
-                        </div>
-                        @endforeach
-
-                    </div>
-                    <!-- /.card-body -->
+        <div class="form-group row">
+            <div class="col-md-6">
+                <label for="inputEmail3" class="col-12 col-form-label">Nombre <span class="right badge badge-danger">(*)</span></label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" onkeyup="mayus(this);" name="name" placeholder="Ejm: Categoría">
                 </div>
             </div>
-
+            <div class="col-md-6">
+                <label for="inputEmail3" class="col-12 col-form-label">Descripcion</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" onkeyup="mayus(this);" name="description" placeholder="Ejm: Descripción">
+                </div>
+            </div>
         </div>
+
+        <div class="form-group row">
+            <div class="col-md-6">
+                <label for="inputEmail3" class="col-12 col-form-label">Monto</label>
+                <div class="col-sm-10">
+                    <input type="number" class="form-control" name="description" placeholder="Ejm: Descripción">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label for="inputEmail3" class="col-12 col-form-label">Porcentaje</label>
+                <div class="col-sm-10">
+                    <input type="number" class="form-control" name="description" placeholder="Ejm: Descripción">
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-12">
                 <button type="reset" class="btn btn-outline-secondary">Cancelar</button>

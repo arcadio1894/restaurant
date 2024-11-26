@@ -233,32 +233,49 @@ class ProductController extends Controller
                 $product->save();
             }
 
-            // TODO: Guardar las promociones
-            $old_productTypes = ProductType::where('product_id',$product->id)->get();
-            foreach ( $old_productTypes as $old_productType )
-            {
-                $old_productType->delete();
-            }
+            // TODO: Guardar las product types
+            $types = $request->input('type', []); // Tipos seleccionados
+            $priceTypes = $request->input('productPrice', []); // Precios de los tipos
+            $defaultType = $request->input('defaultType'); // Tipo marcado como default
 
-            $types = $request->input('type', []);
-            $priceTypes = $request->input('productPrice', []);
-            $defaultType = $request->input('defaultType');
+            // Obtener los tipos actuales de la base de datos
+            $existingProductTypes = ProductType::where('product_id', $product->id)->get();
 
+            // Convertir los tipos existentes a un array asociativo para fácil acceso
+            $existingProductTypesMap = $existingProductTypes->keyBy('type_id');
+
+            // Recorrer los tipos enviados desde el formulario
             foreach ($types as $typeId => $value) {
-                // Verificamos si el checkbox fue marcado
                 if (isset($value)) {
                     // Obtenemos el precio correspondiente
                     $priceType = isset($priceTypes[$typeId]) ? $priceTypes[$typeId] : null;
 
-                    // Guardamos la información en la base de datos
-                    ProductType::create([
-                        'product_id' => $product->id,
-                        'type_id' => $typeId,
-                        'price' => $priceType,
-                        'default' => ($typeId == $defaultType), // Solo el seleccionado será default
-                    ]);
+                    if (isset($existingProductTypesMap[$typeId])) {
+                        // Si ya existe, actualizamos los datos
+                        $existingProductType = $existingProductTypesMap[$typeId];
+                        $existingProductType->update([
+                            'price' => $priceType,
+                            'default' => ($typeId == $defaultType),
+                        ]);
+                    } else {
+                        // Si no existe, lo creamos
+                        ProductType::create([
+                            'product_id' => $product->id,
+                            'type_id' => $typeId,
+                            'price' => $priceType,
+                            'default' => ($typeId == $defaultType),
+                        ]);
+                    }
                 }
             }
+
+            // Eliminar los tipos que no están en la nueva lista
+            $typesToKeep = array_keys($types); // IDs de los tipos seleccionados
+            $existingProductTypes->each(function ($productType) use ($typesToKeep) {
+                if (!in_array($productType->type_id, $typesToKeep)) {
+                    $productType->delete();
+                }
+            });
 
             DB::commit();
         } catch ( \Throwable $e ) {

@@ -41,7 +41,7 @@
                             <form method="POST" action="{{ route('register') }}" class="signin-form">
                                 @csrf
                                 <div class="form-group mb-3">
-                                    <label class="label" for="name">Name</label>
+                                    <label class="label" for="name">Nombre Completo</label>
                                     <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus>
 
                                     @error('name')
@@ -51,7 +51,7 @@
                                     @enderror
                                 </div>
                                 <div class="form-group mb-3">
-                                    <label class="label" for="name">Email</label>
+                                    <label class="label" for="name">Correo Electrónico</label>
                                     <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
 
                                     @error('email')
@@ -61,7 +61,7 @@
                                     @enderror
                                 </div>
                                 <div class="form-group mb-3">
-                                    <label class="label" for="password">Password</label>
+                                    <label class="label" for="password">Contraseña</label>
                                     <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
 
                                     @error('password')
@@ -71,17 +71,17 @@
                                     @enderror
                                 </div>
                                 <div class="form-group mb-3">
-                                    <label for="password-confirm" class="label">{{ __('Confirm Password') }}</label>
+                                    <label for="password-confirm" class="label">Confirmar contraseña</label>
                                     <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
 
                                 </div>
                                 <div class="form-group">
-                                    <button type="submit" class="btn-submit form-control btn btn-primary rounded submit px-3">Sign Up</button>
+                                    <button type="submit" class="btn-submit form-control btn btn-primary rounded submit px-3">Registrar</button>
                                 </div>
 
                             </form>
                             @if (Route::has('login'))
-                                <p class="text-center">Do you hav a account? <a href="{{ route('login') }}">Sign In</a></p>
+                                <p class="text-center">Tienes una cuenta? <a href="{{ route('login') }}">Inicia sesión</a></p>
                             @endif
                             <p class="text-center">Regresar <a href="{{ url('/') }}">Inicio</a></p>
 

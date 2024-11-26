@@ -57,9 +57,9 @@
                                 <li class="nav-item active">
                                     <a class="nav-link" href="{{ url('/') }}">Inicio <span class="sr-only">(current)</span></a>
                                 </li>
-                                {{--<li class="nav-item">
-                                    <a class="nav-link" href="{{ route('menu') }}">Menu</a>
-                                </li>--}}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('home') }}">Menu</a>
+                                </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('about') }}">Nosotros</a>
                                 </li>
@@ -175,8 +175,8 @@
                                                 Disfruta de una pizza ligera llena de frescura. Margarita del Campo realza la esencia de la albahaca fresca sobre una capa de queso derretido y salsa de tomate, en un bocado que celebra lo natural.
                                             </p>
                                             <div class="btn-box">
-                                                <a href="{{ route('product.show', [1]) }}" class="btn1">
-                                                    Order Now
+                                                <a href="{{ route('home') }}" class="btn1">
+                                                    Ordena ahora
                                                 </a>
                                             </div>
                                         </div>
@@ -196,8 +196,8 @@
                                                 Una explosión de sabores tropicales. La Aloha Suprema combina el clásico jamón y piña con el toque único del durazno dulce y la intensidad de la aceituna verde. Un festín para los sentidos en cada rebanada, que lleva la experiencia hawaiana a nuevas alturas.
                                             </p>
                                             <div class="btn-box">
-                                                <a href="{{ route('product.show', [2]) }}"  class="btn1">
-                                                    Order Now
+                                                <a href="{{ route('home') }}"  class="btn1">
+                                                    Ordena ahora
                                                 </a>
                                             </div>
                                         </div>
@@ -217,8 +217,8 @@
                                                 Fusión perfecta de lo intenso y lo fresco. Chorizo del Huerto une el chorizo ahumado con aceitunas verdes sobre una base de salsa de tomate y queso, creando un bocado lleno de sabor y un toque de frescura en cada mordisco.
                                             </p>
                                             <div class="btn-box">
-                                                <a href="{{ route('product.show', [3]) }}" class="btn1">
-                                                    Order Now
+                                                <a href="{{ route('home') }}" class="btn1">
+                                                    Ordena ahora
                                                 </a>
                                             </div>
                                         </div>
@@ -258,8 +258,8 @@
                                     <h6>
                                         <span>50%</span> descuento
                                     </h6>
-                                    <a href="">
-                                        Quiero una pizza...                                       
+                                    <a href="{{ route('home') }}" class="text-center">
+                                        Usa el codigo <b>MiPrimeraPizza</b>
                                     </a>
                                 </div>
                             </div>
@@ -352,7 +352,7 @@
                 </div>
 
                 <ul class="filters_menu">
-                    <li class="active" data-filter="*">All</li>
+                    <li class="active" data-filter="*">Todos</li>
                     @foreach($categories as $category)
                         <li data-filter=".category{{ $category->id }}">{{ $category->name }}</li>
                     @endforeach

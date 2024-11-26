@@ -124,7 +124,7 @@
                         <div class="card shadow-0 border">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between">
-                                    <p class="mb-2">Precio Total:</p>
+                                    <p class="mb-2">Sub Total:</p>
                                     <p class="mb-2" id="subtotal_cart">S/ {{ number_format($cart->subtotal_cart, 2) }}</p>
                                 </div>
                                 <div class="d-flex justify-content-between">
@@ -132,12 +132,12 @@
                                     <p class="mb-2 text-success">S/ {{ number_format(0, 2) }}</p>
                                 </div>
                                 <div class="d-flex justify-content-between">
-                                    <p class="mb-2">TAX:</p>
+                                    <p class="mb-2">IGV:</p>
                                     <p class="mb-2" id="taxes_cart">S/ {{ number_format($cart->taxes_cart, 2) }}</p>
                                 </div>
                                 <hr />
                                 <div class="d-flex justify-content-between">
-                                    <p class="mb-2">Total price:</p>
+                                    <p class="mb-2">Precio Total:</p>
                                     <p class="mb-2 fw-bold" id="total_cart">S/ {{ number_format($cart->total_cart, 2) }}</p>
                                 </div>
 

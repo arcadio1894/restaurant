@@ -11,10 +11,10 @@ class CouponController extends Controller
     public function index()
     {
         $coupons = Coupon::all();
-        return view('coupons.index', compact('coupons'));
+        return view('coupon.index', compact('coupons'));
     }
 
-    public function getDataProducts(Request $request, $pageNumber = 1)
+    public function getDataCoupons(Request $request, $pageNumber = 1)
     {
         $perPage = 10;
         $name = $request->input('name');
@@ -53,13 +53,21 @@ class CouponController extends Controller
 
         foreach ( $coupons as $product )
         {
+            if ( $coupons->status == 'active' )
+            {
+                $stateText = '<span class="badge bg-success">Activo</span>';
+            } else {
+                $stateText = '<span class="badge bg-danger">Inactivo</span>';
+            }
+
             array_push($array, [
                 "id" => $product->id,
                 "nombre" => $product->name,
                 "descripcion" => $product->description,
                 "precio" => $product->amount,
                 "porcentage" => $product->percentage,
-                "estado" => $coupons->status,
+                "estado" => $stateText,
+                "state" => $coupons->status
             ]);
         }
 
@@ -77,7 +85,7 @@ class CouponController extends Controller
 
     public function create()
     {
-        return view('coupons.create');
+        return view('coupon.create');
     }
 
     public function store(Request $request)
@@ -105,7 +113,7 @@ class CouponController extends Controller
 
     public function edit(Coupon $coupon)
     {
-        return view('coupons.edit', compact('coupon'));
+        return view('coupon.edit', compact('coupon'));
     }
 
     public function update(Request $request, Coupon $coupon)

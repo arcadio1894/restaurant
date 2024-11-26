@@ -90,7 +90,7 @@ Route::middleware('auth')->group(function (){
         // Mostrar listado de cupones
         Route::get('/coupons', [CouponController::class, 'index'])
             ->name('coupons.index');
-        Route::get('/get/data/coupons', [CouponController::class, 'getDataCoupons']);
+        Route::get('/get/data/coupons/{page}', [CouponController::class, 'getDataCoupons']);
         Route::get('/coupons/create', [CouponController::class, 'create'])
             ->name('coupons.create');
         Route::post('/coupons', [CouponController::class, 'store'])

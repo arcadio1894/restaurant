@@ -41,7 +41,7 @@
                             <form method="POST" action="{{ route('login') }}" class="signin-form">
                                 @csrf
                                 <div class="form-group mb-3">
-                                    <label class="label" for="name">Email</label>
+                                    <label class="label" for="name">Correo Electrónico</label>
                                     <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
 
                                     @error('email')
@@ -51,7 +51,7 @@
                                     @enderror
                                 </div>
                                 <div class="form-group mb-3">
-                                    <label class="label" for="password">Password</label>
+                                    <label class="label" for="password">Contraseña</label>
                                     <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
 
                                     @error('password')
@@ -65,23 +65,23 @@
                                 </div>
                                 <div class="form-group d-md-flex">
                                     <div class="w-50 text-left">
-                                        <label class="checkbox-wrap checkbox-primary mb-0">Remember Me
+                                        <label class="checkbox-wrap checkbox-primary mb-0">Recordar
                                             <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }} checked>
 
                                             <span class="checkmark"></span>
                                         </label>
                                     </div>
-                                    <div class="w-50 text-md-right">
+                                    {{--<div class="w-50 text-md-right">
                                         @if (Route::has('password.request'))
                                             <a class="btn btn-link" href="{{ route('password.request') }}">
                                                 {{ __('Forgot Your Password?') }}
                                             </a>
                                         @endif
-                                    </div>
+                                    </div>--}}
                                 </div>
                             </form>
                             @if (Route::has('register'))
-                            <p class="text-center">Not a member? <a href="{{ route('register') }}">Sign Up</a></p>
+                            <p class="text-center">Aún no tienes una cuenta? <a href="{{ route('register') }}">Regístrate</a></p>
                             @endif
                             <p class="text-center">Regresar <a href="{{ url('/') }}">Inicio</a></p>
 
