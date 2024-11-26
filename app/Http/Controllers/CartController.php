@@ -141,7 +141,7 @@ class CartController extends Controller
             $shippingAddressId = null;
 
             // Verificar si 'save-info' está marcado como "on"
-            if ($request->has('save-info') && $request->input('save-info') === 'on') {
+            //if ($request->has('save-info') && $request->input('save-info') === 'on') {
                 $isDefault = true;
                 $existingDefaultAddress = Address::where('user_id', auth()->id())->where('is_default', true)->first();
                 if ($existingDefaultAddress) {
@@ -165,7 +165,7 @@ class CartController extends Controller
                 ]);
 
                 $shippingAddressId = $address->id;
-            }
+            //}
 
             $cart = Cart::findOrFail($validatedData['cart_id']);
             $totalAmount = $cart->total_cart;

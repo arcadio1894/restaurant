@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Address;
 use App\Models\Order;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -85,10 +86,12 @@ class OrderController extends Controller
 
         foreach ( $orders as $order )
         {
+            $direccion = Address::find($order->shipping_address_id);
             array_push($arrayGuides, [
                 "id" => $order->id,
                 "code" => "ORDEN - ".$order->id,
                 "date" => ($order->created_at != null) ? $order->formatted_date : "",
+                "phone" => $direccion->phone,
                 "total" => $order->total_amount,
                 "method" => ($order->payment_method_id == null) ? 'Sin método de pago':$order->payment_method->name ,
                 "state" => $order->status_name,

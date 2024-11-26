@@ -198,6 +198,7 @@
                     {{--<th>ID</th>--}}
                     <th>Código</th>
                     <th>Fecha</th>
+                    <th>Teléfono</th>
                     <th>Total</th>
                     <th>Metodo de Pago</th>
                     <th>Dato de Pago</th>
@@ -259,6 +260,7 @@
             {{--<td data-id></td>--}}
             <td data-code></td>
             <td data-date></td>
+            <td data-phone></td>
             <td data-total></td>
             <td data-method></td>
             <td data-data_payment></td>
