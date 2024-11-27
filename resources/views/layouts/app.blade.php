@@ -379,6 +379,11 @@
 </footer>
 <!-- footer section -->
 
+<div id="business-status" style="display: none; position: fixed; top: 20px; left: 20px; background-color: rgba(255, 0, 0, 0.9); border: 1px solid #cc0000; padding: 15px; border-radius: 5px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); z-index: 9999; color: #fff;">
+    <button id="close-business-status" style="background: none; border: none; font-size: 16px; font-weight: bold; color: #fff; float: right; cursor: pointer;">&times;</button>
+    <p id="business-message" style="margin: 0; font-size: 14px; font-weight: bold;"></p>
+</div>
+
 <!-- jQery -->
 <script src="{{ asset('landing/js/jquery-3.4.1.min.js') }}"></script>
 <!-- popper js -->
@@ -402,5 +407,28 @@
 <script src="{{ asset('plugins/toastr/toastr.min.js') }}"></script>
 
 @yield('scripts')
+
+<script>
+    // Llamar al método para verificar horario de atención
+    $.ajax({
+        url: '/api/business-hours', // Cambia la ruta si es necesario
+        method: 'GET',
+        success: function (response) {
+            if (!response.is_open) {
+                // Mostrar mensaje si el negocio está cerrado
+                $('#business-message').text(response.message);
+                $('#business-status').fadeIn();
+            }
+        },
+        error: function () {
+            console.error('No se pudo verificar el horario de atención.');
+        }
+    });
+
+    // Cerrar el mensaje al hacer clic en el botón "X"
+    $('#close-business-status').on('click', function () {
+        $('#business-status').fadeOut();
+    });
+</script>
 </body>
 </html>

@@ -1,5 +1,24 @@
 $(document).ready(function() {
+    // Llamar al método para verificar horario de atención
+    $.ajax({
+        url: '/api/business-hours', // Cambia la ruta si es necesario
+        method: 'GET',
+        success: function (response) {
+            if (!response.is_open) {
+                // Mostrar mensaje si el negocio está cerrado
+                $('#business-message').text(response.message);
+                $('#business-status').fadeIn();
+            }
+        },
+        error: function () {
+            console.error('No se pudo verificar el horario de atención.');
+        }
+    });
 
+    // Cerrar el mensaje al hacer clic en el botón "X"
+    $('#close-business-status').on('click', function () {
+        $('#business-status').fadeOut();
+    });
 });
 
 function checkAuthentication(productId, linkElement) {

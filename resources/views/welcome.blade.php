@@ -557,6 +557,11 @@
         </footer>
         <!-- footer section -->
 
+        <div id="business-status" style="display: none; position: fixed; top: 20px; left: 20px; background-color: rgba(255, 0, 0, 0.9); border: 1px solid #cc0000; padding: 15px; border-radius: 5px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); z-index: 9999; color: #fff;">
+            <button id="close-business-status" style="background: none; border: none; font-size: 16px; font-weight: bold; color: #fff; float: right; cursor: pointer;">&times;</button>
+            <p id="business-message" style="margin: 0; font-size: 14px; font-weight: bold;"></p>
+        </div>
+
         <!-- jQery -->
         <script src="{{ asset('landing/js/jquery-3.4.1.min.js') }}"></script>
         <!-- popper js -->

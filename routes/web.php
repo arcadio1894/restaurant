@@ -9,6 +9,7 @@ use \App\Http\Controllers\CartController;
 use \App\Http\Controllers\OrderController;
 use \App\Http\Controllers\TelegramController;
 use \App\Http\Controllers\CouponController;
+use \App\Http\Controllers\BusinessController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -65,6 +66,8 @@ Route::get('/pago-pendiente', [CartController::class, 'pagoPendiente'])->name('p
 
 Route::get('/pedidos', [OrderController::class, 'index'])->name('orders.index');
 Route::get('/get/orders/{page}', [OrderController::class, 'getOrders']);
+
+Route::get('/api/business-hours', [BusinessController::class, 'getBusinessHours']);
 
 
 Route::middleware('auth')->group(function (){
