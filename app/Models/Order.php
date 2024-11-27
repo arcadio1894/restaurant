@@ -22,7 +22,9 @@ class Order extends Model
         'status',
         'payment_method_id',
         'payment_amount',
-        'payment_code'
+        'payment_code',
+        'amount_shipping',
+        'shipping_district_id',
     ];
 
     public function user()
@@ -110,10 +112,12 @@ class Order extends Model
         // Verificar si hay un descuento aplicado
         if ($userCoupon) {
             // Si existe un descuento, restar el discount_amount del total
-            return number_format($this->total_amount - $userCoupon->discount_amount, 2, '.', '');
+            return number_format($this->total_amount - $userCoupon->discount_amount + $this->amount_shipping, 2, '.', '');
         }
 
         // Si no hay descuento, devolver el total sin cambios
-        return number_format($this->total_amount, 2, '.', '');
+        return number_format($this->total_amount + $this->amount_shipping, 2, '.', '');
+
+
     }
 }

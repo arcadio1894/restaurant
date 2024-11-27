@@ -1,15 +1,46 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-RLQWDGJ81N"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-RLQWDGJ81N');
+        </script>
         <!-- Basic -->
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <!-- Mobile Metas -->
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <!-- Site Metas -->
-        <meta name="keywords" content="" />
-        <meta name="description" content="" />
-        <meta name="author" content="" />
+        <title>FUEGO Y MASA | La Mejor Pizza en Trujillo - Delivery Rápido y Delicioso</title>
+        <meta name="description" content="Descubre las pizzas más deliciosas en Trujillo. FUEGO Y MASA ofrece delivery rápido, promociones irresistibles y calidad insuperable. ¡Haz tu pedido ahora!">
+        <meta name="keywords" content="pizzas Trujillo, delivery pizza Trujillo, pizzerías en Trujillo, FUEGO Y MASA, mejor pizza Trujillo">
+        <meta name="author" content="FUEGO Y MASA">
+        <meta name="robots" content="index, follow">
+
+        <!-- Open Graph para redes sociales -->
+        <meta property="og:title" content="FUEGO Y MASA | La Mejor Pizza en Trujillo">
+        <meta property="og:description" content="Disfruta las mejores pizzas en Trujillo. Delivery rápido y promociones exclusivas en FUEGO Y MASA. ¡Prueba el sabor que encanta!">
+        <meta property="og:image" content="https://www.fuegoymasa.com/images/pizza-destacada.jpg">
+        <meta property="og:url" content="https://www.fuegoymasa.com">
+        <meta property="og:type" content="website">
+        <meta property="og:locale" content="es_PE">
+
+        <!-- Twitter Cards -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="FUEGO Y MASA | La Mejor Pizza en Trujillo">
+        <meta name="twitter:description" content="Haz tu pedido online en FUEGO Y MASA y disfruta de las mejores pizzas en Trujillo. ¡Promociones especiales todos los días!">
+        <meta name="twitter:image" content="https://www.fuegoymasa.com/images/pizza-destacada.jpg">
+
+        <!-- Favicon -->
+        <link rel="icon" href="{{ asset('landing/images/favicon.png') }}" type="image/x-icon">
+
+        <!-- Canonical URL -->
+        <link rel="canonical" href="https://www.fuegoymasa.com">
 
         <meta name="csrf-token" content="{{ csrf_token() }}">
 

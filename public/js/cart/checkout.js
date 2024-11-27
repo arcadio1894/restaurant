@@ -49,13 +49,13 @@ $(document).ready(function() {
     // Acción al presionar el botón "Aplicar"
     $('#btn-promo_code').click(function () {
         $('#info_code').addClass('hidden'); // Ocultar
-        $('#coupon_name').val("");
-        const promoCode = $('input[placeholder="Código de Promocíon"]').val();
-        const cartId = $('input[name="cart_id"]').val(); // Obtenemos el cart_id
+        $('#coupon_name').val(""); // Limpiar el campo del nombre del cupón
+        const promoCode = $('#promo_code').val();
+        const cartId = $('input[name="cart_id"]').val(); // Obtener cart_id
+        const district = $('#district').val(); // Obtener el distrito elegido (ajustar el selector si es diferente)
 
-        if (promoCode.trim() === '') {
-            //alert('Por favor, ingrese un código de promoción.');
-            toastr.error('Por favor, ingrese un código de promoción.', 'Éxito',
+        /*if (promoCode.trim() === '') {
+            toastr.error('Por favor, ingrese un código de promoción.', 'Error',
                 {
                     "closeButton": true,
                     "debug": false,
@@ -74,16 +74,16 @@ $(document).ready(function() {
                     "hideMethod": "fadeOut"
                 });
             return;
-        }
+        }*/
 
         // Realizamos la solicitud al servidor para validar el código
-        $.get('/apply-coupon', { code: promoCode, cart_id: cartId }, function (response) {
+        $.get('/apply-coupon', { code: promoCode, cart_id: cartId, district: district }, function (response) {
             if (response.success) {
                 // Si el código es válido, actualizamos los elementos
                 $('#info_code').removeClass('hidden'); // Mostrar
                 $('#name_code').text(response.code_name); // Nombre del código
                 $('#amount_code').text(response.discount_display); // Monto de descuento
-                $('#total_amount').text(`S/ ${response.new_total}`); // Nuevo total
+                $('#total_amount').text(`S/ ${response.new_total}`); // Nuevo total con envío y descuento
                 $('#coupon_name').val(response.code_name); // Nombre del código
                 toastr.success(response.message, 'Éxito',
                     {
@@ -104,6 +104,10 @@ $(document).ready(function() {
                         "hideMethod": "fadeOut"
                     });
             } else {
+                // Si hay error, ocultamos el código y restauramos el total con envío
+                $('#info_code').addClass('hidden');
+                $('#total_amount').text(`S/ ${response.new_total}`); // Devolver el total con envío sin descuento
+                $('#coupon_name').val(""); // Limpiar el nombre del cupón
                 toastr.error(response.message, 'Error',
                     {
                         "closeButton": true,
@@ -122,11 +126,9 @@ $(document).ready(function() {
                         "showMethod": "fadeIn",
                         "hideMethod": "fadeOut"
                     });
-                //alert(response.message); // Mostramos el mensaje de error
             }
         }).fail(function () {
-            //alert('Ocurrió un error al procesar el código de promoción.');
-            toastr.error('Ocurrió un error al procesar el código de promoción.', 'Éxito',
+            toastr.error('Ocurrió un error al procesar el código de promoción.', 'Error',
                 {
                     "closeButton": true,
                     "debug": false,
@@ -300,6 +302,65 @@ $(document).ready(function() {
                 });*/
 
             }
+        }
+    });
+
+    $('#district').on('change', function () {
+        const districtId = $(this).val();
+        const cartId = $('input[name="cart_id"]').val();
+        const couponName = $('#coupon_name').val();
+
+        if (!districtId) {
+            // Caso cuando se selecciona "Ninguno"
+            $('#info_shipping').addClass('hidden'); // Ocultar costo de envío
+            const defaultShippingCost = 0;
+
+            $.ajax({
+                url: '/checkout/shipping',
+                method: 'POST',
+                data: {
+                    district_id: null, // Enviar nulo al backend
+                    cart_id: cartId,
+                    coupon_name: couponName,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (data) {
+                    if (data.success) {
+                        // Restablecer el costo de envío
+                        $('#amount_shipping').text(`+ S/ ${defaultShippingCost.toFixed(2)}`);
+                        // Actualizar el total
+                        $('#total_amount').text(`S/ ${data.new_total.toFixed(2)}`);
+                    }
+                },
+                error: function (xhr) {
+                    toastr.error(xhr.responseJSON?.message || 'Error inesperado.', 'Error');
+                }
+            });
+        } else {
+            // Caso normal
+            $('#info_shipping').addClass('hidden'); // Ocultar mientras carga
+            $.ajax({
+                url: '/checkout/shipping',
+                method: 'POST',
+                data: {
+                    district_id: districtId,
+                    cart_id: cartId,
+                    coupon_name: couponName,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (data) {
+                    if (data.success) {
+                        $('#info_shipping').removeClass('hidden');
+                        $('#amount_shipping').text(`+ S/ ${data.shipping_cost.toFixed(2)}`);
+                        $('#total_amount').text(`S/ ${data.new_total.toFixed(2)}`);
+                    } else {
+                        toastr.error(data.message, 'Error');
+                    }
+                },
+                error: function (xhr) {
+                    toastr.error(xhr.responseJSON?.message || 'Error inesperado.', 'Error');
+                }
+            });
         }
     });
 });

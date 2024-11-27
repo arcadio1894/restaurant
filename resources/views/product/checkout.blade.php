@@ -34,7 +34,7 @@
                         <div>
                             {{ $detail->product->full_name }} x{{ $detail->quantity }}
                         </div>
-                        <span class="text-muted">S/ {{ $detail->subtotal }}</span>
+                        <span class="text-muted">S/ {{ number_format($detail->subtotal, 2, '.', '') }}</span>
                     </li>
                     @endforeach
                     <li id="info_code" class="list-group-item d-flex justify-content-between bg-light hidden" style="display: none;">
@@ -44,14 +44,20 @@
                         </div>
                         <span class="text-success" id="amount_code">-$5</span>
                     </li>
+                    <li id="info_shipping" class="list-group-item d-flex justify-content-between bg-light hidden">
+                        <div class="text-danger">
+                            <h6 class="my-0">Costo de Envío</h6>
+                        </div>
+                        <span class="text-danger" id="amount_shipping">+$5</span>
+                    </li>
                     <li class="list-group-item d-flex justify-content-between">
                         <span>Total </span>
-                        <strong id="total_amount">S/ {{ $cart->total_cart }}</strong>
+                        <strong id="total_amount">S/ {{ number_format($cart->total_cart, 2, '.', '') }}</strong>
                     </li>
                 </ul>
 
                 <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Código de Promocíon">
+                    <input type="text" class="form-control" id="promo_code" placeholder="Código de Promocíon">
                     <div class="input-group-append">
                         <button type="button" id="btn-promo_code" class="btn btn-secondary">Aplicar</button>
                     </div>
@@ -93,6 +99,19 @@
                             <div class="invalid-feedback" style="width: 100%;">
                                 Su teléfono es obligatorio.
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="district">Seleccione su Distrito</label>
+                        <select class="form-control" name="district" id="district" required>
+                            <option value="" selected>Ninguno</option>
+                            @foreach( $districts as $district )
+                            <option value="{{ $district->id }}" data-shipping_cost="{{ $district->shipping_cost }}">{{ $district->name }}</option>
+                            @endforeach
+                        </select>
+                        <div class="invalid-feedback" style="width: 100%;">
+                            Su distrito es obligatorio.
                         </div>
                     </div>
 

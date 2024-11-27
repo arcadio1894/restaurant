@@ -12,6 +12,7 @@ use App\Models\OrderDetail;
 use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\ProductType;
+use App\Models\ShippingDistrict;
 use App\Models\UserCoupon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -129,7 +130,9 @@ class CartController extends Controller
             ->where('is_default', true)
             ->first();
 
-        return view('product.checkout', compact('cart', 'payment_methods', 'defaultAddress'));
+        $districts = ShippingDistrict::all();
+
+        return view('product.checkout', compact('cart', 'payment_methods', 'defaultAddress', 'districts'));
     }
 
     public function pagar( CheckoutRequest $request )
@@ -171,6 +174,17 @@ class CartController extends Controller
 
             $cart = Cart::findOrFail($validatedData['cart_id']);
             $totalAmount = $cart->total_cart;
+
+            // Obtener el distrito seleccionado y su costo de envío
+            $districtId = $request->input('district');
+            if (!$districtId) {
+                DB::rollBack();
+                return response()->json(['success' => false, 'message' => 'Debe seleccionar un distrito para el envío.']);
+            }
+
+            $district = ShippingDistrict::findOrFail($districtId);
+            $shippingCost = $district->shipping_cost;
+
 
             // Verificar el cupón
             $couponName = $request->input('coupon_name');
@@ -215,7 +229,9 @@ class CartController extends Controller
                 'billing_address_id' => $shippingAddressId,
                 'total_amount' => $totalAmount,
                 'status' => 'created',
-                'payment_method_id' => $validatedData['paymentMethod']
+                'payment_method_id' => $validatedData['paymentMethod'],
+                'amount_shipping' => $shippingCost,
+                'shipping_district_id' => $districtId,
             ]);
 
             // Crear los detalles de la orden basados en el carrito
@@ -358,26 +374,42 @@ class CartController extends Controller
     {
         $code = $request->input('code');
         $cartId = $request->input('cart_id');
-
-        // Validar que el carrito exista
+        $districtId = $request->input('district');  // El distrito seleccionado
         $cart = Cart::find($cartId);
+
         if (!$cart) {
             return response()->json([
                 'success' => false,
                 'message' => 'El carrito no existe.',
+                'new_total' => number_format($cart->total_cart, 2) // Devolver el total sin descuento
             ]);
         }
+
+        // Obtener el costo de envío dependiendo del distrito
+        $shippingCost = 0; // Costo por defecto
+        if ($districtId) {
+            $district = ShippingDistrict::find($districtId); // Buscar el distrito
+            if ($district) {
+                $shippingCost = $district->shipping_cost; // Suponiendo que cada distrito tiene un campo 'shipping_cost'
+            }
+        }
+
+        // Obtener el total con el envío
+        $totalWithShipping = $cart->total_cart + $shippingCost;
 
         // Buscar el cupón
         $coupon = Coupon::where('name', $code)->where('status', 'active')->first();
 
-        if (!$coupon) {
+        if (!$coupon || $code == "") {
             return response()->json([
                 'success' => false,
                 'message' => 'El código de promoción no es válido o está inactivo.',
+                'new_total' => number_format($totalWithShipping, 2), // Devolver el total con envío sin descuento
+                'coupon_name' => '' // Limpiar el nombre del cupón
             ]);
         }
 
+        // Validar si el cupón ya ha sido usado
         $userCoupon = UserCoupon::where('user_id', auth()->id())
             ->where('coupon_id', $coupon->id)
             ->first();
@@ -386,10 +418,13 @@ class CartController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'El cupón ya ha sido utilizado.',
+                'new_total' => number_format($totalWithShipping, 2), // Devolver el total con envío sin descuento
+                'coupon_name' => '' // Limpiar el nombre del cupón
             ]);
         }
 
-        $total = $cart->total_cart;
+        // Cálculo del descuento
+        $total = $totalWithShipping; // Considerar el total con envío
         $discount = 0;
 
         if ($coupon->type == 'total') {
@@ -426,6 +461,72 @@ class CartController extends Controller
             'new_total' => number_format($newTotal, 2),
             'message' => 'Código aplicado. No borre el código.',
             'coupon_id' => $coupon->id,
+            'district' => $districtId, // Devolver el distrito
+        ]);
+    }
+
+    public function calculateShipping(Request $request)
+    {
+        $districtId = $request->district_id;
+        $cartId = $request->cart_id;
+        $couponName = $request->coupon_name;
+
+        // Obtener el costo de envío (0 si no hay distrito)
+        $shippingCost = 0;
+        if ($districtId) {
+            $district = ShippingDistrict::find($districtId);
+            if (!$district) {
+                return response()->json(['success' => false, 'message' => 'Distrito no válido.'], 400);
+            }
+            $shippingCost = $district->shipping_cost;
+        }
+
+        // Calcular el subtotal del carrito
+        $cart = Cart::with('details')->find($cartId);
+        if (!$cart) {
+            return response()->json(['success' => false, 'message' => 'Carrito no encontrado.'], 400);
+        }
+
+        $total = $cart->total_cart;
+        $discount = 0;
+
+        // Calcular el descuento si hay un cupón
+        if ($couponName) {
+            $coupon = Coupon::where('name', $couponName)->first();
+
+            if ($coupon) {
+                if ($coupon->type == 'total') {
+                    if ($coupon->amount != 0) {
+                        $discount = $coupon->amount;
+                    } elseif ($coupon->percentage != 0) {
+                        $discount = $total * ($coupon->percentage / 100);
+                    }
+                } elseif ($coupon->type == 'detail') {
+                    $maxDetail = $cart->details->sortByDesc('subtotal')->first();
+
+                    if ($maxDetail) {
+                        if ($coupon->amount != 0) {
+                            $discount = $coupon->amount;
+                        } elseif ($coupon->percentage != 0) {
+                            $discount = $maxDetail->subtotal * ($coupon->percentage / 100);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Ajustar el descuento si es mayor que el total
+        if ($discount > $total) {
+            $discount = $total;
+        }
+
+        // Calcular el nuevo total
+        $newTotal = $total - $discount + $shippingCost;
+
+        return response()->json([
+            'success' => true,
+            'shipping_cost' => (float)$shippingCost,
+            'new_total' => (float)$newTotal,
         ]);
     }
 
