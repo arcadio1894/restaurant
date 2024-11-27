@@ -329,6 +329,7 @@ function renderDataTable(data) {
     clone.querySelector("[data-code]").innerHTML = data.code;
     clone.querySelector("[data-date]").innerHTML = data.date;
     clone.querySelector("[data-phone]").innerHTML = data.phone;
+    clone.querySelector("[data-address]").innerHTML = data.address;
     clone.querySelector("[data-total]").innerHTML = data.total;
     clone.querySelector("[data-method]").innerHTML = data.method;
     clone.querySelector("[data-state]").innerHTML = data.state;

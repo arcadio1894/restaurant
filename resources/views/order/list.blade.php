@@ -199,6 +199,7 @@
                     <th>Código</th>
                     <th>Fecha</th>
                     <th>Teléfono</th>
+                    <th>Dirección</th>
                     <th>Total</th>
                     <th>Metodo de Pago</th>
                     <th>Dato de Pago</th>
@@ -261,6 +262,7 @@
             <td data-code></td>
             <td data-date></td>
             <td data-phone></td>
+            <td data-address></td>
             <td data-total></td>
             <td data-method></td>
             <td data-data_payment></td>
