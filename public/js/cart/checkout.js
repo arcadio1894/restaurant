@@ -174,7 +174,7 @@ $(document).ready(function() {
     // Al hacer clic en el botón de enviar
     $('#btn-submit').on('click', function(event) {
         event.preventDefault();
-
+        $('#btn-submit').attr("disabled", true);
         // Llamar al método para verificar horario de atención
         $.ajax({
             url: '/api/business-hours', // Cambia la ruta si es necesario
@@ -461,6 +461,7 @@ function submitFormAjax(extraData = {}) {
                         "showMethod": "fadeIn",
                         "hideMethod": "fadeOut"
                     });
+                $('#btn-submit').attr("disabled", false);
             }
         },
         error: function(data) {
@@ -506,6 +507,7 @@ function submitFormAjax(extraData = {}) {
                     });
             }
 
+            $('#btn-submit').attr("disabled", false);
         }
     });
 }

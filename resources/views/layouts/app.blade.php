@@ -356,14 +356,14 @@
                     Lunes a Viernes
                 </p>
                 <p>
-                    6:30 PM - 11:30 PM
+                    6:30 PM - 11:00 PM
                 </p>
 
                 <p>
                     Sábados y Domingos
                 </p>
                 <p>
-                    1.30 Pm -11.30 Pm
+                    3:30 PM - 11:30 Pm
                 </p>
             </div>
         </div>

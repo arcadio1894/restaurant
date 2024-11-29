@@ -92,7 +92,8 @@ class OrderController extends Controller
             array_push($arrayGuides, [
                 "id" => $order->id,
                 "code" => "ORDEN - ".$order->id,
-                "date" => ($order->created_at != null) ? $order->formatted_date : "",
+                "date" => ($order->created_at != null) ? $order->formatted_created_date : "",
+                "date_delivery" => ($order->created_at != null) ? $order->formatted_date : "",
                 "phone" => $direccion->phone,
                 "address" => $direccion->address_line. " - ".( (!isset($distrito)) ? 'N/A':$distrito->name),
                 "total" => $order->amount_pay,
