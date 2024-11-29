@@ -6,6 +6,7 @@ use App\Http\Requests\DeleteProductRequest;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Category;
+use App\Models\Option;
 use App\Models\Product;
 use App\Models\ProductType;
 use App\Models\Type;
@@ -106,7 +107,9 @@ class ProductController extends Controller
     {
         $categories = Category::all();
         $types = Type::all();
-        return view('product.create', compact('categories', 'types'));
+
+        $products = Product::all();
+        return view('product.create', compact('categories', 'types', 'products'));
     }
 
     public function store(StoreProductRequest $request)
@@ -309,7 +312,9 @@ class ProductController extends Controller
         // Obtener el tipo por defecto
         $defaultProductType = $productTypes->where('default', true)->first();
 
-        return view('product.show', compact('product', 'productTypes', 'defaultProductType'));
+        $options = Option::with('selections.product')->where('product_id', $id)->get();
+
+        return view('product.show', compact('product', 'productTypes', 'defaultProductType', 'options'));
     }
 
 }

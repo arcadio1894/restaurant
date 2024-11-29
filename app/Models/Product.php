@@ -19,6 +19,11 @@ class Product extends Model
         'ingredients'
     ];
 
+    public function options()
+    {
+        return $this->hasMany(Option::class);
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class)->withTrashed();

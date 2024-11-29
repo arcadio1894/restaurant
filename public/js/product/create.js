@@ -3,16 +3,62 @@ $(document).ready(function () {
     //$formCreate.on('submit', storeMaterial);
     $('#btn-submit').on('click', storeProduct);
 
-    $(document).on('click', '[data-delete]', deleteSpecification);
-
     $selectCategory = $('#category');
 
-    $('#btn-generateCode').on('click', generateCodeProduct);
+    let optionIndex = 0;
+
+    /*$('.add-option').on('click', function () {
+        optionIndex++;
+        let newOption = `
+        <div class="option" data-index="${optionIndex}">
+            <label>Descripción</label>
+            <input type="text" name="options[${optionIndex}][description]" class="form-control">
+            <label>Cantidad</label>
+            <input type="number" name="options[${optionIndex}][quantity]" class="form-control">
+            <label>Tipo</label>
+            <select name="options[${optionIndex}][type]" class="form-control">
+                <option value="radio">Radio</option>
+                <option value="checkbox">Checkbox</option>
+                <option value="select">Select</option>
+            </select>
+            <div class="selections"></div>
+            <button type="button" class="btn btn-primary add-selection">Agregar Selección</button>
+        </div>`;
+        $('#product-options').append(newOption);
+    });*/
+
+    $("#new-option").on('click', addOption);
+    $(document).on('click', '[data-selection]', addSelection);
+    
+    $(document).on('click', '[data-delete_option]', deleteOption);
 });
 
 var $formCreate;
 var $select;
 var $selectCategory;
+
+function deleteOption() {
+    $(this).parent().parent().parent().remove();
+}
+
+function addSelection() {
+    var clone = activateTemplate('#template-selection');
+    var place = $(this).parent().parent().next();
+    place.append(clone);
+    $('.selections').select2({
+        placeholder: "Selecione Producto",
+        allowClear: true,
+    });
+}
+
+function addOption() {
+    var clone = activateTemplate('#template-option');
+    $("#product-options").append(clone);
+    $('.options').select2({
+        placeholder: "Selecione Tipo",
+        allowClear: true,
+    });
+}
 
 function storeProduct() {
     event.preventDefault();
