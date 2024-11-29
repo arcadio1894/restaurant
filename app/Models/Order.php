@@ -104,6 +104,11 @@ class Order extends Model
         return Carbon::parse($this->created_at)->addMinutes(40)->isoFormat('DD/MM/YYYY [a las] h:mm A');
     }
 
+    public function getFormattedCreatedDateAttribute()
+    {
+        return Carbon::parse($this->created_at)->isoFormat('DD/MM/YYYY [a las] h:mm A');
+    }
+
     public function getAmountPayAttribute()
     {
         // Obtener el descuento aplicado, si existe
