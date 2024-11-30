@@ -52,7 +52,7 @@ $(document).ready(function () {
     $formDelete = $('#formDelete');
     $formDelete.on('submit', disableMaterial);
     $modalDelete = $('#modalDelete');
-    $(document).on('click', '[data-delete]', openModalDisable);
+    $(document).on('click', '[data-cambiar_estado]', openModalDisable);
 
     $(document).on('click', '[data-image]', showImage);
 
@@ -74,10 +74,19 @@ function getActiveColumns() {
 }
 
 function openModalDisable() {
-    var material_id = $(this).data('delete');
+    var product_id = $(this).data('product_id');
     var description = $(this).data('description');
+    var state = $(this).data('state');
 
-    $modalDelete.find('[id=product_id]').val(material_id);
+    var title = "";
+    if ( state == 'activo' )
+    {
+        title = "Confirmar cambio de estado a INACTIVO";
+    } else {
+        title = "Confirmar cambio de estado a ACTIVO";
+    }
+    $modalDelete.find('[id=product_id]').val(product_id);
+    $modalDelete.find('[id=modal_title]').html(title);
     $modalDelete.find('[id=descriptionDelete]').html(description);
 
     $modalDelete.modal('show');
@@ -482,6 +491,11 @@ function renderDataTable(data, activeColumns) {
     clone.querySelector("[data-precio]").innerHTML = data.precio;
     clone.querySelector("[data-categoria]").innerHTML = data.categoria;
     clone.querySelector("[data-ingredientes]").innerHTML = data.ingredientes;
+    clone.querySelector("[data-estado]").innerHTML = data.estado;
+    clone.querySelector("[data-cambiar_estado]").setAttribute("data-cambiar_estado", data.state);
+    clone.querySelector("[data-cambiar_estado]").setAttribute("data-product_id", data.id);
+    clone.querySelector("[data-cambiar_estado]").setAttribute("data-state", data.textEstado);
+    clone.querySelector("[data-cambiar_estado]").setAttribute("data-description", data.nombre);
 
     let url_image = document.location.origin + '/images/products/' + data.image;
     clone.querySelector("[data-ver_imagen]").setAttribute("data-src", url_image);
@@ -499,8 +513,8 @@ function renderDataTable(data, activeColumns) {
     }*/
 
     /*if ($.inArray('enable_material', $permissions) !== -1) {*/
-        clone.querySelector("[data-deshabilitar]").setAttribute("data-delete", data.id);
-        clone.querySelector("[data-deshabilitar]").setAttribute("data-description", data.nombre);
+        /*clone.querySelector("[data-deshabilitar]").setAttribute("data-delete", data.id);
+        clone.querySelector("[data-deshabilitar]").setAttribute("data-description", data.nombre);*/
     /*} else {
         let element = clone.querySelector("[data-deshabilitar]");
         if (element) {

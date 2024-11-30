@@ -197,8 +197,12 @@
             <label class="custom-control-label" for="customSwitch6">Ingredientes</label>
         </div>
         <div class="col-md-2 custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-            <input type="checkbox" checked data-column="imagen" class="custom-control-input" id="customSwitch7">
-            <label class="custom-control-label" for="customSwitch7">Imagen</label>
+            <input type="checkbox" checked data-column="estado" class="custom-control-input" id="customSwitch7">
+            <label class="custom-control-label" for="customSwitch7">Estado</label>
+        </div>
+        <div class="col-md-2 custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+            <input type="checkbox" checked data-column="imagen" class="custom-control-input" id="customSwitch8">
+            <label class="custom-control-label" for="customSwitch8">Imagen</label>
         </div>
     </div>
 
@@ -249,6 +253,7 @@
             <th data-column="precio" data-precio>Precio</th>
             <th data-column="categoria" data-categoria>Categoría</th>
             <th data-column="ingredientes" data-ingredientes>Ingredientes</th>
+            <th data-column="estado" data-estado>Estado</th>
             <th data-column="imagen" data-imagen>Imagen</th>
             <th></th>
         </tr>
@@ -292,12 +297,13 @@
             <td data-column="precio" data-precio>Precio</td>
             <td data-column="categoria" data-categoria>Categoría</td>
             <td data-column="ingredientes" data-ingredientes>Ingredientes</td>
+            <td data-column="estado" data-estado>Estado</td>
             <td data-column="imagen" data-imagen>
                 <button data-ver_imagen data-src="" data-image="" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Imagen"><i class="fa fa-image"></i></button>
             </td>
             <td>
                 <a data-editar_product href="{{--'+document.location.origin+ '/dashboard/editar/material/'+item.id+'--}}" class="btn btn-outline-warning btn-sm" data-toggle="tooltip" data-placement="top" title="Editar"><i class="fa fa-pen"></i> </a>
-                <button data-deshabilitar data-delete="{{--'+item.id+'--}}" data-description="{{--'+item.full_description+'--}}" class="btn btn-outline-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Deshabilitar"><i class="fas fa-bell-slash"></i> </button>
+                <button data-cambiar_estado="" data-product_id="{{--'+item.id+'--}}" data-state="{{--'+item.id+'--}}" data-description="{{--'+item.full_description+'--}}" class="btn btn-outline-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Cambiar de estado"><i class="fas fa-bell-slash"></i> </button>
             </td>
         </tr>
     </template>
@@ -313,19 +319,19 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Confirmar inhabilitación</h4>
+                        <h4 class="modal-title" id="modal_title"></h4>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     </div>
                     <form id="formDelete" data-url="{{ route('product.delete') }}">
                         @csrf
                         <div class="modal-body">
                             <input type="hidden" id="product_id" name="product_id">
-                            <p>¿Está seguro de inhabilitar este material? Ya no se mostrará en los listados</p>
+                            <p>¿Está seguro de cambiar el estado este material? </p>
                             <p id="descriptionDelete"></p>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-danger">Inhabilitar</button>
+                            <button type="submit" class="btn btn-danger">Cambiar estado</button>
                         </div>
                     </form>
                 </div>

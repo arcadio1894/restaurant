@@ -25,7 +25,6 @@ class ProductController extends Controller
         $category = $request->input('category');
 
         $query = Product::with('category:id,name')
-            ->where('enable_status', 1)
             ->orderBy('id');
 
         // Aplicar filtros si se proporcionan
@@ -68,6 +67,14 @@ class ProductController extends Controller
 
         foreach ( $products as $product )
         {
+            if ( $product->enable_status == 1 )
+            {
+                $estado = '<span class="badge bg-success">ACTIVO</span>';
+                $textEstado = "activo";
+            } else {
+                $estado = '<span class="badge bg-danger">INACTIVO</span>';
+                $textEstado = "inactivo";
+            }
             array_push($array, [
                 "id" => $product->id,
                 "codigo" => $product->code,
@@ -76,6 +83,9 @@ class ProductController extends Controller
                 "precio" => $product->price_default,
                 "categoria" => ($product->category == null) ? '': $product->category->name,
                 "ingredientes" => $product->ingredients,
+                "state" => $product->enable_status,
+                "estado" => $estado,
+                "textEstado" => $textEstado,
                 "image" => ($product->image == null || $product->image == "" ) ? 'no_image.png':$product->image,
 
             ]);
@@ -320,11 +330,18 @@ class ProductController extends Controller
 
         $product = Product::find($request->get('product_id'));
 
-        $product->enable_status = 0;
+        $currentState = $product->enable_status;
+
+        if ($currentState == 1)
+        {
+            $product->enable_status = 0;
+        } else {
+            $product->enable_status = 1;
+        }
 
         $product->save();
 
-        return response()->json(['message' => 'Producto eliminado con éxito.'], 200);
+        return response()->json(['message' => 'Producto cambiado su estado con éxito.'], 200);
 
     }
 
