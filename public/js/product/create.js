@@ -31,14 +31,20 @@ $(document).ready(function () {
     $(document).on('click', '[data-selection]', addSelection);
     
     $(document).on('click', '[data-delete_option]', deleteOption);
+
+    $(document).on('click', '[data-delete_selection]', deleteSelection);
 });
 
 var $formCreate;
 var $select;
 var $selectCategory;
 
-function deleteOption() {
+function deleteSelection() {
     $(this).parent().parent().parent().remove();
+}
+
+function deleteOption() {
+    $(this).parent().parent().parent().parent().remove();
 }
 
 function addSelection() {
@@ -63,9 +69,60 @@ function addOption() {
 function storeProduct() {
     event.preventDefault();
     $("#btn-submit").attr("disabled", true);
+
+    let optionsArray = [];
+
+    // Filtrar y recorrer solo las tarjetas de opciones con datos válidos
+    $("#product-options .card").each(function (index, optionCard) {
+        let option = {};
+
+        // Capturar datos de la opción
+        option.description = $(optionCard).find("input[name^='options'][name$='[description]']").val();
+        option.quantity = $(optionCard).find("input[name^='options'][name$='[quantity]']").val();
+        option.type = $(optionCard).find("select[name^='options'][name$='[type]']").val();
+
+        // Validar si la opción tiene datos válidos
+        if (!option.description || !option.quantity || !option.type) {
+            return; // Saltar esta iteración si falta algún dato obligatorio
+        }
+
+        // Capturar selecciones de la opción
+        let selectionsArray = [];
+        $(optionCard)
+            .find("[data-option_selection='option-selections'] .card")
+            .each(function (sIndex, selectionCard) {
+                let selection = {};
+
+                selection.product_id = $(selectionCard)
+                    .find("select[name^='options'][name$='[product_id]']")
+                    .val();
+                selection.additional_price = $(selectionCard)
+                    .find("input[name^='options'][name$='[additional_price]']")
+                    .val();
+
+                // Validar si la selección tiene al menos un producto seleccionado
+                if (selection.product_id) {
+                    selectionsArray.push(selection);
+                }
+            });
+
+        // Asignar selecciones al objeto opción
+        option.selections = selectionsArray;
+
+        // Agregar la opción al array de opciones
+        optionsArray.push(option);
+    });
+
+    console.log(optionsArray); // Verifica la estructura del array en la consola
+
+    // Serializar las opciones como JSON
+    let optionsJson = JSON.stringify(optionsArray);
+
     // Obtener la URL
     var createUrl = $formCreate.data('url');
     var form = new FormData($('#formCreate')[0]);
+    form.append('options', optionsJson);
+
     $.ajax({
         url: createUrl,
         method: 'POST',

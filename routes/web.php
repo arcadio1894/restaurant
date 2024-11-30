@@ -93,6 +93,8 @@ Route::middleware('auth')->group(function (){
             ->name('product.edit');
         Route::post('/update/product/', [ProductController::class, 'update'])
             ->name('product.update');
+        Route::post('/delete/product/', [ProductController::class, 'delete'])
+            ->name('product.delete');
 
         // Mostrar listado de cupones
         Route::get('/coupons', [CouponController::class, 'index'])

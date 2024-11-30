@@ -17,7 +17,7 @@ class CreateOptionsTable extends Migration
             $table->id();
             $table->foreignId('product_id')->nullable()->constrained('products');
             $table->string('description');
-            $table->integer('quantity')->default(1); // Cantidad máxima seleccionable
+            $table->integer('quantity')->default(0); // Cantidad máxima seleccionable
             $table->enum('type', ['radio', 'checkbox', 'select']);
             $table->timestamps();
         });

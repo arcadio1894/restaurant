@@ -316,10 +316,10 @@
                         <h4 class="modal-title">Confirmar inhabilitación</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     </div>
-                    <form id="formDelete" data-url="{{--{{ route('material.disable') }}--}}">
+                    <form id="formDelete" data-url="{{ route('product.delete') }}">
                         @csrf
                         <div class="modal-body">
-                            <input type="hidden" id="material_id" name="material_id">
+                            <input type="hidden" id="product_id" name="product_id">
                             <p>¿Está seguro de inhabilitar este material? Ya no se mostrará en los listados</p>
                             <p id="descriptionDelete"></p>
                         </div>

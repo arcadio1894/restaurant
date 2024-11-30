@@ -17,6 +17,41 @@
         .icon-hover:hover i {
             color: #3b71ca !important;
         }
+
+        .custom-radio-checkbox {
+            position: relative;
+            padding-left: 2.5rem; /* Espacio para el icono más grande */
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .custom-radio-checkbox .form-check-input {
+            width: 1.2rem;
+            height: 1.2rem;
+            margin-left: -2.5rem; /* Coloca el input dentro del padding */
+            cursor: pointer;
+            accent-color: #e69c00; /* Color personalizado para el icono */
+            transition: transform 0.2s ease;
+        }
+
+        .custom-radio-checkbox .form-check-input:checked {
+            transform: scale(1.2); /* Aumenta el tamaño al seleccionar */
+        }
+
+        .custom-radio-checkbox:hover {
+            background-color: rgba(230, 156, 0, 0.1); /* Fondo suave al pasar el mouse */
+            border-radius: 5px; /* Bordes redondeados */
+        }
+
+        .custom-radio-checkbox .form-check-label {
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        .custom-radio-checkbox .form-check-input:checked + .form-check-label {
+            color: #e69c00; /* Cambia el color del texto al seleccionarse */
+            font-weight: bold;
+        }
     </style>
 @endsection
 
@@ -84,19 +119,61 @@
                             {!! nl2br($product->ingredients) !!}
                         </p>
 
-                        {{--<div class="row">
-                            <dt class="col-3">Type:</dt>
-                            <dd class="col-9">Regular</dd>
+                        <div class="row">
+                            {{-- Logica para mostrar las opciones --}}
+                            @foreach ($product->options as $option)
+                                <div class="col-md-12 mb-4">
+                                    <strong>{{ $option->description }}</strong>
+                                    <small>Cantidad máxima: {{ $option->quantity }}</small>
+                                    <br><br>
+                                    <div class="option-container"
+                                         data-option-id="{{ $option->id }}"
+                                         data-quantity="{{ $option->quantity }}"
+                                         data-type="{{ $option->type }}">
 
-                            <dt class="col-3">Color</dt>
-                            <dd class="col-9">Brown</dd>
-
-                            <dt class="col-3">Material</dt>
-                            <dd class="col-9">Cotton, Jeans</dd>
-
-                            <dt class="col-3">Brand</dt>
-                            <dd class="col-9">Reebook</dd>
-                        </div>--}}
+                                        {{-- Según el tipo de la opción, generar dinámicamente los inputs --}}
+                                        @if ($option->type == 'radio')
+                                            @foreach ($option->selections as $selection)
+                                                <div class="form-check mb-2 custom-radio-checkbox">
+                                                    <input class="form-check-input option-input"
+                                                           type="radio"
+                                                           name="option_{{ $option->id }}"
+                                                           value="{{ $selection->product_id }}"
+                                                           id="radio_{{ $option->id }}_{{ $loop->index }}" />
+                                                    <label class="form-check-label" for="radio_{{ $option->id }}_{{ $loop->index }}">
+                                                        {{ $selection->product->full_name }}
+                                                    </label>
+                                                </div>
+                                            @endforeach
+                                        @elseif ($option->type == 'checkbox')
+                                            @foreach ($option->selections as $selection)
+                                                <div class="form-check mb-2 custom-radio-checkbox">
+                                                    <input class="form-check-input option-input"
+                                                           type="checkbox"
+                                                           name="option_{{ $option->id }}[]"
+                                                           value="{{ $selection->product_id }}"
+                                                           id="checkbox_{{ $option->id }}_{{ $loop->index }}" />
+                                                    <label class="form-check-label" for="checkbox_{{ $option->id }}_{{ $loop->index }}">
+                                                        {{ $selection->product->full_name }}
+                                                    </label>
+                                                </div>
+                                            @endforeach
+                                        @elseif ($option->type == 'select')
+                                            <div class="mb-2">
+                                                <select class="form-select option-input" name="option_{{ $option->id }}">
+                                                    <option value="">Seleccione una opción</option>
+                                                    @foreach ($option->selections as $selection)
+                                                        <option value="{{ $selection->product_id }}">
+                                                            {{ $selection->product->full_name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
 
                         <hr />
 
@@ -114,16 +191,6 @@
                             </div>
                             <!-- col.// -->
                             <div class="col-md-4 col-6 mb-3">
-                                {{--<label class="mb-2 d-block">Quantity</label>
-                                <div class="input-group mb-3" style="width: 170px;">
-                                    <button class="btn btn-white border border-secondary px-3" type="button" id="button-addon1" data-mdb-ripple-color="dark">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                    <input type="text" class="form-control text-center border border-secondary" placeholder="14" aria-label="Example text with button addon" aria-describedby="button-addon1" />
-                                    <button class="btn btn-white border border-secondary" type="button" id="button-addon2" data-mdb-ripple-color="dark">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                </div>--}}
                                 <a href="#"
                                    class="btn btn-primary shadow-0"
                                    id="add-to-cart-btn"

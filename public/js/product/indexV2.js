@@ -77,7 +77,7 @@ function openModalDisable() {
     var material_id = $(this).data('delete');
     var description = $(this).data('description');
 
-    $modalDelete.find('[id=material_id]').val(material_id);
+    $modalDelete.find('[id=product_id]').val(material_id);
     $modalDelete.find('[id=descriptionDelete]').html(description);
 
     $modalDelete.modal('show');

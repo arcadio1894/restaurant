@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Option;
 use App\Models\Product;
 use App\Models\ProductType;
+use App\Models\Selection;
 use App\Models\Type;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -174,6 +175,29 @@ class ProductController extends Controller
                     ]);
                 }
             }
+
+            // Decodificar las opciones enviadas como JSON
+            $options = json_decode($request->input('options'), true);
+
+            if ($options) {
+                foreach ($options as $option) {
+                    $newOption = Option::create([
+                        'product_id' => $product->id,
+                        'description' => $option['description'],
+                        'quantity' => $option['quantity'],
+                        'type' => $option['type'],
+                    ]);
+
+                    foreach ($option['selections'] as $selection) {
+                        Selection::create([
+                            'option_id' => $newOption->id,
+                            'product_id' => $selection['product_id'],
+                            'additional_price' => ($selection['additional_price'] == null || $selection['additional_price'] == "") ? null : $selection['additional_price'],
+                        ]);
+                    }
+                }
+            }
+
             DB::commit();
         } catch ( \Throwable $e ) {
             DB::rollBack();
@@ -290,13 +314,15 @@ class ProductController extends Controller
 
     }
 
-    public function destroy(DeleteProductRequest $request)
+    public function delete(DeleteProductRequest $request)
     {
         $validated = $request->validated();
 
-        $product = Product::find($request->get('material_id'));
+        $product = Product::find($request->get('product_id'));
 
         $product->enable_status = 0;
+
+        $product->save();
 
         return response()->json(['message' => 'Producto eliminado con éxito.'], 200);
 

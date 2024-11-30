@@ -44,12 +44,25 @@
                                                 <img src="{{ asset('images/products/'.$detail->product->image) }}" class="border rounded me-3" style="width: 96px; height: 96px;" />
                                                 <div class="">
                                                     <a href="#" class="nav-link">{{ $detail->product->full_name }}</a>
-                                                    <p class="text-muted ml-3">
+                                                    <p class="text-muted ml-3 mb-0">
                                                         Tipo: {{ $detail->productType->type->name }}
                                                         @if($detail->productType->type && $detail->productType->type->size)
                                                             ( {{ $detail->productType->type->size }} )
                                                         @endif
                                                     </p>
+                                                    <div class="text-muted ml-1 small">
+                                                        @if($detail->options->isNotEmpty())
+                                                            <ul class="mb-0 ps-3">
+                                                                @foreach($detail->options as $option)
+                                                                    <li>{{ $option->option->name }}
+                                                                        @if($option->product)
+                                                                            {{ $option->product->full_name }}
+                                                                        @endif
+                                                                    </li>
+                                                                @endforeach
+                                                            </ul>
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

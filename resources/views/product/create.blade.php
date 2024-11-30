@@ -245,9 +245,13 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-4">
-                        <label>Precio adicional (Opcional)</label>
+                    <div class="col-md-3">
+                        <label>Precio (Opcional)</label>
                         <input type="text" name="options[0][selections][0][additional_price]" class="form-control form-control-sm">
+                    </div>
+                    <div class="col-md-1">
+                        <label>&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                        <button type="button" data-delete_selection class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
             </div>

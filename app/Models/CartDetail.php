@@ -30,4 +30,9 @@ class CartDetail extends Model
     {
         return $this->belongsTo(ProductType::class, 'product_type_id');
     }
+
+    public function options()
+    {
+        return $this->hasMany(CartDetailOption::class);
+    }
 }

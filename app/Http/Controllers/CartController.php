@@ -6,6 +6,7 @@ use App\Http\Requests\CheckoutRequest;
 use App\Models\Address;
 use App\Models\Cart;
 use App\Models\CartDetail;
+use App\Models\CartDetailOption;
 use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -35,6 +36,7 @@ class CartController extends Controller
         $user = Auth::user();
         $product_id = $request->input('product_id');
         $product_type_id = $request->input('product_type_id'); // Tipo de producto
+        $selectedOptions = $request->input('options', []); // Opciones seleccionadas
 
         // Verificar si el usuario tiene un carrito pendiente
         $cart = Cart::where('user_id', $user->id)
@@ -63,7 +65,7 @@ class CartController extends Controller
         } else {
             // Si no existe, agregar un nuevo detalle
             $product = Product::find($product_id);
-            $cart->details()->create([
+            $cartDetail = $cart->details()->create([
                 'product_id' => $product_id,
                 'product_type_id' => $product_type_id,
                 'quantity' => 1,
@@ -72,14 +74,29 @@ class CartController extends Controller
             ]);
         }
 
+        // Validar que $cartDetail esté correctamente definido
+        if (!$cartDetail) {
+            return response()->json(['error' => 'No se pudo crear el detalle del carrito.'], 500);
+        }
+
+        // Guardar las opciones seleccionadas
+        foreach ($selectedOptions as $optionId => $productIds) {
+            foreach ((array) $productIds as $productId) {
+                $cartDetail->options()->create([
+                    'option_id' => $optionId,
+                    'product_id' => $productId,
+                ]);
+            }
+        }
+
         return response()->json(['redirect' => route('cart.show')]);
     }
 
     public function show()
     {
         $user = Auth::user();
-
-        $cart = Cart::with('details.product')->where('user_id', $user->id)
+        //$cart = Cart::with(['details.options.option', 'details.options.product'])->find($cartId);
+        $cart = Cart::with(['details.options.option', 'details.options.product'])->where('user_id', $user->id)
             ->where('status', 'pending')
             ->first();
         return view('product.cart', compact('cart'));
@@ -583,6 +600,14 @@ class CartController extends Controller
 
             // Obtener el carrito asociado
             $cart = $detail->cart;
+
+            // Eliminar los options
+            $options = CartDetailOption::where('cart_detail_id', $detail->id)->get();
+
+            foreach ( $options as $option )
+            {
+                $option->delete();
+            }
 
             // Eliminar el detalle
             $detail->delete();
