@@ -62,6 +62,7 @@
                         <button type="button" id="btn-promo_code" class="btn btn-secondary">Aplicar</button>
                     </div>
                 </div>
+                <a href="{{ route('home') }}" class="btn btn-light w-100 border mt-2"> Volver al menú </a>
             </div>
             <div class="col-md-6 order-md-1">
                 <h4 class="mb-3">Dirección de envío</h4>
