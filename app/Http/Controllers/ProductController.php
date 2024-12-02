@@ -436,7 +436,12 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
         // Obtener los tipos relacionados al producto
-        $productTypes = $product->productTypes()->with('type')->get();
+        $productTypes = $product->productTypes()
+            ->whereHas('type', function ($query) {
+                $query->where('active', 1); // Filtra solo los tipos activos
+            })
+            ->with('type')
+            ->get();
 
         // Obtener el tipo por defecto
         $defaultProductType = $productTypes->where('default', true)->first();
