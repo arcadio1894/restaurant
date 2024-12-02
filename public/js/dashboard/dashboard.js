@@ -48,4 +48,25 @@ $(document).ready(function () {
             },
         });
     });
+
+    $('#btn-print').on('click', printEpson);
 });
+
+function printEpson() {
+    $.ajax({
+        url: '/dashboard/print',
+        type: 'POST',
+        processData:false,
+        contentType:false,
+        success: function(response) {
+            if (response.success) {
+                alert("Impresión exitosa: " + response.success);
+            } else {
+                alert("Error en la impresión: " + response.error);
+            }
+        },
+        error: function(error) {
+            console.error("Error:", error);
+        }
+    });
+}

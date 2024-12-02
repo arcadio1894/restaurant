@@ -10,6 +10,7 @@ use \App\Http\Controllers\OrderController;
 use \App\Http\Controllers\TelegramController;
 use \App\Http\Controllers\CouponController;
 use \App\Http\Controllers\BusinessController;
+use \App\Http\Controllers\PrintController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -119,3 +120,5 @@ Route::get('/telegram/send', [TelegramController::class, 'sendMessage']);
 
 Route::post('/dashboard/toggle-store-status', [BusinessController::class, 'toggleStoreStatus']);
 
+Route::post('/dashboard/print', [PrintController::class, 'imprimir']);
+Route::post('/print/order/{order_id}', [PrintController::class, 'printOrder']);

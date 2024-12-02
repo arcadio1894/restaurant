@@ -125,4 +125,10 @@ class Order extends Model
 
 
     }
+
+    public function getTotalAmountPrintAttribute()
+    {
+        return number_format($this->total_amount + $this->amount_shipping, 2, '.', '');
+
+    }
 }

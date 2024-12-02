@@ -30,6 +30,8 @@ $(document).ready(function () {
 
     $(document).on('click', '[data-ver_detalles]', showDetails);
 
+    $(document).on('click', '[data-print]', printOrder);
+
 });
 
 var $formDelete;
@@ -39,6 +41,79 @@ var $formDecimals;
 
 var $permissions;
 var $modalDetraction;
+
+function printOrder() {
+    const orderId = $(this).data('id');
+
+    // Realizar una solicitud AJAX para obtener los detalles del pedido
+    $.ajax({
+        url: `/print/order/${orderId}`,
+        method: 'POST',
+        processData:false,
+        contentType:false,
+        success: function (response) {
+            if (response.error) {
+                // Generar dinámicamente el contenido del modal
+                toastr.success(response.message, 'Éxito', {
+                    "closeButton": true,
+                    "debug": false,
+                    "newestOnTop": false,
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "preventDuplicates": false,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "2000",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                });
+
+            } else {
+                toastr.error(response.message, 'Error', {
+                    "closeButton": true,
+                    "debug": false,
+                    "newestOnTop": false,
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "preventDuplicates": false,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "2000",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                });
+            }
+        },
+        error: function (xhr) {
+            console.error('Error:', xhr.responseText);
+            toastr.error(xhr.responseText, 'Error', {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "2000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            });
+        }
+    });
+}
 
 function showDetails() {
     const orderId = $(this).data('id');
@@ -425,6 +500,8 @@ function renderDataTable(data) {
     cloneBtnActive.querySelector("[data-cocinando]").setAttribute("data-id", data.id);
     cloneBtnActive.querySelector("[data-enviando]").setAttribute("data-id", data.id);
     cloneBtnActive.querySelector("[data-completado]").setAttribute("data-id", data.id);
+
+    cloneBtnActive.querySelector("[data-print]").setAttribute("data-id", data.id);
 
     botones.append(cloneBtnActive);
 

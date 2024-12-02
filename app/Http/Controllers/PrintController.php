@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
+use App\Models\UserCoupon;
 use Illuminate\Http\Request;
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
@@ -30,11 +32,11 @@ class PrintController extends Controller
 
     public function imprimir($id)
     {
-        $boleta = Boleta::find($id);
+        //$boleta = Boleta::find($id);
 
-        if (!$boleta) {
+        /*if (!$boleta) {
             return response()->json(['error' => 'Boleta no encontrada'], 404);
-        }
+        }*/
 
         try {
             // Conectar a la impresora
@@ -42,7 +44,7 @@ class PrintController extends Controller
             $printer = new Printer($connector);
 
             // Cargar e imprimir el logotipo
-            $logoPath = public_path('images/logo.png'); // Ruta del logotipo
+            $logoPath = public_path('images/logo/logoPequeño.png'); // Ruta del logotipo
             if (file_exists($logoPath)) {
                 $logo = ImagickEscposImage::load($logoPath);
                 $printer->graphics($logo); // Imprime la imagen
@@ -55,7 +57,7 @@ class PrintController extends Controller
             $printer->text("Av. Principal 123, Lima\n");
             $printer->text("--------------------------------\n");
             $printer->text("BOLETA DE VENTA\n");
-            $printer->text("Nro: {$boleta->numero_boleta}\n");
+            /*$printer->text("Nro: {$boleta->numero_boleta}\n");
             $printer->text("Cliente: {$boleta->cliente}\n");
             $printer->text("--------------------------------\n");
 
@@ -78,7 +80,7 @@ class PrintController extends Controller
             $printer->text("Subtotal: S/. {$boleta->subtotal}\n");
             $printer->text("Descuento: S/. {$boleta->descuento}\n");
             $printer->text("IGV: S/. {$boleta->igv}\n");
-            $printer->text("TOTAL: S/. {$boleta->total}\n");
+            $printer->text("TOTAL: S/. {$boleta->total}\n");*/
             $printer->text("--------------------------------\n");
 
             // Pie de página
@@ -91,6 +93,97 @@ class PrintController extends Controller
             $printer->close();
 
             return response()->json(['success' => 'Boleta impresa correctamente']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al imprimir: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function impriprintOrdermir($id)
+    {
+        $order = Order::find($id);
+
+        if (!$order) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Boleta no encontrada'
+            ], 420);
+        }
+
+        try {
+            // Conectar a la impresora
+            $connector = new WindowsPrintConnector("EPSON_TM-T20III");
+            $printer = new Printer($connector);
+
+            // Cargar e imprimir el logotipo
+            $logoPath = public_path('images/logo/logoPequeño.png'); // Ruta del logotipo
+            if (file_exists($logoPath)) {
+                $logo = ImagickEscposImage::load($logoPath);
+                $printer->graphics($logo); // Imprime la imagen
+            }
+
+            // Encabezado de la boleta
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->text("RESTAURANTE FUEGO Y MASA\n");
+            $printer->text("RUC: 12345678901\n");
+            $printer->text("Av. Principal 123, Lima\n");
+            $printer->text("--------------------------------\n");
+            $printer->text("BOLETA DE VENTA\n");
+            $printer->text("Nro: ORDEN - {$order->id}\n");
+            $printer->text("Cliente: {$order->user->name}\n");
+            $printer->text("--------------------------------\n");
+
+            // Detalle de productos
+            $printer->setJustification(Printer::JUSTIFY_LEFT);
+
+            foreach ($order->details as $detail) {
+
+                $nombre = str_pad($detail->product->full_name."|".$detail->productType->type->name."(".$detail->productType->type->size.")", 50);
+                $precio = str_pad('S/. ' . number_format($detail->price * $detail->quantity, 2), 10, ' ', STR_PAD_LEFT);
+                $printer->text("{$nombre}{$precio}\n");
+                $printer->text("  {$detail->quantity} x S/. {$detail->price}\n");
+                /*if ($producto['descuento'] > 0) {
+                    $printer->text("  Descuento: S/. {$producto['descuento']}\n");
+                }*/
+            }
+
+            $printer->text("--------------------------------\n");
+
+            $userCoupon = UserCoupon::where('order_id', $order->id)->first();
+
+            if ($userCoupon) {
+                // Si existe un descuento, restar el discount_amount del total
+                $discount =  number_format($userCoupon->discount_amount, 2, '.', '');
+            } else {
+                $discount =  number_format(0, 2, '.', '');
+
+            }
+
+            // Totales
+
+            $amount_total = round($order->total_amount + $order->amount_shipping, 2);
+            $amount_subtotal = number_format(round($amount_total/1.18, 2), 2, '.', '');
+            $amount_igv = round($amount_total - $amount_subtotal, 2);
+
+            $printer->setJustification(Printer::JUSTIFY_RIGHT);
+            $printer->text("Subtotal: S/. {$amount_subtotal}\n");
+            $printer->text("Descuento: S/. {$discount}\n");
+            $printer->text("IGV: S/. {$amount_igv}\n");
+            $printer->text("TOTAL: S/. {$order->amount_pay}\n");
+            $printer->text("--------------------------------\n");
+
+            // Pie de página
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->text("Gracias por su compra\n");
+            $printer->text("www.fuegoymasa.com\n");
+
+            // Finalizar impresión
+            $printer->cut();
+            $printer->close();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Comanda impresa correctamente'
+            ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al imprimir: ' . $e->getMessage()], 500);
         }
