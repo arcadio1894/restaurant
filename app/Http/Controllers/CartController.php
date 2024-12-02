@@ -547,6 +547,8 @@ class CartController extends Controller
                 ]);
             }
 
+
+
             // Filtrar los detalles que no sean de categoría 'combo' (category_id = 3)
             $eligibleDetails = $cart->details->filter(function ($detail) {
                 return $detail->product->category_id != 3;
