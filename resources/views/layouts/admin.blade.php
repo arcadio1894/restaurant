@@ -422,12 +422,12 @@
                                     <p>Listar cupones</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
+                            {{--<li class="nav-item">
                                 <a href="{{route('coupons.create')}}" class="nav-link @yield('activeCreateCoupons')">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Crear cupones</p>
                                 </a>
-                            </li>
+                            </li>--}}
                         </ul>
                     </li>
                     <li class="nav-item has-treeview @yield('openProducts')">
@@ -453,7 +453,29 @@
                             </li>
                         </ul>
                     </li>
-
+                    <li class="nav-item has-treeview @yield('openTypes')">
+                        <a href="#" class="nav-link @yield('activeTypes')">
+                            <i class="nav-icon fas fa-list"></i>
+                            <p>
+                                Tipos de Productos
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{route('types.index')}}" class="nav-link @yield('activeListTypes')">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Listar tipos</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{route('types.create')}}" class="nav-link @yield('activeCreateTypes')">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Crear tipo</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
 
                     {{--@canany('list_report')
                         <li class="nav-header">REPORTES</li>

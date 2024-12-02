@@ -11,6 +11,7 @@ use \App\Http\Controllers\TelegramController;
 use \App\Http\Controllers\CouponController;
 use \App\Http\Controllers\BusinessController;
 use \App\Http\Controllers\PrintController;
+use \App\Http\Controllers\TypeController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -113,6 +114,23 @@ Route::middleware('auth')->group(function (){
             ->name('coupons.update');
         Route::delete('/coupons/{coupon}', [CouponController::class, 'destroy'])
             ->name('coupons.destroy');
+
+        // Mostrar listado de types
+        Route::get('/types', [TypeController::class, 'index'])
+            ->name('types.index');
+        Route::get('/get/data/types/{page}', [TypeController::class, 'getDataTypes']);
+        Route::get('/types/create', [TypeController::class, 'create'])
+            ->name('types.create');
+        Route::post('/types', [TypeController::class, 'store'])
+            ->name('types.store');
+        Route::get('/types/{type}', [TypeController::class, 'show'])
+            ->name('types.show');
+        Route::get('/types/{type}/edit/', [TypeController::class, 'edit'])
+            ->name('types.edit');
+        Route::post('/types/{type}/update', [TypeController::class, 'update'])
+            ->name('types.update');
+        Route::post('/types/destroy', [TypeController::class, 'destroy'])
+            ->name('types.destroy');
     });
 });
 
