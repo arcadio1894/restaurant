@@ -224,19 +224,53 @@ class CartController extends Controller
 
                 // Lógica para calcular el descuento
                 if ($coupon->type == 'total') {
+                    // Validar que no haya productos de categoría 'combo' (category_id = 3)
+                    $hasCombo = $cart->details->contains(function ($detail) {
+                        return $detail->product->category_id == 3;
+                    });
+
+                    if ($hasCombo) {
+                        DB::rollBack();
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'El cupón no se puede aplicar a carritos que contengan combos.',
+                        ]);
+                    }
+
+                    // Aplicar descuento al total
                     if ($coupon->amount != 0) {
                         $discountAmount = $coupon->amount;
                     } elseif ($coupon->percentage != 0) {
                         $discountAmount = ($coupon->percentage / 100) * $cart->total_cart;
                     }
                 } elseif ($coupon->type == 'detail') {
-                    // Lógica para aplicar el descuento al detalle con mayor monto
-                    $maxDetail = $cart->details()->orderByDesc('subtotal')->first();
+                    // Verificar si todos los productos son de categoría 'combo' (category_id = 3)
+                    $onlyCombos = $cart->details->every(function ($detail) {
+                        return $detail->product->category_id == 3;
+                    });
 
-                    if ($coupon->amount != 0) {
-                        $discountAmount = $coupon->amount;
-                    } elseif ($coupon->percentage != 0) {
-                        $discountAmount = ($coupon->percentage / 100) * $maxDetail->subtotal;
+                    if ($onlyCombos) {
+                        DB::rollBack();
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'El cupón no se puede aplicar porque solo hay combos en el pedido.',
+                        ]);
+                    }
+
+                    // Filtrar los detalles que no sean de categoría 'combo' (category_id = 3)
+                    $eligibleDetails = $cart->details->filter(function ($detail) {
+                        return $detail->product->category_id != 3;
+                    });
+
+                    // Buscar el detalle elegible con el subtotal más alto
+                    $maxDetail = $eligibleDetails->sortByDesc('subtotal')->first();
+
+                    if ($maxDetail) {
+                        if ($coupon->amount != 0) {
+                            $discountAmount = $coupon->amount;
+                        } elseif ($coupon->percentage != 0) {
+                            $discountAmount = ($coupon->percentage / 100) * $maxDetail->subtotal;
+                        }
                     }
                 }
             }
@@ -458,7 +492,7 @@ class CartController extends Controller
         $total = $totalWithShipping; // Considerar el total con envío
         $discount = 0;
 
-        if ($coupon->type == 'total') {
+        /*if ($coupon->type == 'total') {
             // Si el cupón aplica al total
             if ($coupon->amount != 0) {
                 $discount = $coupon->amount;
@@ -468,6 +502,58 @@ class CartController extends Controller
         } elseif ($coupon->type == 'detail') {
             // Si el cupón aplica a un detalle
             $maxDetail = $cart->details->sortByDesc('subtotal')->first();
+
+            if ($maxDetail) {
+                if ($coupon->amount != 0) {
+                    $discount = $coupon->amount;
+                } elseif ($coupon->percentage != 0) {
+                    $discount = $maxDetail->subtotal * ($coupon->percentage / 100);
+                }
+            }
+        }*/
+        if ($coupon->type == 'total') {
+            // Validar que no haya productos de categoría 'combo' (category_id = 3)
+            $hasCombo = $cart->details->contains(function ($detail) {
+                return $detail->product->category_id == 3;
+            });
+
+            if ($hasCombo) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El cupón no se puede aplicar a carritos que contengan combos.',
+                    'new_total' => number_format($totalWithShipping, 2), // Devolver el total con envío sin descuento
+                    'coupon_name' => '' // Limpiar el nombre del cupón
+                ]);
+            }
+
+            // Aplicar el descuento al total
+            if ($coupon->amount != 0) {
+                $discount = $coupon->amount;
+            } elseif ($coupon->percentage != 0) {
+                $discount = $total * ($coupon->percentage / 100);
+            }
+        } elseif ($coupon->type == 'detail') {
+            // Verificar si todos los productos son de categoría 'combo' (category_id = 3)
+            $onlyCombos = $cart->details->every(function ($detail) {
+                return $detail->product->category_id == 3;
+            });
+
+            if ($onlyCombos) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El cupón no se puede aplicar porque solo hay combos en el pedido.',
+                    'new_total' => number_format($totalWithShipping, 2), // Devolver el total con envío sin descuento
+                    'coupon_name' => '' // Limpiar el nombre del cupón
+                ]);
+            }
+
+            // Filtrar los detalles que no sean de categoría 'combo' (category_id = 3)
+            $eligibleDetails = $cart->details->filter(function ($detail) {
+                return $detail->product->category_id != 3;
+            });
+
+            // Buscar el detalle elegible con el subtotal más alto
+            $maxDetail = $eligibleDetails->sortByDesc('subtotal')->first();
 
             if ($maxDetail) {
                 if ($coupon->amount != 0) {
@@ -525,7 +611,7 @@ class CartController extends Controller
         if ($couponName) {
             $coupon = Coupon::where('name', $couponName)->first();
 
-            if ($coupon) {
+            /*if ($coupon) {
                 if ($coupon->type == 'total') {
                     if ($coupon->amount != 0) {
                         $discount = $coupon->amount;
@@ -541,6 +627,57 @@ class CartController extends Controller
                         } elseif ($coupon->percentage != 0) {
                             $discount = $maxDetail->subtotal * ($coupon->percentage / 100);
                         }
+                    }
+                }
+            }*/
+            // Lógica para calcular el descuento
+            if ($coupon->type == 'total') {
+                // Validar que no haya productos de categoría 'combo' (category_id = 3)
+                $hasCombo = $cart->details->contains(function ($detail) {
+                    return $detail->product->category_id == 3;
+                });
+
+                if ($hasCombo) {
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'El cupón no se puede aplicar a carritos que contengan combos.',
+                    ]);
+                }
+
+                // Aplicar descuento al total
+                if ($coupon->amount != 0) {
+                    $discount = $coupon->amount;
+                } elseif ($coupon->percentage != 0) {
+                    $discount = ($coupon->percentage / 100) * $cart->total_cart;
+                }
+            } elseif ($coupon->type == 'detail') {
+                // Verificar si todos los productos son de categoría 'combo' (category_id = 3)
+                $onlyCombos = $cart->details->every(function ($detail) {
+                    return $detail->product->category_id == 3;
+                });
+
+                if ($onlyCombos) {
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'El cupón no se puede aplicar porque solo hay combos en el pedido.',
+                    ]);
+                }
+
+                // Filtrar los detalles que no sean de categoría 'combo' (category_id = 3)
+                $eligibleDetails = $cart->details->filter(function ($detail) {
+                    return $detail->product->category_id != 3;
+                });
+
+                // Buscar el detalle elegible con el subtotal más alto
+                $maxDetail = $eligibleDetails->sortByDesc('subtotal')->first();
+
+                if ($maxDetail) {
+                    if ($coupon->amount != 0) {
+                        $discount = $coupon->amount;
+                    } elseif ($coupon->percentage != 0) {
+                        $discount = ($coupon->percentage / 100) * $maxDetail->subtotal;
                     }
                 }
             }
