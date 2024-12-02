@@ -134,7 +134,13 @@ class OrderController extends Controller
 
     public function getOrderDetails($orderId)
     {
-        $order = Order::with(['details.productType.type', 'details.product'])->find($orderId);
+
+        $order = Order::with([
+            'details.productType.type',
+            'details.product',
+            'details.options.option',
+            'details.options.product',
+        ])->find($orderId);
 
         if (!$order) {
             return response()->json(['error' => 'Pedido no encontrado'], 404);
@@ -143,9 +149,15 @@ class OrderController extends Controller
         $details = $order->details->map(function ($detail) {
             return [
                 'pizza_name' => $detail->product->full_name,
+                'quantity' => $detail->quantity,
                 'type' => $detail->productType->type->name,
                 'size' => ($detail->productType->type->size == null) ? 'N/A': $detail->productType->type->size,
                 'ingredients' => ($detail->product->ingredients == null) ? 'N/A':$detail->product->ingredients,
+                'options' => $detail->options->map(function ($option) {
+                    return [
+                        'product_name' => ($option->product->full_name == null) ? 'N/A': $option->product->full_name,
+                    ];
+                }),
             ];
         });
 

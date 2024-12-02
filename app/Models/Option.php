@@ -14,6 +14,7 @@ class Option extends Model
         'description',
         'quantity',
         'type',
+        'active'
     ];
 
     public function product()

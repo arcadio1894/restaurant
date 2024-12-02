@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\DataGeneral;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -36,6 +37,8 @@ class WelcomeController extends Controller
 
     public function goToDashboard()
     {
-        return view('welcome.dashboard');
+        $status = DataGeneral::getValue('status_store');
+        //dd($status);
+        return view('welcome.dashboard', compact('status'));
     }
 }

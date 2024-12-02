@@ -116,3 +116,6 @@ Route::middleware('auth')->group(function (){
 });
 
 Route::get('/telegram/send', [TelegramController::class, 'sendMessage']);
+
+Route::post('/dashboard/toggle-store-status', [BusinessController::class, 'toggleStoreStatus']);
+

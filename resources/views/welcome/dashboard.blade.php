@@ -5,6 +5,7 @@
 @endsection
 
 @section('styles-plugins')
+    <link rel="stylesheet" href="{{ asset('admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
 
 @endsection
 
@@ -25,6 +26,11 @@
 @endsection
 
 @section('content')
+
+    <div class="form-group">
+        <label for="btn-status"> Estado de la tienda </label> <br>
+        <input id="btn-status" type="checkbox" data-status="{{ $status }}" name="status" {{ ($status == 1) ? 'checked':'' }} data-bootstrap-switch data-off-color="danger" data-on-text="ABIERTA" data-off-text="CERRADA" data-on-color="success">
+    </div>
     {{--@hasanyrole('admin|almacen|principal')
     <div class="row">
         @can('list_customer')
@@ -310,6 +316,7 @@
 
 @section('scripts')
     <!-- Select2 -->
+    <script src="{{ asset('admin/plugins/bootstrap-switch/js/bootstrap-switch.min.js') }}"></script>
 
     <script src="{{ asset('admin/plugins/moment/moment.min.js') }}"></script>
     <script src="{{ asset('admin/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
@@ -319,13 +326,12 @@
     <script>
         $(function () {
             //Initialize Select2 Elements
-            $('#location').select2({
-                placeholder: "Selecione un almacén",
+            $("input[data-bootstrap-switch]").each(function(){
+                $(this).bootstrapSwitch();
             });
-            $('#typeEntry').select2({
-                placeholder: "Selecione Tipo",
-                allowClear: true
-            });
+
+
         })
     </script>
+    <script src="{{ asset('js/dashboard/dashboard.js')}}"></script>
 @endsection

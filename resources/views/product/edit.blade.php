@@ -178,16 +178,182 @@
                     <!-- /.card-body -->
                 </div>
             </div>
-
         </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card card-success">
+                    <div class="card-header">
+                        <h3 class="card-title">Opciones del Producto</h3>
+
+                        <div class="card-tools">
+                            <button type="button" id="new-option" class="btn btn-sm btn-primary">
+                                Agregar opción
+                            </button>
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="product-options">
+                            @foreach($product->options as $optionIndex => $option)
+                                <div class="card card-primary">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Opción</h3>
+                                        <div class="card-tools">
+                                            <button type="button" data-delete_option="{{ $option->id }}" class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i></button>
+                                            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body" style="display: block;">
+                                        <div class="form-group row">
+                                            <input type="hidden" name="options[{{ $optionIndex }}][id]" value="{{ $option->id }}">
+                                            <div class="col-md-12">
+                                                <label>Descripción</label>
+                                                <input type="text" name="options[{{ $optionIndex }}][description]" class="form-control form-control-sm" value="{{ $option->description }}">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-md-4">
+                                                <label>Cantidad</label>
+                                                <input type="number" name="options[{{ $optionIndex }}][quantity]" class="form-control form-control-sm" value="{{ $option->quantity }}">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label>Tipo</label>
+                                                <select name="options[{{ $optionIndex }}][type]" class="form-control form-control-sm options">
+                                                    <option value=""></option>
+                                                    <option value="radio" {{ $option->type === 'radio' ? 'selected' : '' }}>Radio</option>
+                                                    <option value="checkbox" {{ $option->type === 'checkbox' ? 'selected' : '' }}>Checkbox</option>
+                                                    <option value="select" {{ $option->type === 'select' ? 'selected' : '' }}>Select</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                                <button type="button" data-selection class="btn btn-sm btn-success btn-block"><i class="fas fa-plus"></i> Selección</button>
+                                            </div>
+                                        </div>
+                                        <div data-option_selection="option-selections">
+                                            @foreach($option->selections as $selectionIndex => $selection)
+                                                <div class="card bg-primary mb-3">
+                                                    <div class="card-body" style="display: block;">
+                                                        <div class="form-group row">
+                                                            <input type="hidden" name="options[{{ $optionIndex }}][selections][{{ $selectionIndex }}][id]" value="{{ $selection->id}}">
+                                                            <div class="col-md-8">
+                                                                <label>Producto</label>
+                                                                <select name="options[{{ $optionIndex }}][selections][{{ $selectionIndex }}][product_id]" class="form-control form-control-sm selections">
+                                                                    <option value=""></option>
+                                                                    @foreach($products as $productOption)
+                                                                        <option value="{{ $productOption->id }}" {{ $selection->product_id == $productOption->id ? 'selected' : '' }}>
+                                                                            {{ $productOption->full_name }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <label>Precio (Opcional)</label>
+                                                                <input type="text" name="options[{{ $optionIndex }}][selections][{{ $selectionIndex }}][additional_price]" class="form-control form-control-sm" value="{{ $selection->additional_price }}">
+                                                            </div>
+                                                            <div class="col-md-1">
+                                                                <label>&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                                                <button type="button" data-delete_selection="{{ $selection->id }}" class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i></button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-12">
                 <a href="{{ route('products.list') }}" class="btn btn-outline-secondary">Cancelar</a>
-                <button type="button" id="btn-submit" class="btn btn-outline-success float-right">Guardar material</button>
+                <button type="button" id="btn-submit" class="btn btn-outline-success float-right">Guardar producto</button>
             </div>
         </div>
         <!-- /.card-footer -->
     </form>
+
+    <template id="template-option">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Opción</h3>
+                <div class="card-tools">
+                    <button type="button" data-delete_option class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i></button>
+
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body" style="display: block;">
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <label >Descripción</label>
+                        <input type="text" name="options[0][description]" class="form-control form-control-sm">
+                    </div>
+
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <label>Cantidad</label>
+                        <input type="number" name="options[0][quantity]" class="form-control form-control-sm">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Tipo</label>
+                        <select name="options[0][type]" class="form-control form-control-sm options">
+                            <option value=""></option>
+                            <option value="radio">Radio</option>
+                            <option value="checkbox">Checkbox</option>
+                            <option value="select">Select</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                        <button type="button" data-selection class="btn btn-sm btn-success btn-block"><i class="fas fa-plus"></i> Selección</button>
+                    </div>
+                </div>
+                <div data-option_selection="option-selections">
+
+                </div>
+
+
+            </div>
+        </div>
+    </template>
+    <template id="template-selection">
+        <div class="card bg-primary mb-3">
+            <div class="card-body" style="display: block;">
+                <div class="form-group row">
+                    <div class="col-md-8">
+                        <label>Producto</label>
+                        <select name="options[0][selections][0][product_id]" class="form-control form-control-sm selections">
+                            <option value=""></option>
+                            @foreach( $products as $product )
+                                <option value="{{ $product->id }}">{{ $product->full_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Precio (Opcional)</label>
+                        <input type="text" name="options[0][selections][0][additional_price]" class="form-control form-control-sm">
+                    </div>
+                    <div class="col-md-1">
+                        <label>&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                        <button type="button" data-delete_selection class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
 @endsection
 
 @section('plugins')

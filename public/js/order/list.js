@@ -55,6 +55,86 @@ function showDetails() {
                     content += `
                         <div class="mb-4">
                             <h6><strong>Pizza:</strong> ${detail.pizza_name} | ${detail.type} (${detail.size})</h6>
+                            <p><strong>Ingredientes:</strong> ${detail.ingredients}</p>
+                    `;
+
+                    // Agregar las opciones seleccionadas
+                    if (detail.options && detail.options.length > 0) {
+                        content += `<p><strong>Opciones seleccionadas:</strong></p><ul>`;
+                        detail.options.forEach(option => {
+                            content += `
+                                <li><em>${option.product_name}</em></li>
+                            `;
+                        });
+                        content += `</ul>`;
+                    }
+
+                    content += `</div><hr />`;
+                });
+
+                // Insertar el contenido generado en el modal
+                $('#order-details-content').html(content);
+
+                // Mostrar el modal
+                $('#orderDetailsModal').modal('show');
+            } else {
+                toastr.error('No se encontraron detalles para este pedido.', 'Error', {
+                    "closeButton": true,
+                    "debug": false,
+                    "newestOnTop": false,
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "preventDuplicates": false,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "2000",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                });
+            }
+        },
+        error: function (xhr) {
+            console.error('Error:', xhr.responseText);
+            toastr.error('Ocurrió un error al obtener los detalles del pedido.', 'Error', {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "2000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            });
+        }
+    });
+}
+
+/*function showDetails() {
+    const orderId = $(this).data('id');
+
+    // Realizar una solicitud AJAX para obtener los detalles del pedido
+    $.ajax({
+        url: `/dashboard/orders/${orderId}/details`,
+        method: 'GET',
+        success: function (response) {
+            if (response.details) {
+                // Generar dinámicamente el contenido del modal
+                let content = '';
+                response.details.forEach((detail, index) => {
+                    content += `
+                        <div class="mb-4">
+                            <h6><strong>Pizza:</strong> ${detail.pizza_name} | ${detail.type} (${detail.size})</h6>
                             <p><strong>Ingredientes:</strong> </p>
                             <p>${detail.ingredients}</p>
                         </div>
@@ -111,7 +191,7 @@ function showDetails() {
             });
         }
     });
-}
+}*/
 
 function changeStatusOrder() {
     var order_id = $(this).data('id');

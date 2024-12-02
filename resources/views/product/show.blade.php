@@ -121,7 +121,7 @@
 
                         <div class="row">
                             {{-- Logica para mostrar las opciones --}}
-                            @foreach ($product->options as $option)
+                            @foreach ($options as $option)
                                 <div class="col-md-12 mb-4">
                                     <strong>{{ $option->description }}</strong>
                                     <small>Cantidad máxima: {{ $option->quantity }}</small>

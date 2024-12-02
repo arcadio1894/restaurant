@@ -5,16 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Selection extends Model
+class OrderDetailOption extends Model
 {
     use HasFactory;
 
     protected $fillable = [
+        'order_detail_id',
         'option_id',
         'product_id',
-        'additional_price',
-        'active'
     ];
+
+    public function orderDetail()
+    {
+        return $this->belongsTo(OrderDetail::class);
+    }
 
     public function option()
     {

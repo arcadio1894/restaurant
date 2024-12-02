@@ -10,6 +10,7 @@ use App\Models\CartDetailOption;
 use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\OrderDetailOption;
 use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\ProductType;
@@ -72,22 +73,23 @@ class CartController extends Controller
                 'price' => ProductType::find($product_type_id)->price, // Obtener el precio desde ProductType
                 'subtotal' => ProductType::find($product_type_id)->price * 1, // Calcular el subtotal
             ]);
+            // Guardar las opciones seleccionadas
+            foreach ($selectedOptions as $optionId => $productIds) {
+                foreach ((array) $productIds as $productId) {
+                    $cartDetail->options()->create([
+                        'option_id' => $optionId,
+                        'product_id' => $productId,
+                    ]);
+                }
+            }
         }
-
+/*
         // Validar que $cartDetail esté correctamente definido
         if (!$cartDetail) {
             return response()->json(['error' => 'No se pudo crear el detalle del carrito.'], 500);
-        }
+        }*/
 
-        // Guardar las opciones seleccionadas
-        foreach ($selectedOptions as $optionId => $productIds) {
-            foreach ((array) $productIds as $productId) {
-                $cartDetail->options()->create([
-                    'option_id' => $optionId,
-                    'product_id' => $productId,
-                ]);
-            }
-        }
+
 
         return response()->json(['redirect' => route('cart.show')]);
     }
@@ -253,14 +255,26 @@ class CartController extends Controller
 
             // Crear los detalles de la orden basados en el carrito
             foreach ($cart->details as $cartItem) {
-                OrderDetail::create([
+                // Crear el detalle de la orden
+                $orderDetail = OrderDetail::create([
                     'order_id' => $order->id,
                     'product_id' => $cartItem->product_id,
                     'product_type_id' => $cartItem->product_type_id,
                     'quantity' => $cartItem->quantity,
                     'price' => $cartItem->price,
-                    'subtotal' => $cartItem->quantity * $cartItem->price
+                    'subtotal' => $cartItem->quantity * $cartItem->price,
                 ]);
+
+                // Guardar las opciones relacionadas con este detalle
+                if (!empty($cartItem->options)) {
+                    foreach ($cartItem->options as $option) {
+                        OrderDetailOption::create([
+                            'order_detail_id' => $orderDetail->id, // Relación con el detalle de la orden
+                            'option_id' => $option->id,           // ID de la opción seleccionada
+                            'product_id' => $option->product_id,  // ID del producto asociado a la opción
+                        ]);
+                    }
+                }
             }
 
             $cart->status = 'completed';
@@ -318,8 +332,8 @@ class CartController extends Controller
                         'order' => "ORDEN - ".$order->id
                     ];
 
-                    $telegramController = new TelegramController();
-                    $telegramController->sendNotification('process', $data);
+                    /*$telegramController = new TelegramController();
+                    $telegramController->sendNotification('process', $data);*/
 
                     DB::commit();
 

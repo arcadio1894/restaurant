@@ -220,7 +220,16 @@ class ProductController extends Controller
 
     public function edit($id)
     {
-        $product = Product::with(['category'])->find($id);
+        $product = Product::with([
+            'category',
+            'options' => function ($query) {
+                $query->where('active', 1); // Filtrar opciones activas
+            },
+            'options.selections' => function ($query) {
+                $query->where('active', 1); // Filtrar selecciones activas
+            }
+        ])->find($id);
+
         $categories = Category::all();
         $types = Type::all();
         $priceTypes = ProductType::where('product_id', $id)
@@ -234,14 +243,15 @@ class ProductController extends Controller
             })
             ->toArray();
         //dd($priceTypes);
+        $products = Product::all();
 
-        return view('product.edit', compact('product', 'categories', 'types', 'priceTypes'));
+        return view('product.edit', compact('product', 'categories', 'types', 'priceTypes', 'products'));
 
     }
 
     public function update(UpdateProductRequest $request)
     {
-        //dd($request->get('typescrap'));
+        //dd($request);
         $validated = $request->validated();
 
         DB::beginTransaction();
@@ -314,6 +324,82 @@ class ProductController extends Controller
                 }
             });
 
+            $options = json_decode($request->input('options'), true);
+            // Obtener todas las opciones actuales del producto
+            $existingOptions = Option::where('product_id', $product->id)->with('selections')->get();
+
+            // IDs de opciones y selecciones procesadas
+            $processedOptionIds = [];
+            $processedSelectionIds = [];
+            foreach ($options as $optionData) {
+                if (!empty($optionData['id'])) {
+                    // Si la opción ya existe, actualizarla
+                    $option = Option::find($optionData['id']);
+                    if ($option) {
+                        $option->update([
+                            'description' => $optionData['description'],
+                            'quantity' => $optionData['quantity'],
+                            'type' => $optionData['type'],
+                            'active' => 1, // Reactivar la opción
+                        ]);
+                        $processedOptionIds[] = $option->id;
+                    }
+                } else {
+                    // Crear nueva opción
+                    $option = Option::create([
+                        'product_id' => $product->id,
+                        'description' => $optionData['description'],
+                        'quantity' => $optionData['quantity'],
+                        'type' => $optionData['type'],
+                        'active' => 1,
+                    ]);
+                    $processedOptionIds[] = $option->id;
+                }
+
+                // Procesar selecciones asociadas a la opción
+                foreach ($optionData['selections'] as $selectionData) {
+                    if (!empty($selectionData['id'])) {
+                        // Si la selección ya existe, actualizarla
+                        $selection = Selection::find($selectionData['id']);
+                        if ($selection) {
+                            $selection->update([
+                                'product_id' => $selectionData['product_id'],
+                                'additional_price' => ($selectionData['additional_price'] == null || $selectionData['additional_price'] == "") ? null : $selectionData['additional_price'],
+                                'active' => 1, // Reactivar la selección
+                            ]);
+                            $processedSelectionIds[] = $selection->id;
+                        }
+                    } else {
+                        // Crear nueva selección
+                        $newSelection = Selection::create([
+                            'option_id' => $option->id,
+                            'product_id' => $selectionData['product_id'],
+                            'additional_price' => ($selectionData['additional_price'] == null || $selectionData['additional_price'] == "") ? null : $selectionData['additional_price'],
+                            'active' => 1,
+                        ]);
+                        $processedSelectionIds[] = $newSelection->id;
+                    }
+                }
+
+                // Marcar como inactivas las selecciones no enviadas
+                $existingSelections = $option->selections;
+                foreach ($existingSelections as $existingSelection) {
+                    if (!in_array($existingSelection->id, $processedSelectionIds)) {
+                        $existingSelection->update(['active' => 0]);
+                    }
+                }
+            }
+
+            // Marcar como inactivas las opciones no enviadas
+            foreach ($existingOptions as $existingOption) {
+                if (!in_array($existingOption->id, $processedOptionIds)) {
+                    $existingOption->update(['active' => 0]);
+                    foreach ($existingOption->selections as $selection) {
+                        $selection->update(['active' => 0]);
+                    }
+                }
+            }
+
             DB::commit();
         } catch ( \Throwable $e ) {
             DB::rollBack();
@@ -355,7 +441,14 @@ class ProductController extends Controller
         // Obtener el tipo por defecto
         $defaultProductType = $productTypes->where('default', true)->first();
 
-        $options = Option::with('selections.product')->where('product_id', $id)->get();
+        $options = Option::where('product_id', $id)
+            ->where('active', 1) // Solo opciones activas
+            ->with(['selections' => function ($query) {
+                $query->where('active', 1); // Solo selecciones activas
+            }])
+            ->get();
+
+        //dd($options);
 
         return view('product.show', compact('product', 'productTypes', 'defaultProductType', 'options'));
     }
