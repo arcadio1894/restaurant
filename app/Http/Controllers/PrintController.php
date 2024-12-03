@@ -176,15 +176,19 @@ class PrintController extends Controller
             $printer->text("IGV: S/. {$amount_igv}\n");
             $printer->text("TOTAL: S/. {$order->amount_pay}\n");
             $printer->text("--------------------------------\n");
+            dump("Totales listo");
 
             // Pie de página
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->text("Gracias por su compra\n");
             $printer->text("www.fuegoymasa.com\n");
 
+            dump("Pie de pagina listo");
             // Finalizar impresión
             $printer->cut();
+            dump("Cut listo");
             $printer->close();
+            dump("Close listo");
 
             return response()->json([
                 'success' => true,
