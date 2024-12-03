@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 use Mike42\Escpos\ImagickEscposImage; // Para manejar imágenes
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PrintController extends Controller
 {
@@ -197,5 +198,37 @@ class PrintController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al imprimir: ' . $e->getMessage()], 500);
         }
+    }
+
+    public function generarRecibo($id)
+    {
+        $order = Order::find($id);
+
+        if (!$order) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Boleta no encontrada'
+            ], 420);
+        }
+
+        $userCoupon = UserCoupon::where('order_id', $order->id)->first();
+
+        if ($userCoupon) {
+            // Si existe un descuento, restar el discount_amount del total
+            $discount =  number_format($userCoupon->discount_amount, 2, '.', '');
+        } else {
+            $discount =  number_format(0, 2, '.', '');
+
+        }
+        // Totales
+
+        $amount_total = round($order->total_amount + $order->amount_shipping, 2);
+        $amount_subtotal = number_format(round($amount_total/1.18, 2), 2, '.', '');
+        $amount_igv = round($amount_total - $amount_subtotal, 2);
+
+        $pdf = Pdf::loadView('order.recibo', compact('order','amount_total', 'amount_subtotal', 'amount_igv', 'discount'))
+            ->setPaper([0, 0, 226.8, 900], 'portrait'); // 80mm de ancho, altura dinámica
+
+        return $pdf->stream("recibo_{$order->id}.pdf");
     }
 }

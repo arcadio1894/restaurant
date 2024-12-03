@@ -280,7 +280,7 @@
     </template>
 
     <template id="template-active">
-        <button data-print data-id="" class="btn btn-outline-dark btn-sm" data-toggle="tooltip" data-placement="top" title="Imprimir comanda"><i class="fas fa-print"></i></button>
+        <a href="" target="_blank" data-print data-id="" class="btn btn-outline-dark btn-sm" data-toggle="tooltip" data-placement="top" title="Imprimir comanda"><i class="fas fa-print"></i></a>
         <button data-ver_detalles data-id="" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Detalles"><i class="fas fa-list-ol"></i></button>
 
         <button data-recibido data-id="" data-state="created" data-state_name="RECIBIDO" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Recibido"><i class="far fa-file-alt"></i></button>

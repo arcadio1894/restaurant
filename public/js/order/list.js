@@ -504,6 +504,9 @@ function renderDataTable(data) {
 
     cloneBtnActive.querySelector("[data-print]").setAttribute("data-id", data.id);
 
+    let url = document.location.origin + '/imprimir/recibo/' + data.id;
+    cloneBtnActive.querySelector("[data-print]").setAttribute("href", url);
+
     botones.append(cloneBtnActive);
 
     $("#body-table").append(clone);

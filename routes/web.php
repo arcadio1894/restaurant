@@ -140,3 +140,4 @@ Route::post('/dashboard/toggle-store-status', [BusinessController::class, 'toggl
 
 Route::post('/dashboard/print', [PrintController::class, 'imprimir']);
 Route::post('/print/order/{order_id}', [PrintController::class, 'printOrder']);
+Route::get('/imprimir/recibo/{id}', [PrintController::class, 'generarRecibo']);
