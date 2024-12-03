@@ -46,27 +46,26 @@
         <p>RUC: 20613407287</p>
         <p>Manuel Candamo 810, Lima</p>
         <div class="line"></div>
-        <p>NOTA DE VENTA - {{ $order->id }}</p>
+        <p>COMANDA - {{ $order->id }}</p>
         {{--<p>Nro: ORDEN - {{ $order->id }}</p>--}}
         <div class="line"></div>
     </div>
-    <p><b>Fecha Pedido:</b> {{ $order->created_at->format('d/m/Y') }}</p>
-    {{--<p><b>Entrega:</b> {{ $order->formatted_date }}</p>--}}
+    <p><b>Pedido:</b> {{ $order->formatted_created_date }}</p>
+    <p><b>Entrega:</b> {{ $order->formatted_date }}</p>
     <p><b>Cliente:</b> {{ $order->user->name }}</p>
     <p><b>Telefono:</b> {{ ($order->shipping_address_id == null) ? 'N/A':$order->shipping_address->phone }}</p>
     <div class="line"></div>
     @foreach ($order->details as $detail)
-
-        <p><b>{{ str_pad( ($detail->product->full_name), 10, ' ', STR_PAD_LEFT)  }} x {{ $detail->quantity }}</b>  <span style="float: right;">{{ 'S/. ' . number_format($detail->price * $detail->quantity, 2) }}</span></p>
+        <strong><p style="font-size: 18px">{{ ($detail->product->full_name) }} <span style="float: right;">{{ $detail->quantity }}</span></p></strong>
         @foreach( $detail->options as $option )
-            <p>- {{ str_pad( ($option->product->full_name), 10, ' ', STR_PAD_LEFT) }}</p>
+            <p style="font-size: 16px">- {{ str_pad( ($option->product->full_name), 10, ' ', STR_PAD_LEFT) }} x {{ $detail->quantity }}</p>
         @endforeach
     @endforeach
     <div class="line"></div>
-    <p><b>Sub Total:</b> <span style="float: right;">S/. {{ $amount_subtotal }}</span></p>
-    <p><b>Descuento:</b> <span style="float: right;">S/. {{ $discount }}</span></p>
-    <p><b>IGV:</b> <span style="float: right;">S/. {{ $amount_igv }}</span></p>
-    <p><b>TOTAL:</b> <span style="float: right;">S/. {{ $order->amount_pay }}</span></p>
+    <div style="border: 0.5px solid black; padding: 3px; margin-top: 10px;">
+        <strong>Observaciones:</strong>
+        {{ $order->observations }}
+    </div>
     <div class="text-center" >
         <p>¡Gracias por su compra!</p>
         <p>www.fuegoymasa.com</p>

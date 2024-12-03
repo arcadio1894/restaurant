@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Cart extends Model
 {
-    protected $fillable = ['user_id', 'status', 'total'];
+    protected $fillable = ['user_id', 'status', 'total', 'observations'];
 
     public function getTotalCartAttribute()
     {

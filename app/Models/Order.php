@@ -25,6 +25,7 @@ class Order extends Model
         'payment_code',
         'amount_shipping',
         'shipping_district_id',
+        'observations'
     ];
 
     public function user()

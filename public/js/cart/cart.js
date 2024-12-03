@@ -49,7 +49,74 @@ $(document).ready(function() {
             }
         });
     }
+
+    $("#btn-observations").on('click', saveObservations);
 });
+
+function saveObservations() {
+    let cart_id = $("#cart_id").val();
+    let observation = $("#observations").val();
+
+    event.preventDefault();
+    $("#btn-observations").attr("disabled", true);
+    // Obtener la URL
+    $.ajax({
+        url: `/cart/save-observation/${cart_id}`,
+        method: 'POST',
+        data: {
+            observation: observation,
+            _token: $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function (data) {
+            console.log(data);
+            toastr.success(data.message, 'Éxito',
+                {
+                    "closeButton": true,
+                    "debug": false,
+                    "newestOnTop": false,
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "preventDuplicates": false,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "2000",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                });
+            setTimeout( function () {
+                $("#btn-observations").attr("disabled", false);
+            }, 2000 )
+        },
+        error: function (data) {
+            for ( var property in data.responseJSON.errors ) {
+                toastr.error(data.responseJSON.errors[property], 'Error',
+                    {
+                        "closeButton": true,
+                        "debug": false,
+                        "newestOnTop": false,
+                        "progressBar": true,
+                        "positionClass": "toast-top-right",
+                        "preventDuplicates": false,
+                        "onclick": null,
+                        "showDuration": "300",
+                        "hideDuration": "1000",
+                        "timeOut": "4000",
+                        "extendedTimeOut": "1000",
+                        "showEasing": "swing",
+                        "hideEasing": "linear",
+                        "showMethod": "fadeIn",
+                        "hideMethod": "fadeOut"
+                    });
+            }
+            $("#btn-observations").attr("disabled", false);
+
+        },
+    });
+}
 
 function deleteItem(button) {
     let detailId = button.data('detail_id');

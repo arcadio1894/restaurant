@@ -231,4 +231,36 @@ class PrintController extends Controller
 
         return $pdf->stream("recibo_{$order->id}.pdf");
     }
+
+    public function generarComanda($id)
+    {
+        $order = Order::find($id);
+
+        if (!$order) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Boleta no encontrada'
+            ], 420);
+        }
+
+        $userCoupon = UserCoupon::where('order_id', $order->id)->first();
+
+        if ($userCoupon) {
+            // Si existe un descuento, restar el discount_amount del total
+            $discount =  number_format($userCoupon->discount_amount, 2, '.', '');
+        } else {
+            $discount =  number_format(0, 2, '.', '');
+
+        }
+        // Totales
+
+        $amount_total = round($order->total_amount + $order->amount_shipping, 2);
+        $amount_subtotal = number_format(round($amount_total/1.18, 2), 2, '.', '');
+        $amount_igv = round($amount_total - $amount_subtotal, 2);
+
+        $pdf = Pdf::loadView('order.comanda', compact('order','amount_total', 'amount_subtotal', 'amount_igv', 'discount'))
+            ->setPaper([0, 0, 226.8, 900], 'portrait'); // 80mm de ancho, altura dinámica
+
+        return $pdf->stream("recibo_{$order->id}.pdf");
+    }
 }

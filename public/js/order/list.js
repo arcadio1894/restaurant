@@ -30,7 +30,7 @@ $(document).ready(function () {
 
     $(document).on('click', '[data-ver_detalles]', showDetails);
 
-    $(document).on('click', '[data-print]', printOrder);
+    $(document).on('click', '[data-print_nota]', printOrder);
 
 });
 
@@ -497,15 +497,18 @@ function renderDataTable(data) {
     var cloneBtnActive = activateTemplate('#template-active');
     cloneBtnActive.querySelector("[data-ver_detalles]").setAttribute("data-id", data.id);
 
-    cloneBtnActive.querySelector("[data-recibido]").setAttribute("data-id", data.id);
     cloneBtnActive.querySelector("[data-cocinando]").setAttribute("data-id", data.id);
     cloneBtnActive.querySelector("[data-enviando]").setAttribute("data-id", data.id);
     cloneBtnActive.querySelector("[data-completado]").setAttribute("data-id", data.id);
 
-    cloneBtnActive.querySelector("[data-print]").setAttribute("data-id", data.id);
+    cloneBtnActive.querySelector("[data-print_nota]").setAttribute("data-id", data.id);
+    cloneBtnActive.querySelector("[data-print_comanda]").setAttribute("data-id", data.id);
 
     let url = document.location.origin + '/imprimir/recibo/' + data.id;
-    cloneBtnActive.querySelector("[data-print]").setAttribute("href", url);
+    cloneBtnActive.querySelector("[data-print_nota]").setAttribute("href", url);
+
+    let url_comanda = document.location.origin + '/imprimir/comanda/' + data.id;
+    cloneBtnActive.querySelector("[data-print_comanda]").setAttribute("href", url_comanda);
 
     botones.append(cloneBtnActive);
 

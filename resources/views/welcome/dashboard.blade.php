@@ -32,7 +32,7 @@
         <input id="btn-status" type="checkbox" data-status="{{ $status }}" name="status" {{ ($status == 1) ? 'checked':'' }} data-bootstrap-switch data-off-color="danger" data-on-text="ABIERTA" data-off-text="CERRADA" data-on-color="success">
     </div>
 
-    <button type="button" id="btn-print" class="btn btn-success">Imprimir</button>
+    {{--<button type="button" id="btn-print" class="btn btn-success">Imprimir</button>--}}
     {{--@hasanyrole('admin|almacen|principal')
     <div class="row">
         @can('list_customer')

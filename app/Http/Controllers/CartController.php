@@ -63,6 +63,9 @@ class CartController extends Controller
             $cartDetail->quantity += 1;
             $cartDetail->subtotal = $cartDetail->quantity * $cartDetail->price;
             $cartDetail->save();
+            // TODO: Si es combo que cree un detalle mas SI las selecciones y el producto sondiferentes
+            // Si son iguales entonces agrega unno mas
+            // Si no es combo que haga lo actual
         } else {
             // Si no existe, agregar un nuevo detalle
             $product = Product::find($product_id);
@@ -285,6 +288,7 @@ class CartController extends Controller
                 'payment_method_id' => $validatedData['paymentMethod'],
                 'amount_shipping' => $shippingCost,
                 'shipping_district_id' => $districtId,
+                'observations' => $cart->observations
             ]);
 
             // Crear los detalles de la orden basados en el carrito
@@ -816,5 +820,22 @@ class CartController extends Controller
                 'message' => 'Ocurrió un error al eliminar el detalle del carrito. Intenta de nuevo más tarde.',
             ], 500);
         }
+    }
+
+    public function saveObservation( Request $request, $cart_id )
+    {
+        DB::beginTransaction();
+        try {
+            $cart = Cart::find($cart_id);
+            $cart->observations = $request->get('observation'); // Cambiar estado a inactivo
+            $cart->save();
+
+            DB::commit();
+        } catch ( \Throwable $e ) {
+            DB::rollBack();
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return response()->json(['message' => 'Observación guardad con éxito.'], 200);
     }
 }

@@ -28,6 +28,7 @@
 @endsection
 
 @section('content')
+    <input type="hidden" id="cart_id" value="{{ $cart->id }}">
     <section class="bg-light my-5">
         <div class="container">
             <div class="row">
@@ -118,21 +119,6 @@
                 <!-- summary -->
 
                 <div class="col-lg-3">
-                    {{--@if($cart && $cart->details->isNotEmpty())
-                    <div class="card mb-3 border shadow-0">
-                        <div class="card-body">
-
-                            <div class="form-group">
-                                <label class="form-label">Have coupon?</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control border" name="" placeholder="Coupon code" />
-                                    <button class="btn btn-light border">Apply</button>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                    @endif--}}
                     @if($cart && $cart->details->isNotEmpty())
                         <div class="card shadow-0 border">
                             <div class="card-body">
@@ -164,6 +150,20 @@
 
                 </div>
                 <!-- summary -->
+            </div>
+
+            <div class="row">
+                <div class="col-md-9">
+                    <div class="card border shadow-0 mt-3 pt-3 pb-3">
+                        <div class="col-sm-12">
+                            <label for="observations" class="col-form-label">Ingrese alguna información de sus pedido</label>
+                            <button type="button" id="btn-observations" class="btn btn-outline-success btn-sm float-right"><i class="far fa-save"></i> Guardar</button>
+                        </div>
+                        <div class="col-sm-12">
+                            <textarea name="observations" id="observations" rows="3" class="form-control">{{$cart->observations}}</textarea>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>

@@ -53,6 +53,8 @@ Route::get('/checkout', [CartController::class, 'checkout'])->middleware('auth')
 Route::post('/checkout/pagar', [CartController::class, 'pagar'])->name('checkout.pagar');
 Route::post('/checkout/crear-preferencia', [CartController::class, 'crearPreferencia'])->name('checkout.crearPreferencia');
 Route::delete('/cart/delete-detail/{id}', [CartController::class, 'deleteDetail'])->name('cart.detail.delete');
+Route::post('/cart/save-observation/{id}', [CartController::class, 'saveObservation'])->name('cart.save.observation');
+
 
 Route::get('/apply-coupon', [CartController::class, 'applyCoupon'])->name('apply.coupon');
 Route::post('/checkout/shipping', [CartController::class, 'calculateShipping']);
@@ -141,3 +143,4 @@ Route::post('/dashboard/toggle-store-status', [BusinessController::class, 'toggl
 Route::post('/dashboard/print', [PrintController::class, 'imprimir']);
 Route::post('/print/order/{order_id}', [PrintController::class, 'printOrder']);
 Route::get('/imprimir/recibo/{id}', [PrintController::class, 'generarRecibo']);
+Route::get('/imprimir/comanda/{id}', [PrintController::class, 'generarComanda']);
