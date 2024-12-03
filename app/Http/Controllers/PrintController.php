@@ -111,15 +111,18 @@ class PrintController extends Controller
 
         try {
             // Conectar a la impresora
+            dump("Inicio del codigo");
             $connector = new WindowsPrintConnector("EPSON TM-T20III Receipt");
+            dump("Conector listo");
             $printer = new Printer($connector);
-
+            dump("Printer listo");
             // Cargar e imprimir el logotipo
             $logoPath = public_path('images/logo/logoPequeño.png'); // Ruta del logotipo
             if (file_exists($logoPath)) {
                 $logo = ImagickEscposImage::load($logoPath);
                 $printer->graphics($logo); // Imprime la imagen
             }
+            dump("Imagen listo");
 
             // Encabezado de la boleta
             $printer->setJustification(Printer::JUSTIFY_CENTER);
@@ -131,6 +134,7 @@ class PrintController extends Controller
             $printer->text("Nro: ORDEN - {$order->id}\n");
             $printer->text("Cliente: {$order->user->name}\n");
             $printer->text("--------------------------------\n");
+            dump("Encabezado listo");
 
             // Detalle de productos
             $printer->setJustification(Printer::JUSTIFY_LEFT);
@@ -145,6 +149,8 @@ class PrintController extends Controller
                     $printer->text("  Descuento: S/. {$producto['descuento']}\n");
                 }*/
             }
+
+            dump("Detalles listo");
 
             $printer->text("--------------------------------\n");
 
