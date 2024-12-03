@@ -56,6 +56,9 @@ function printEpson() {
     $.ajax({
         url: '/dashboard/print',
         type: 'POST',
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content')
+        },
         processData:false,
         contentType:false,
         success: function(response) {

@@ -40,7 +40,7 @@ class PrintController extends Controller
 
         try {
             // Conectar a la impresora
-            $connector = new WindowsPrintConnector("EPSON_TM-T20III");
+            $connector = new WindowsPrintConnector("EPSON TM-T20III Receipt");
             $printer = new Printer($connector);
 
             // Cargar e imprimir el logotipo
@@ -111,7 +111,7 @@ class PrintController extends Controller
 
         try {
             // Conectar a la impresora
-            $connector = new WindowsPrintConnector("EPSON_TM-T20III");
+            $connector = new WindowsPrintConnector("EPSON TM-T20III Receipt");
             $printer = new Printer($connector);
 
             // Cargar e imprimir el logotipo
