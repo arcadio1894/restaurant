@@ -98,7 +98,7 @@ class PrintController extends Controller
         }
     }
 
-    public function impriprintOrdermir($id)
+    public function printOrder($id)
     {
         $order = Order::find($id);
 
