@@ -49,9 +49,7 @@ function printOrder() {
     $.ajax({
         url: `/print/order/${orderId}`,
         method: 'POST',
-        data: {
-            _token: $('meta[name="csrf-token"]').attr('content')
-        },
+        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
         processData:false,
         contentType:false,
         success: function (response) {
