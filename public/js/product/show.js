@@ -224,8 +224,8 @@ $(document).ready(function () {
                 }).get();
 
                 // Validar selección mínima y máxima
-                if (selected.length === 0) {
-                    showError(`Debes seleccionar al menos una opción para: ${optionDescription}.`);
+                if (selected.length === 0 || selected.length < maxQuantity) {
+                    showError(`Debes seleccionar productos para la opción: ${optionDescription}.`);
                     valid = false;
                     return false; // Detener iteración
                 }
