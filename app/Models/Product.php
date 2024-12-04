@@ -44,7 +44,7 @@ class Product extends Model
         // Obtener el tipo por defecto
         $defaultProductType = $productTypes->where('default', true)->first();
 
-        if ( $defaultProductType->price )
+        if ( isset($defaultProductType) )
         {
             return $defaultProductType->price;
         } else {

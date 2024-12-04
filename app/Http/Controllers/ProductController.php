@@ -166,7 +166,7 @@ class ProductController extends Controller
             $priceTypes = $request->input('productPrice', []);
             $defaultType = $request->input('defaultType');
 
-            if (!$defaultType) {
+            if (!$defaultType && count($types) > 0) {
                 return response()->json(['message' => 'El tipo por defecto no se seleccionó.'], 422);
             }
 
