@@ -184,7 +184,7 @@
                                         <option value="{{ $productType->id }}"
                                                 data-price="{{ $productType->price }}"
                                                 {{ $productType->default ? 'selected' : '' }}>
-                                            {{ $productType->type->name }} ({{ $productType->type->size }})
+                                            {{ $productType->type->name }} {{ ($productType->type->size == null) ? "":"(".$productType->type->size.")" }}
                                         </option>
                                     @endforeach
                                 </select>
