@@ -12,6 +12,7 @@ use \App\Http\Controllers\CouponController;
 use \App\Http\Controllers\BusinessController;
 use \App\Http\Controllers\PrintController;
 use \App\Http\Controllers\TypeController;
+use \App\Http\Controllers\CategoryController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -133,6 +134,23 @@ Route::middleware('auth')->group(function (){
             ->name('types.update');
         Route::post('/types/destroy', [TypeController::class, 'destroy'])
             ->name('types.destroy');
+
+        // Mostrar Categorías
+        Route::get('/categories', [CategoryController::class, 'index'])
+            ->name('categories.index');
+        Route::get('/get/data/categories/{page}', [CategoryController::class, 'getDataCategories']);
+        Route::get('/categories/create', [CategoryController::class, 'create'])
+            ->name('categories.create');
+        Route::post('/categories', [CategoryController::class, 'store'])
+            ->name('categories.store');
+        Route::get('/categories/{type}', [CategoryController::class, 'show'])
+            ->name('categories.show');
+        Route::get('/categories/{type}/edit/', [CategoryController::class, 'edit'])
+            ->name('categories.edit');
+        Route::post('/categories/{type}/update', [CategoryController::class, 'update'])
+            ->name('categories.update');
+        Route::post('/categories/destroy', [CategoryController::class, 'destroy'])
+            ->name('categories.destroy');
     });
 });
 

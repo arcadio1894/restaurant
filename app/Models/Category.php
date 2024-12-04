@@ -11,11 +11,16 @@ class Category extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['name','description'];
+    protected $fillable = [
+        'name',
+        'description',
+        'visible',
+        'enable_status'
+    ];
 
-    public function materials()
+    public function products()
     {
-        return $this->hasMany('App\Material');
+        return $this->hasMany(Product::class);
     }
 
     protected $dates = ['deleted_at'];
