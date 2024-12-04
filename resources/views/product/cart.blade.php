@@ -115,6 +115,18 @@
                             </div>
                         @endif--}}
                     </div>
+                    @if($cart && $cart->details->isNotEmpty())
+
+                        <div class="card border shadow-0 mt-3 pt-3 pb-3">
+                            <div class="col-sm-12">
+                                <label for="observations" class="col-form-label">Ingrese alguna información de sus pedido</label>
+                                <button type="button" id="btn-observations" class="btn btn-outline-success btn-sm float-right"><i class="far fa-save"></i> Guardar</button>
+                            </div>
+                            <div class="col-sm-12">
+                                <textarea name="observations" id="observations" rows="3" class="form-control">{{$cart->observations}}</textarea>
+                            </div>
+                        </div>
+                    @endif
                 </div>
                 <!-- cart -->
                 <!-- summary -->
@@ -152,21 +164,7 @@
                 </div>
                 <!-- summary -->
             </div>
-            @if($cart && $cart->details->isNotEmpty())
-            <div class="row">
-                <div class="col-md-9">
-                    <div class="card border shadow-0 mt-3 pt-3 pb-3">
-                        <div class="col-sm-12">
-                            <label for="observations" class="col-form-label">Ingrese alguna información de sus pedido</label>
-                            <button type="button" id="btn-observations" class="btn btn-outline-success btn-sm float-right"><i class="far fa-save"></i> Guardar</button>
-                        </div>
-                        <div class="col-sm-12">
-                            <textarea name="observations" id="observations" rows="3" class="form-control">{{$cart->observations}}</textarea>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @endif
+
         </div>
     </section>
 @endsection
