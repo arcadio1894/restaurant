@@ -28,7 +28,7 @@
 @endsection
 
 @section('content')
-    <input type="hidden" id="cart_id" value="{{ $cart->id }}">
+
     <section class="bg-light my-5">
         <div class="container">
             <div class="row">
@@ -37,6 +37,7 @@
                     <div class="card border shadow-0">
                         <div class="m-4">
                         @if($cart && $cart->details->isNotEmpty())
+                            <input type="hidden" id="cart_id" value="{{ $cart->id }}">
                             @foreach( $cart->details as $detail )
                                 <div class="row gy-3 mb-4">
                                     <div class="col-md-5">
@@ -151,7 +152,7 @@
                 </div>
                 <!-- summary -->
             </div>
-
+            @if($cart && $cart->details->isNotEmpty())
             <div class="row">
                 <div class="col-md-9">
                     <div class="card border shadow-0 mt-3 pt-3 pb-3">
@@ -165,6 +166,7 @@
                     </div>
                 </div>
             </div>
+            @endif
         </div>
     </section>
 @endsection
