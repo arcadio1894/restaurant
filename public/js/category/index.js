@@ -42,7 +42,7 @@ var $modalImage;
 var $permissions;
 
 function openModalDisable() {
-    var type_id = $(this).data('delete');
+    var category_id = $(this).data('delete');
     var description = $(this).data('description');
     var state = $(this).data('state');
     var textState = "";
@@ -53,7 +53,7 @@ function openModalDisable() {
         textState = 'ACTIVO'
     }
 
-    $modalDelete.find('[id=type_id]').val(type_id);
+    $modalDelete.find('[id=category_id]').val(category_id);
     $modalDelete.find('[id=title]').html(textState);
     $modalDelete.find('[id=descriptionDelete]').html(description);
 
@@ -177,7 +177,7 @@ function getDataProducts($numberPage) {
 
     var name = $('#name').val();
 
-    $.get('/dashboard/get/data/types/'+$numberPage, {
+    $.get('/dashboard/get/data/categories/'+$numberPage, {
         name:name,
     }, function(data) {
         if ( data.data.length == 0 )
@@ -322,14 +322,14 @@ function renderDataTable(data, activeColumns) {
     // Llenar los datos en cada celda según el objeto de datos
     clone.querySelector("[data-id]").innerHTML = data.id;
     clone.querySelector("[data-name]").innerHTML = data.name;
-    clone.querySelector("[data-size]").innerHTML = data.size;
-    clone.querySelector("[data-price]").innerHTML = data.price;
-    clone.querySelector("[data-estado]").innerHTML = data.stateText;
+    clone.querySelector("[data-description]").innerHTML = data.description;
+    clone.querySelector("[data-visible]").innerHTML = data.visibleText;
+    clone.querySelector("[data-estado]").innerHTML = data.enableText;
 
     // Configurar enlaces y botones según los permisos y datos
     /*if ($.inArray('update_material', $permissions) !== -1) {*/
-        let url = document.location.origin + '/dashboard/types/' + data.id+'/edit/';
-        clone.querySelector("[data-editar_type]").setAttribute("href", url);
+        let url = document.location.origin + '/dashboard/categories/' + data.id+'/edit/';
+        clone.querySelector("[data-editar_category]").setAttribute("href", url);
     /*} else {
         let element = clone.querySelector("[data-editar_material]");
         if (element) {
@@ -340,7 +340,7 @@ function renderDataTable(data, activeColumns) {
     /*if ($.inArray('enable_material', $permissions) !== -1) {*/
         clone.querySelector("[data-deshabilitar]").setAttribute("data-delete", data.id);
         clone.querySelector("[data-deshabilitar]").setAttribute("data-description", data.name);
-        clone.querySelector("[data-deshabilitar]").setAttribute("data-state", data.active);
+        clone.querySelector("[data-deshabilitar]").setAttribute("data-state", data.enable_status);
     /*} else {
         let element = clone.querySelector("[data-deshabilitar]");
         if (element) {

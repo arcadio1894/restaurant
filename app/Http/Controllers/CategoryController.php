@@ -70,8 +70,7 @@ class CategoryController extends Controller
             array_push($array, [
                 "id" => $type->id,
                 "name" => $type->name,
-                "size" => $type->size,
-                "price" => $type->price,
+                "description" => $type->description,
                 "visible" => $type->visible,
                 "visibleText" => $visibleText,
                 "enable_status" => $type->enable_status,
@@ -106,12 +105,15 @@ class CategoryController extends Controller
                 'description' => 'nullable|string',
             ]);
 
-            Category::create([
-                'name' => $request->get('name'),
-                'description' => $request->get('description'),
-                'visible' => $request->get('visible'),
-                'enable_status' => 1
-            ]);
+            // Procesar el estado de visibilidad
+            $isActive = $request->has('active') ? 1 : 0; // Si 'active' no está presente, será 0
+
+            // Crear la categoría
+            $category = new Category();
+            $category->name = $request->input('name');
+            $category->description = $request->input('description');
+            $category->visible = $isActive; // Asignar el estado de visibilidad
+            $category->save();
 
             DB::commit();
         } catch ( \Throwable $e ) {
@@ -137,9 +139,13 @@ class CategoryController extends Controller
             ]);
 
             $category = Category::find($category->id);
-            $category->name = $request->get('name');
-            $category->description = $request->get('description');
-            $category->visible = $request->get('visible');
+            // Procesar el estado de visibilidad
+            $isActive = $request->has('active') ? 1 : 0; // Si 'active' no está presente, será 0
+
+            // Crear la categoría
+            $category->name = $request->input('name');
+            $category->description = $request->input('description');
+            $category->visible = $isActive; // Asignar el estado de visibilidad
             $category->save();
 
             DB::commit();

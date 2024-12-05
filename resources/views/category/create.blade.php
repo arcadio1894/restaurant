@@ -1,14 +1,14 @@
 @extends('layouts.admin')
 
-@section('openTypes')
+@section('openCategories')
     menu-open
 @endsection
 
-@section('activeTypes')
+@section('activeCategories')
     active
 @endsection
 
-@section('activeCreateTypes')
+@section('activeCreateCategories')
     active
 @endsection
 

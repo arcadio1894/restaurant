@@ -1,19 +1,19 @@
 @extends('layouts.admin')
 
-@section('openCoupons')
+@section('openCategories')
     menu-open
 @endsection
 
-@section('activeCoupons')
+@section('activeCategories')
     active
 @endsection
 
-@section('activeListCoupons')
+@section('activeListCategories')
     active
 @endsection
 
 @section('title')
-    Cupones
+    Categorías
 @endsection
 
 @section('styles-plugins')
@@ -96,13 +96,13 @@
 @endsection
 
 @section('page-header')
-    <h1 class="page-title">Tipo de productos</h1>
+    <h1 class="page-title">Categorías</h1>
 @endsection
 
 @section('page-title')
-    <h5 class="card-title">Listado de productos</h5>
+    <h5 class="card-title">Listado de Categorías</h5>
     {{--@can('create_material')--}}
-        <a href="{{ route('types.create') }}" class="btn btn-outline-success btn-sm float-right" > <i class="fa fa-plus font-20"></i> Nuevo Tipo </a>
+        <a href="{{ route('categories.create') }}" class="btn btn-outline-success btn-sm float-right" > <i class="fa fa-plus font-20"></i> Nueva Categoría </a>
     {{--@endcan--}}
 @endsection
 
@@ -111,7 +111,7 @@
         <li class="breadcrumb-item">
             <a href="{{ route('dashboard.principal') }}"><i class="fa fa-home"></i> Dashboard</a>
         </li>
-        <li class="breadcrumb-item"><i class="fa fa-archive"></i> Tipo de productos </li>
+        <li class="breadcrumb-item"><i class="fa fa-archive"></i> Categorías </li>
     </ol>
 @endsection
 
@@ -125,7 +125,7 @@
             <div class="col-md-12">
                 <!-- Barra de búsqueda -->
                 <div class="input-group">
-                    <input type="text" id="name" class="form-control" placeholder="Nombre del tipo..." autocomplete="off">
+                    <input type="text" id="name" class="form-control" placeholder="Nombre de la categoría..." autocomplete="off">
                     <div class="input-group-append ">
                         <button class="btn btn-primary" type="button" id="btn-search">Buscar</button>
                         {{--<a href="#" id="btnBusquedaAvanzada" class="vertical-center ml-3 mt-2">Búsqueda Avanzada</a>--}}
@@ -147,7 +147,7 @@
     <div class="d-flex flex-wrap flex-stack pb-2">
         <!--begin::Title-->
         <div class="d-flex flex-wrap align-items-center my-1">
-            <h3 class="fw-bolder me-5 my-1"><span id="numberItems"></span> Tipos de productos
+            <h3 class="fw-bolder me-5 my-1"><span id="numberItems"></span> Categorías
                 <span class="text-gray-400 fs-6">por fecha de creación ↓ </span>
             </h3>
         </div>
@@ -164,8 +164,8 @@
                     <tr class="normal-title">
                         <th>Código</th>
                         <th>Nombre</th>
-                        <th>Tamaño</th>
-                        <th>Precio</th>
+                        <th>Descripción</th>
+                        <th>Visible</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
@@ -223,11 +223,11 @@
         <tr>
             <td data-column="id" data-id></td>
             <td data-column="name" data-name></td>
-            <td data-column="size" data-size></td>
-            <td data-column="price" data-price></td>
+            <td data-column="description" data-description></td>
+            <td data-column="visible" data-visible></td>
             <td data-column="estado" data-estado></td>
             <td>
-                <a data-editar_type href="" class="btn btn-outline-warning btn-sm" data-toggle="tooltip" data-placement="top" title="Editar"><i class="fa fa-pen"></i> </a>
+                <a data-editar_category href="" class="btn btn-outline-warning btn-sm" data-toggle="tooltip" data-placement="top" title="Editar"><i class="fa fa-pen"></i> </a>
                 <button data-deshabilitar data-delete="" data-description="" data-state class="btn btn-outline-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Cambiar estado"><i class="fas fa-bell-slash"></i> </button>
             </td>
         </tr>
@@ -247,11 +247,11 @@
                         <h4 class="modal-title">Confirmar cambio de estado a <span id="title"></span></h4>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     </div>
-                    <form id="formDelete" data-url="{{ route('types.destroy') }}">
+                    <form id="formDelete" data-url="{{ route('categories.destroy') }}">
                         @csrf
                         <div class="modal-body">
-                            <input type="hidden" id="type_id" name="type_id">
-                            <p>¿Está seguro de cambiar el estado de este tipo?</p>
+                            <input type="hidden" id="category_id" name="category_id">
+                            <p>¿Está seguro de cambiar el estado de este categoría?</p>
                             <p id="descriptionDelete"></p>
                         </div>
                         <div class="modal-footer">
@@ -293,6 +293,6 @@
 
         })
     </script>
-    <script src="{{ asset('js/type/index.js') }}"></script>
+    <script src="{{ asset('js/category/index.js') }}"></script>
 
 @endsection

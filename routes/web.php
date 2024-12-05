@@ -143,11 +143,11 @@ Route::middleware('auth')->group(function (){
             ->name('categories.create');
         Route::post('/categories', [CategoryController::class, 'store'])
             ->name('categories.store');
-        Route::get('/categories/{type}', [CategoryController::class, 'show'])
+        Route::get('/categories/{category}', [CategoryController::class, 'show'])
             ->name('categories.show');
-        Route::get('/categories/{type}/edit/', [CategoryController::class, 'edit'])
+        Route::get('/categories/{category}/edit/', [CategoryController::class, 'edit'])
             ->name('categories.edit');
-        Route::post('/categories/{type}/update', [CategoryController::class, 'update'])
+        Route::post('/categories/{category}/update', [CategoryController::class, 'update'])
             ->name('categories.update');
         Route::post('/categories/destroy', [CategoryController::class, 'destroy'])
             ->name('categories.destroy');

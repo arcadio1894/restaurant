@@ -1,19 +1,19 @@
 @extends('layouts.admin')
 
-@section('openCoupons')
+@section('openTypes')
     menu-open
 @endsection
 
-@section('activeCoupons')
+@section('activeTypes')
     active
 @endsection
 
-@section('activeListCoupons')
+@section('activeListTypes')
     active
 @endsection
 
 @section('title')
-    Cupones
+    Tipo de productos
 @endsection
 
 @section('styles-plugins')

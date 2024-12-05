@@ -1,19 +1,19 @@
 @extends('layouts.admin')
 
-@section('openTypes')
+@section('openCategories')
     menu-open
 @endsection
 
-@section('activeTypes')
+@section('activeCategories')
     active
 @endsection
 
-@section('activeLCreateTypes')
+@section('activeCreateCategories')
     active
 @endsection
 
 @section('title')
-    Tipo de productos
+    Categorías
 @endsection
 
 @section('styles-plugins')
@@ -34,11 +34,11 @@
 @endsection
 
 @section('page-header')
-    <h1 class="page-title">Tipo de Productos</h1>
+    <h1 class="page-title">Categorías</h1>
 @endsection
 
 @section('page-title')
-    <h5 class="card-title">Modificar tipo de producto</h5>
+    <h5 class="card-title">Modificar Categorías</h5>
 @endsection
 
 @section('page-breadcrumb')
@@ -47,42 +47,42 @@
             <a href="{{ route('dashboard.principal') }}"><i class="fa fa-home"></i> Dashboard</a>
         </li>
         <li class="breadcrumb-item">
-            <a href="{{ route('types.index') }}"><i class="fa fa-archive"></i> Tipo de Productos</a>
+            <a href="{{ route('categories.index') }}"><i class="fa fa-archive"></i> Categorías</a>
         </li>
         <li class="breadcrumb-item"><i class="fa fa-plus-circle"></i> Editar</li>
     </ol>
 @endsection
 
 @section('content')
-    <form id="formEdit" class="form-horizontal" data-url="{{ route('types.update', $type->id) }}" enctype="multipart/form-data">
+    <form id="formEdit" class="form-horizontal" data-url="{{ route('categories.update', $category->id) }}" enctype="multipart/form-data">
         @csrf
-        <input type="hidden" name="type_id" value="{{ $type->id }}">
+        <input type="hidden" name="category_id" value="{{ $category->id }}">
 
         <div class="form-group row">
             <div class="col-md-4">
-                <label for="name" class="col-12 col-form-label">Nombre <span class="right badge badge-danger">(*)</span></label>
+                <label for="name" class="col-12 col-form-label">Categoría <span class="right badge badge-danger">(*)</span></label>
                 <div class="col-sm-12">
-                    <input type="text" class="form-control" name="name" id="name" value="{{ $type->name }}" placeholder="Tipo">
+                    <input type="text" class="form-control" name="name" id="name" placeholder="Categoría" value="{{ $category->name }}">
                 </div>
             </div>
-            <div class="col-md-4">
-                <label for="size" class="col-12 col-form-label">Tamaño <span class="right badge badge-danger">(*)</span></label>
+            <div class="col-md-8">
+                <label for="size" class="col-12 col-form-label">Descripción <span class="right badge badge-danger">(*)</span></label>
                 <div class="col-sm-12">
-                    <input type="text" class="form-control" name="size" id="size" value="{{ $type->size }}" placeholder="20cm">
+                    <input type="text" class="form-control" name="description" id="description" placeholder="Descripción de la categoría" value="{{ $category->description }}">
                 </div>
             </div>
+        </div>
+        <div class="form-group row">
             <div class="col-md-4">
-                <label for="price" class="col-12 col-form-label">Precio referencial <span class="right badge badge-danger">(*)</span></label>
-                <div class="col-sm-12">
-                    <input type="number" class="form-control" name="price" id="price" value="{{ $type->price }}" placeholder="0.00">
-                </div>
+                <label for="active" class="col-12 col-form-label"> Estado visibilidad </label> <br>
+                <input id="active" type="checkbox" name="active" {{ ($category->visible == 1) ? 'checked':'' }} data-bootstrap-switch data-off-color="danger" data-on-text="VISIBLE" data-off-text="NO VISIBLE" data-on-color="success">
             </div>
         </div>
 
         <div class="row">
             <div class="col-12">
-                <a href="{{ route('types.index') }}" class="btn btn-outline-secondary">Cancelar</a>
-                <button type="button" id="btn-submit" class="btn btn-outline-success float-right">Guardar tipo</button>
+                <a href="{{ route('categories.index') }}" class="btn btn-outline-secondary">Cancelar</a>
+                <button type="button" id="btn-submit" class="btn btn-outline-success float-right">Guardar categoría</button>
             </div>
         </div>
         <!-- /.card-footer -->
@@ -111,5 +111,5 @@
             });
         })
     </script>
-    <script src="{{ asset('js/type/edit.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/category/edit.js') }}?v={{ time() }}"></script>
 @endsection
