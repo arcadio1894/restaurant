@@ -456,7 +456,7 @@ class ProductController extends Controller
         //dd($options);
         $adicionales = Product::whereHas('category', function ($query) {
             $query->where('visible', false);
-        })->with('category')->get();
+        })->orWhere('category_id', 5)->with('category')->get();
 
         //dd($adicionales);
 

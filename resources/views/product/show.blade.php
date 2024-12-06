@@ -172,6 +172,54 @@
             font-size: 14px;
             color: #ffc000;
         }
+        /* Aplica a todas las tarjetas */
+        .thumb-wrapper {
+            height: 350px; /* Ajusta la altura fija según sea necesario */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Limita el alto del nombre del producto */
+        .thumb-wrapper h4 {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 0 0 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap; /* Trunca textos largos */
+        }
+
+        /* Ajusta la altura del contenedor de imágenes */
+        .thumb-wrapper .img-box {
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .thumb-wrapper .img-box img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain; /* Asegura que las imágenes se ajusten correctamente */
+        }
+
+        /* Espaciado entre los elementos */
+        .thumb-content {
+            text-align: center;
+            flex-grow: 1; /* Para que ocupe el espacio disponible */
+        }
+
+        /* Botón de agregar */
+        .thumb-content .btn {
+            margin-top: auto; /* Empuja el botón hacia abajo */
+        }
         @media (max-width: 767.98px) {
             .carousel .row .col-12 {
                 flex: 0 0 100%;
