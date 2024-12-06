@@ -150,8 +150,8 @@ class OrderController extends Controller
             return [
                 'pizza_name' => $detail->product->full_name,
                 'quantity' => $detail->quantity,
-                'type' => $detail->productType->type->name,
-                'size' => ($detail->productType->type->size == null) ? 'N/A': $detail->productType->type->size,
+                'type' => ($detail->product_type_id == null) ? 'N/A': $detail->productType->type->name,
+                'size' => ($detail->product_type_id == null) ? 'N/A': $detail->productType->type->size,
                 'ingredients' => ($detail->product->ingredients == null) ? 'N/A':$detail->product->ingredients,
                 'options' => $detail->options->map(function ($option) {
                     return [

@@ -48,6 +48,8 @@ Route::get('/producto/{id}', [ProductController::class, 'show'])->name('product.
 })->name('auth.check');*/
 
 Route::post('/cart/manage', [CartController::class, 'manage'])->name('cart.manage');
+Route::post('/cart/manage/direct', [CartController::class, 'manage2'])->name('cart.manage2');
+Route::post('/cart/manage/adicional', [CartController::class, 'manage3'])->name('cart.manage3');
 Route::get('/carrito', [CartController::class, 'show'])->middleware('auth')->name('cart.show');
 Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])->middleware('auth')->name('cart.updateQuantity');
 Route::get('/checkout', [CartController::class, 'checkout'])->middleware('auth')->name('cart.checkout');

@@ -97,6 +97,104 @@ class CartController extends Controller
         return response()->json(['redirect' => route('cart.show')]);
     }
 
+    public function manage2(Request $request)
+    {
+        $user = Auth::user();
+        $product_id = $request->input('product_id');
+
+        // Verificar si el usuario tiene un carrito pendiente
+        $cart = Cart::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->first();
+
+        if (!$cart) {
+            // Crear un nuevo carrito si no existe uno pendiente
+            $cart = Cart::create([
+                'user_id' => $user->id,
+                'status' => 'pending',
+            ]);
+        }
+
+        $product = Product::find($product_id);
+
+        // Verificar si el producto con el mismo tipo ya está en el carrito
+        $cartDetail = $cart->details()
+            ->where('product_id', $product_id)
+            ->first();
+
+        if ($cartDetail) {
+            // Si existe, aumentar la cantidad
+            $cartDetail->quantity += 1;
+            $cartDetail->subtotal = $cartDetail->quantity * $cartDetail->price;
+            $cartDetail->save();
+            // TODO: Si es combo que cree un detalle mas SI las selecciones y el producto sondiferentes
+            // Si son iguales entonces agrega unno mas
+            // Si no es combo que haga lo actual
+        } else {
+            // Si no existe, agregar un nuevo detalle
+            $product = Product::find($product_id);
+            $cartDetail = $cart->details()->create([
+                'product_id' => $product_id,
+                'product_type_id' => null,
+                'quantity' => 1,
+                'price' => $product->price_default, // Obtener el precio desde ProductType
+                'subtotal' => $product->price_default * 1, // Calcular el subtotal
+            ]);
+
+        }
+
+        return response()->json(['message' => "Producto ".$product->full_name." agregado al carrito de compras."], 200);
+    }
+
+    public function manage3(Request $request)
+    {
+        $user = Auth::user();
+        $product_id = $request->input('product_id');
+
+        // Verificar si el usuario tiene un carrito pendiente
+        $cart = Cart::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->first();
+
+        if (!$cart) {
+            // Crear un nuevo carrito si no existe uno pendiente
+            $cart = Cart::create([
+                'user_id' => $user->id,
+                'status' => 'pending',
+            ]);
+        }
+
+        $product = Product::find($product_id);
+
+        // Verificar si el producto con el mismo tipo ya está en el carrito
+        $cartDetail = $cart->details()
+            ->where('product_id', $product_id)
+            ->first();
+
+        if ($cartDetail) {
+            // Si existe, aumentar la cantidad
+            $cartDetail->quantity += 1;
+            $cartDetail->subtotal = $cartDetail->quantity * $cartDetail->price;
+            $cartDetail->save();
+            // TODO: Si es combo que cree un detalle mas SI las selecciones y el producto sondiferentes
+            // Si son iguales entonces agrega unno mas
+            // Si no es combo que haga lo actual
+        } else {
+            // Si no existe, agregar un nuevo detalle
+            $product = Product::find($product_id);
+            $cartDetail = $cart->details()->create([
+                'product_id' => $product_id,
+                'product_type_id' => null,
+                'quantity' => 1,
+                'price' => $product->price_default, // Obtener el precio desde ProductType
+                'subtotal' => $product->price_default * 1, // Calcular el subtotal
+            ]);
+
+        }
+
+        return response()->json(['redirect' => route('cart.show')]);
+    }
+
     public function show()
     {
         $user = Auth::user();
@@ -370,8 +468,8 @@ class CartController extends Controller
                         'order' => "ORDEN - ".$order->id
                     ];
 
-                    $telegramController = new TelegramController();
-                    $telegramController->sendNotification('process', $data);
+                    /*$telegramController = new TelegramController();
+                    $telegramController->sendNotification('process', $data);*/
 
                     DB::commit();
 

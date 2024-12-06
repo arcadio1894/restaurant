@@ -46,12 +46,14 @@
                                                 <img src="{{ asset('images/products/'.$detail->product->image) }}" class="border rounded me-3" style="width: 96px; height: 96px;" />
                                                 <div class="">
                                                     <a href="#" class="nav-link">{{ $detail->product->full_name }}</a>
+                                                    @if( $detail->productType != null )
                                                     <p class="text-muted ml-3 mb-0">
                                                         Tipo: {{ $detail->productType->type->name }}
                                                         @if($detail->productType->type && $detail->productType->type->size)
                                                             ( {{ $detail->productType->type->size }} )
                                                         @endif
                                                     </p>
+                                                    @endif
                                                     <div class="text-muted ml-1 small">
                                                         @if($detail->options->isNotEmpty())
                                                             <ul class="mb-0 ps-3">
@@ -84,7 +86,11 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <text class="h6">S/ {{ $detail->subtotal }}</text> <br />
-                                                <small class="text-muted text-nowrap"> S/ {{ $detail->productType->price }} / por item </small>
+                                                @if( $detail->productType != null )
+                                                    <small class="text-muted text-nowrap"> S/ {{ $detail->productType->price }} / por item </small>
+                                                @else
+                                                    <small class="text-muted text-nowrap"> S/ {{ $detail->product->price_default }} / por item </small>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>

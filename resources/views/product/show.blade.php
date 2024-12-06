@@ -52,6 +52,132 @@
             color: #e69c00; /* Cambia el color del texto al seleccionarse */
             font-weight: bold;
         }
+
+        .carousel {
+            margin: 50px auto;
+            padding: 0 70px;
+        }
+        .carousel .carousel-item {
+            min-height: 330px;
+            text-align: center;
+            overflow: hidden;
+        }
+        .carousel .carousel-item .img-box {
+            height: 160px;
+            width: 100%;
+            position: relative;
+        }
+        .carousel .carousel-item img {
+            max-width: 100%;
+            max-height: 100%;
+            display: inline-block;
+            position: absolute;
+            bottom: 0;
+            margin: 0 auto;
+            left: 0;
+            right: 0;
+        }
+        .carousel .carousel-item h4 {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        /*.carousel .carousel-item .btn {
+            color: #333;
+            border-radius: 0;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: bold;
+            background: none;
+            border: 1px solid #ccc;
+            padding: 5px 10px;
+            margin-top: 5px;
+            line-height: 16px;
+        }*/
+        .carousel .carousel-item .btn:hover, .carousel .carousel-item .btn:focus {
+            color: #fff;
+            background: #000;
+            border-color: #000;
+            box-shadow: none;
+        }
+        .carousel .carousel-item .btn i {
+            font-size: 14px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        .carousel .thumb-wrapper {
+            text-align: center;
+        }
+        .carousel .thumb-content {
+            padding: 15px;
+        }
+        .carousel-control-prev, .carousel-control-next {
+            height: 100px;
+            width: 40px;
+            background: none;
+            margin: auto 0;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        .carousel-control-prev i, .carousel-control-next i {
+            font-size: 30px;
+            position: absolute;
+            top: 50%;
+            display: inline-block;
+            margin: -16px 0 0 0;
+            z-index: 5;
+            left: 0;
+            right: 0;
+            color: rgba(0, 0, 0, 0.8);
+            text-shadow: none;
+            font-weight: bold;
+        }
+        .carousel-control-prev i {
+            margin-left: -3px;
+        }
+        .carousel-control-next i {
+            margin-right: -3px;
+        }
+        .carousel .item-price {
+            font-size: 13px;
+            padding: 2px 0;
+        }
+        .carousel .item-price strike {
+            color: #999;
+            margin-right: 5px;
+        }
+        .carousel .item-price span {
+            color: #86bd57;
+            font-size: 110%;
+        }
+        .carousel .carousel-indicators {
+            bottom: -50px;
+        }
+        .carousel-indicators li, .carousel-indicators li.active {
+            width: 10px;
+            height: 10px;
+            margin: 4px;
+            border-radius: 50%;
+            border-color: transparent;
+            border: none;
+        }
+        .carousel-indicators li {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        .carousel-indicators li.active {
+            background: rgba(0, 0, 0, 0.6);
+        }
+        .star-rating li {
+            padding: 0;
+        }
+        .star-rating i {
+            font-size: 14px;
+            color: #ffc000;
+        }
+        @media (max-width: 767.98px) {
+            .carousel .row .col-12 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+        }
     </style>
 @endsection
 
@@ -178,6 +304,7 @@
                         <hr />
 
                         <div class="row mb-2">
+                            @if (count($productTypes) > 0)
                             <div class="col-md-4 col-6">
                                 <select id="pizza-type-select" class="form-select border border-secondary" style="height: 35px;">
                                     @foreach($productTypes as $productType)
@@ -189,6 +316,7 @@
                                     @endforeach
                                 </select>
                             </div>
+                            @endif
                             <!-- col.// -->
                             <div class="col-md-4 col-6 mb-3">
                                 <a href="#"
@@ -205,6 +333,162 @@
                         {{--<a href="#" class="btn btn-light border border-secondary icon-hover"> <i class="me-1 fa fa-heart"></i> Save </a>--}}
                     </div>
                 </main>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="text-center">Productos <b>Adicionales</b></h2>
+                    <div class="d-none d-sm-block">
+                        <!-- Carrusel para dispositivos grandes (4 productos por slide) -->
+                        <div id="carouselLarge" class="carousel slide" data-ride="carousel">
+                            <div class="carousel-inner">
+                                @foreach ($adicionales->chunk(4) as $group)
+                                    <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+                                        <div class="row">
+                                            @foreach ($group as $producto)
+                                                <div class="col-sm-3">
+                                                    <div class="thumb-wrapper">
+                                                        <div class="img-box">
+                                                            <img src="{{ asset('images/products/'.$producto->image) }}" class="img-fluid" alt="">
+                                                        </div>
+                                                        <div class="thumb-content">
+                                                            <h4>{{ $producto->full_name }}</h4>
+                                                            <p class="item-price">S/. {{ $producto->price_default }}</p>
+                                                            <div class="text-warning mb-1 me-2">
+                                                                <i class="fa fa-star"></i>
+                                                                <i class="fa fa-star"></i>
+                                                                <i class="fa fa-star"></i>
+                                                                <i class="fa fa-star"></i>
+                                                                <i class="fas fa-star-half"></i>
+                                                                <span class="ms-1">
+                                                                    4.5
+                                                                </span>
+                                                            </div>
+                                                            <a href="#"
+                                                               class="btn btn-primary shadow-0"
+                                                               data-add_to_cart_adicional
+                                                               data-product-id="{{ $producto->id }}"
+                                                               data-auth-check-url="{{ route('auth.check') }}"
+                                                               data-add-cart-url="{{ route('cart.manage2') }}">
+                                                                <i class="me-1 fa fa-shopping-basket"></i> Agregar
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <!-- Controles del carrusel -->
+                            <a class="carousel-control-prev" href="#carouselLarge" role="button" data-slide="prev">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                            <a class="carousel-control-next" href="#carouselLarge" role="button" data-slide="next">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="d-block d-sm-none">
+                        <!-- Carrusel para dispositivos pequeños (1 producto por slide) -->
+                        <div id="carouselSmall" class="carousel slide" data-ride="carousel">
+                            <div class="carousel-inner">
+                                @foreach ($adicionales as $producto)
+                                    <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+                                        <div class="thumb-wrapper text-center">
+                                            <div class="img-box">
+                                                <img src="{{ asset('images/products/'.$producto->image) }}" class="img-fluid" alt="">
+                                            </div>
+                                            <div class="thumb-content">
+                                                <h4>{{ $producto->full_name }}</h4>
+                                                <p class="item-price">S/. {{ $producto->price_default }}</p>
+                                                <div class="text-warning mb-1 me-2">
+                                                    <i class="fa fa-star"></i>
+                                                    <i class="fa fa-star"></i>
+                                                    <i class="fa fa-star"></i>
+                                                    <i class="fa fa-star"></i>
+                                                    <i class="fas fa-star-half"></i>
+                                                    <span class="ms-1">4.5</span>
+                                                </div>
+                                                <a href="#"
+                                                   class="btn btn-primary shadow-0"
+                                                   data-add_to_cart_adicional
+                                                   data-product-id="{{ $producto->id }}"
+                                                   data-auth-check-url="{{ route('auth.check') }}"
+                                                   data-add-cart-url="{{ route('cart.manage') }}">
+                                                    <i class="me-1 fa fa-shopping-basket"></i> Agregar
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <!-- Controles del carrusel -->
+                            <a class="carousel-control-prev" href="#carouselSmall" role="button" data-slide="prev">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                            <a class="carousel-control-next" href="#carouselSmall" role="button" data-slide="next">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {{--<div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="0">
+                        <!-- Carousel indicators -->
+                        <ol class="carousel-indicators">
+                            @foreach($chunkedAdicionales as $index => $chunk)
+                                <li data-target="#myCarousel" data-slide-to="{{ $index }}" class="{{ $index == 0 ? 'active' : '' }}"></li>
+                            @endforeach
+                        </ol>
+                        <!-- Wrapper for carousel items -->
+                        <div class="carousel-inner">
+                            @foreach($chunkedAdicionales as $index => $chunk)
+                                <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
+                                    <div class="row">
+                                        @foreach($chunk as $adicional)
+                                            <div class="col-12 col-sm-6 col-md-3">
+                                                <div class="thumb-wrapper">
+                                                    <div class="img-box">
+                                                        <img src="{{ asset('images/products/'.$adicional->image) }}" class="img-fluid" alt="{{ $adicional->full_name }}">
+                                                    </div>
+                                                    <div class="thumb-content">
+                                                        <h4>{{ $adicional->full_name }}</h4>
+                                                        <p class="item-price">
+                                                            <span>${{ $adicional->price_default }}</span>
+                                                        </p>
+                                                        <div class="star-rating">
+                                                            <ul class="list-inline">
+                                                                @for($i = 0; $i < 5; $i++)
+                                                                    <li class="list-inline-item">
+                                                                        <i class="fa fa-star--}}{{--{{ $i < $adicional->rating ? 'fa-star' : 'fa-star-o' }}--}}{{--"></i>
+                                                                    </li>
+                                                                @endfor
+                                                            </ul>
+                                                        </div>
+                                                        <a href="#"
+                                                           class="btn btn-primary shadow-0"
+                                                           id="add-to-cart-btn"
+                                                           data-product-id="{{ $product->id }}"
+                                                           data-auth-check-url="{{ route('auth.check') }}"
+                                                           data-add-cart-url="{{ route('cart.manage') }}">
+                                                            <i class="me-1 fa fa-shopping-basket"></i> Agregar
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        <!-- Carousel controls -->
+                        <a class="carousel-control-prev" href="#myCarousel" data-slide="prev">
+                            <i class="fa fa-angle-left"></i>
+                        </a>
+                        <a class="carousel-control-next" href="#myCarousel" data-slide="next">
+                            <i class="fa fa-angle-right"></i>
+                        </a>
+                    </div>
+                --}}</div>
             </div>
         </div>
     </section>

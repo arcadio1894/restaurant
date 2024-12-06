@@ -1,5 +1,24 @@
 $(document).ready(function () {
 
+    // Detectar tamaño de la pantalla y ajustar número de productos
+    function adjustCarousel() {
+        if ($(window).width() < 768) {
+            $('.carousel .row .col-12').each(function () {
+                $(this).addClass('single-item');
+            });
+        } else {
+            $('.carousel .row .col-12').each(function () {
+                $(this).removeClass('single-item');
+            });
+        }
+    }
+
+    // Llamar a la función al cargar la página y al cambiar el tamaño de la ventana
+    adjustCarousel();
+    $(window).resize(function () {
+        adjustCarousel();
+    });
+
     $('#pizza-type-select').on('change', function () {
         let selectedPrice = parseFloat($(this).find(':selected').data('price'))
         $('#product-price').text(selectedPrice.toFixed(2));
@@ -275,7 +294,53 @@ $(document).ready(function () {
             success: function (response) {
                 if (response.authenticated) {
                     // Usuario autenticado, agregar al carrito
-                    addToCart(productId, productTypeId, options, addCartUrl);
+                    if ( productTypeId == null )
+                    {
+                        addToCart3(productId, options, addCartUrl);
+                    } else {
+                        addToCart(productId, productTypeId, options, addCartUrl);
+                    }
+
+                } else {
+                    // Redirigir al login
+                    window.location.href = `/login?redirect_to=producto/${productId}`;
+                }
+            },
+            error: function (error) {
+                console.error("Error al verificar la autenticación:", error);
+            }
+        });
+    });
+
+    $(document).on('click', '[data-add_to_cart_adicional]', function (e) {
+        e.preventDefault();
+
+        const productId = $(this).data('product-id');
+        const authCheckUrl = $(this).data('auth-check-url');
+        const addCartUrl = $(this).data('add-cart-url');
+
+        // Recopilar las opciones seleccionadas
+        const options = {};
+
+        // Función para mostrar mensajes de error
+        function showError(message) {
+            toastr.error(message, 'Error', {
+                closeButton: true,
+                progressBar: true,
+                positionClass: "toast-top-right",
+                timeOut: "2000",
+                extendedTimeOut: "1000",
+            });
+        }
+
+        // Verificar autenticación
+        $.ajax({
+            url: authCheckUrl,
+            type: "GET",
+            success: function (response) {
+                if (response.authenticated) {
+                    // Usuario autenticado, agregar al carrito
+                    addToCart2(productId, options, addCartUrl);
                 } else {
                     // Redirigir al login
                     window.location.href = `/login?redirect_to=producto/${productId}`;
@@ -297,6 +362,54 @@ $(document).ready(function () {
             data: {
                 product_id: productId,
                 product_type_id: productTypeId,
+                options: options, // Incluir las opciones seleccionadas
+                _token: csrfToken
+            },
+            success: function (data) {
+                // Redirigir al carrito
+                window.location.href = data.redirect;
+            },
+            error: function (error) {
+                console.error("Error al agregar al carrito:", error);
+            }
+        });
+    }
+
+    function addToCart2(productId, options, url) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: {
+                product_id: productId,
+                options: options, // Incluir las opciones seleccionadas
+                _token: csrfToken
+            },
+            success: function (data) {
+                // Redirigir al carrito
+                toastr.success(data.message, 'Éxito', {
+                    closeButton: true,
+                    progressBar: true,
+                    positionClass: "toast-top-right",
+                    timeOut: "2000",
+                    extendedTimeOut: "1000",
+                });
+            },
+            error: function (error) {
+                console.error("Error al agregar al carrito:", error);
+            }
+        });
+    }
+
+    function addToCart3(productId, options, url) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        $.ajax({
+            url: '/cart/manage/adicional',
+            type: "POST",
+            data: {
+                product_id: productId,
                 options: options, // Incluir las opciones seleccionadas
                 _token: csrfToken
             },
@@ -389,5 +502,7 @@ $(document).ready(function () {
                 });
         }
     });
+
+
 
 });

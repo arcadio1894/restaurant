@@ -454,8 +454,17 @@ class ProductController extends Controller
             ->get();
 
         //dd($options);
+        $adicionales = Product::whereHas('category', function ($query) {
+            $query->where('visible', false);
+        })->with('category')->get();
 
-        return view('product.show', compact('product', 'productTypes', 'defaultProductType', 'options'));
+        //dd($adicionales);
+
+        $chunkedAdicionales = $adicionales->chunk(4);
+
+        //dd($chunkedAdicionales);
+
+        return view('product.show', compact('product', 'productTypes', 'defaultProductType', 'options', 'adicionales'));
     }
 
 }
