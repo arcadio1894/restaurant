@@ -303,7 +303,18 @@ $(document).ready(function () {
 
                 } else {
                     // Redirigir al login
-                    window.location.href = `/login?redirect_to=producto/${productId}`;
+                    //window.location.href = `/login?redirect_to=producto/${productId}`;
+                    // Usuario no autenticado, guarda en localStorage
+                    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                    cart.push({
+                        product_id: productId,
+                        product_type_id: productTypeId,
+                        options: options,
+                        quantity: 1,
+                    });
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartQuantity();
+                    toastr.success("Producto agregado al carrito.", "Éxito");
                 }
             },
             error: function (error) {
@@ -503,6 +514,38 @@ $(document).ready(function () {
         }
     });
 
+    function updateCartQuantity() {
+        const authCheckUrl = '/auth/check'; // URL para verificar autenticación
+        const cartQuantityUrl = '/cart/quantity'; // URL para obtener la cantidad del carrito
 
-
+        $.ajax({
+            url: authCheckUrl,
+            type: "GET",
+            success: function (response) {
+                if (response.authenticated) {
+                    // Si el usuario está autenticado, obtener la cantidad desde el servidor
+                    $.ajax({
+                        url: cartQuantityUrl,
+                        type: "GET",
+                        success: function (data) {
+                            $("#quantityCart").html(`(${data.quantity})`);
+                        },
+                        error: function (error) {
+                            console.error("Error al obtener la cantidad del carrito:", error);
+                            $("#quantityCart").html(`(0)`);
+                        }
+                    });
+                } else {
+                    // Si no está autenticado, obtener la cantidad desde localStorage
+                    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                    let totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+                    $("#quantityCart").html(`(${totalQuantity})`);
+                }
+            },
+            error: function (error) {
+                console.error("Error al verificar autenticación:", error);
+                $("#quantityCart").html(`(0)`);
+            }
+        });
+    }
 });

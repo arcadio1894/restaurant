@@ -52,6 +52,8 @@ Route::post('/cart/manage/direct', [CartController::class, 'manage2'])->name('ca
 Route::post('/cart/manage/adicional', [CartController::class, 'manage3'])->name('cart.manage3');
 Route::get('/carrito', [CartController::class, 'show'])->middleware('auth')->name('cart.show');
 Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])->middleware('auth')->name('cart.updateQuantity');
+Route::get('/cart/quantity', [CartController::class, 'getCartQuantity'])->name('cart.quantity');
+
 Route::get('/checkout', [CartController::class, 'checkout'])->middleware('auth')->name('cart.checkout');
 Route::post('/checkout/pagar', [CartController::class, 'pagar'])->name('checkout.pagar');
 Route::post('/checkout/crear-preferencia', [CartController::class, 'crearPreferencia'])->name('checkout.crearPreferencia');

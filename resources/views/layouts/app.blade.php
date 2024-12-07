@@ -201,6 +201,7 @@
                                     <g>
                                     </g>
                                         </svg>
+                                <span class="text-white" id="quantityCart">(0)</span>
                             </a>
                                 @auth
                                     @if( Auth::user()->is_admin )
@@ -429,6 +430,44 @@
     $('#close-business-status').on('click', function () {
         $('#business-status').fadeOut();
     });
+
+    updateCartQuantity();
+
+    function updateCartQuantity() {
+        const authCheckUrl = '/auth/check'; // URL para verificar autenticación
+        const cartQuantityUrl = '/cart/quantity'; // URL para obtener la cantidad del carrito
+
+        $.ajax({
+            url: authCheckUrl,
+            type: "GET",
+            success: function (response) {
+                if (response.authenticated) {
+                    // Si el usuario está autenticado, obtener la cantidad desde el servidor
+                    $.ajax({
+                        url: cartQuantityUrl,
+                        type: "GET",
+                        success: function (data) {
+                            $("#quantityCart").html(`(${data.quantity})`);
+                        },
+                        error: function (error) {
+                            console.error("Error al obtener la cantidad del carrito:", error);
+                            $("#quantityCart").html(`(0)`);
+                        }
+                    });
+                } else {
+                    // Si no está autenticado, obtener la cantidad desde localStorage
+                    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                    let totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+                    $("#quantityCart").html(`(${totalQuantity})`);
+                }
+            },
+            error: function (error) {
+                console.error("Error al verificar autenticación:", error);
+                $("#quantityCart").html(`(0)`);
+            }
+        });
+    }
+
 </script>
 </body>
 </html>

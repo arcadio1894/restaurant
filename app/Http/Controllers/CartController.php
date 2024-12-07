@@ -32,6 +32,23 @@ class CartController extends Controller
         /*SDK::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN_PRO'));*/
     }
 
+    public function getCartQuantity()
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['quantity' => 0]);
+        }
+
+        $cart = Cart::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->first();
+
+        $quantity = $cart ? $cart->details->sum('quantity') : 0;
+
+        return response()->json(['quantity' => $quantity]);
+    }
+
     public function manage(Request $request)
     {
         $user = Auth::user();
