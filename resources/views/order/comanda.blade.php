@@ -54,9 +54,10 @@
     <p><b>Entrega:</b> {{ $order->formatted_date }}</p>
     <p><b>Cliente:</b> {{ $order->user->name }}</p>
     <p><b>Telefono:</b> {{ ($order->shipping_address_id == null) ? 'N/A':$order->shipping_address->phone }}</p>
-    <div class="line"></div>
+    {{--<div class="line"></div>--}}
     @foreach ($order->details as $detail)
-        <strong><p style="font-size: 18px">{{ ($detail->product->full_name) }} <span style="float: right;">{{ $detail->quantity }}</span></p></strong>
+        <div class="line"></div>
+        <strong><p style="font-size: 18px">{{ $detail->product->full_name.(( $detail->product_type_id == null ) ? '':"|".$detail->productType->type->name."(".$detail->productType->type->size.")") }} <span style="float: right;">{{ $detail->quantity }}</span></p></strong>
         @foreach( $detail->options as $option )
             <p style="font-size: 16px">- {{ str_pad( ($option->product->full_name), 10, ' ', STR_PAD_LEFT) }} x {{ $detail->quantity }}</p>
         @endforeach
