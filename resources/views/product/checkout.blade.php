@@ -151,7 +151,7 @@
                     <!-- Sección para método de pago en efectivo -->
                     <div id="cash-section" style="display: none; margin-top: 15px;">
                         <label for="cashAmount">Monto con el que paga</label>
-                        <input type="number" class="form-control" id="cashAmount" placeholder="Ingrese monto en efectivo">
+                        <input type="number" class="form-control" id="cashAmount" step="0.01" min="0" placeholder="Ingrese monto en efectivo">
                     </div>
 
                     <!-- Sección para método de pago Yape/Plin -->
