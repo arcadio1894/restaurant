@@ -19,7 +19,11 @@ class WelcomeController extends Controller
 
     public function isAuthenticated()
     {
-        return response()->json(['authenticated' => auth()->check()]);
+        return response()->json([
+            'authenticated' => auth()->check(),
+            'user_id' => auth()->check() ? auth()->id() : null,
+            ]
+        );
     }
 
     public function menu()

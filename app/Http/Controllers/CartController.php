@@ -216,10 +216,11 @@ class CartController extends Controller
     {
         $user = Auth::user();
         //$cart = Cart::with(['details.options.option', 'details.options.product'])->find($cartId);
-        $cart = Cart::with(['details.options.option', 'details.options.product'])->where('user_id', $user->id)
+        /*$cart = Cart::with(['details.options.option', 'details.options.product'])->where('user_id', $user->id)
             ->where('status', 'pending')
-            ->first();
-        return view('product.cart', compact('cart'));
+            ->first();*/
+        /*return view('product.cart', compact('cart'));*/
+        return view('product.cart2');
     }
 
     public function updateQuantity(Request $request)

@@ -111,15 +111,6 @@
 
 
                         </div>
-
-                        {{--@if($cart && $cart->details->isNotEmpty())
-                            <div class="border-top pt-4 mx-4 mb-4">
-                                <p><i class="fas fa-truck text-muted fa-lg"></i> Entrega gratuita en 1-2 semanas</p>
-                                <p class="text-muted">
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit...
-                                </p>
-                            </div>
-                        @endif--}}
                     </div>
                     @if($cart && $cart->details->isNotEmpty())
 

@@ -441,25 +441,15 @@
             url: authCheckUrl,
             type: "GET",
             success: function (response) {
-                if (response.authenticated) {
-                    // Si el usuario está autenticado, obtener la cantidad desde el servidor
-                    $.ajax({
-                        url: cartQuantityUrl,
-                        type: "GET",
-                        success: function (data) {
-                            $("#quantityCart").html(`(${data.quantity})`);
-                        },
-                        error: function (error) {
-                            console.error("Error al obtener la cantidad del carrito:", error);
-                            $("#quantityCart").html(`(0)`);
-                        }
-                    });
-                } else {
-                    // Si no está autenticado, obtener la cantidad desde localStorage
-                    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-                    let totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
-                    $("#quantityCart").html(`(${totalQuantity})`);
-                }
+                // Si no está autenticado, obtener la cantidad desde localStorage
+                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+                // Contar el número de productos únicos
+                let totalItems = cart.length;
+
+                // Actualizar el contenido del span
+                $("#quantityCart").html(`(${totalItems})`);
+
             },
             error: function (error) {
                 console.error("Error al verificar autenticación:", error);

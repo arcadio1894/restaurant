@@ -467,4 +467,32 @@ class ProductController extends Controller
         return view('product.show', compact('product', 'productTypes', 'defaultProductType', 'options', 'adicionales'));
     }
 
+    public function getProduct($id)
+    {
+        // Buscar el producto por ID
+        $product = Product::find($id);
+
+        if (!$product) {
+            // Si el producto no existe, devolver error 404
+            return response()->json(['error' => 'Producto no encontrado'], 404);
+        }
+
+        $productType = ProductType::where('product_id', $product->id)->where('default', true)->first();
+
+        $productTypeText = "";
+        if ( $productType )
+        {
+            $productTypeText = "Tipo: ".$productType->type->name." (".$productType->type->size.")";
+        }
+
+        // Formatear la respuesta
+        return response()->json([
+            'id' => $product->id,
+            'name' => $product->full_name,
+            'price' => (float)$product->price_default,
+            'image_url' => $product->image,
+            'product_type' => $productTypeText
+        ]);
+    }
+
 }

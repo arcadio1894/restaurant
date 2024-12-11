@@ -176,6 +176,7 @@
                                         <g>
                                         </g>
                                     </svg>
+                                    <span class="text-white" id="quantityCart">(0)</span>
                                 </a>
                                 @auth
                                     @if( Auth::user()->is_admin )

@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    updateCartQuantity();
     // Llamar al método para verificar horario de atención
     $.ajax({
         url: '/api/business-hours', // Cambia la ruta si es necesario
@@ -61,6 +62,32 @@ function addToCart(productId) {
         },
         error: function(error) {
             console.error("Error al agregar al carrito:", error);
+        }
+    });
+}
+
+function updateCartQuantity() {
+    const authCheckUrl = '/auth/check'; // URL para verificar autenticación
+    const cartQuantityUrl = '/cart/quantity'; // URL para obtener la cantidad del carrito
+
+    $.ajax({
+        url: authCheckUrl,
+        type: "GET",
+        success: function (response) {
+
+            // Si no está autenticado, obtener la cantidad desde localStorage
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+            // Contar el número de productos únicos
+            let totalItems = cart.length;
+
+            // Actualizar el contenido del span
+            $("#quantityCart").html(`(${totalItems})`);
+
+        },
+        error: function (error) {
+            console.error("Error al verificar autenticación:", error);
+            $("#quantityCart").html(`(0)`);
         }
     });
 }
