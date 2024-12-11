@@ -406,7 +406,7 @@ class CartController extends Controller
                     foreach ($cartItem->options as $option) {
                         OrderDetailOption::create([
                             'order_detail_id' => $orderDetail->id, // Relación con el detalle de la orden
-                            'option_id' => $option->id,           // ID de la opción seleccionada
+                            'option_id' => $option->option_id,           // ID de la opción seleccionada
                             'product_id' => $option->product_id,  // ID del producto asociado a la opción
                         ]);
                     }

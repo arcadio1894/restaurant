@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Product extends Model
 {
@@ -16,7 +17,8 @@ class Product extends Model
         'image',
         'category_id',
         'enable_status',
-        'ingredients'
+        'ingredients',
+        'slug'
     ];
 
     public function options()
@@ -51,5 +53,40 @@ class Product extends Model
             return $this->unit_price;
         }
 
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($post) {
+            if (empty($post->slug)) {
+                $originalSlug = Str::slug($post->title, '-');
+                $slug = $originalSlug;
+                $count = 1;
+
+                while (Product::where('slug', $slug)->exists()) {
+                    $slug = $originalSlug . '-' . $count;
+                    $count++;
+                }
+
+                $post->slug = $slug;
+            }
+        });
+
+        static::updating(function ($post) {
+            if (empty($post->slug)) {
+                $originalSlug = Str::slug($post->title, '-');
+                $slug = $originalSlug;
+                $count = 1;
+
+                while (Product::where('slug', $slug)->exists()) {
+                    $slug = $originalSlug . '-' . $count;
+                    $count++;
+                }
+
+                $post->slug = $slug;
+            }
+        });
     }
 }
