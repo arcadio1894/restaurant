@@ -402,7 +402,7 @@
                                             <h5>{{ $product->full_name }}</h5>
                                             <p>
                                                 {{ \Illuminate\Support\Str::limit($product->description, 150, '...') }}
-                                                <a href="{{ route('product.show', $product->id) }}">Ver detalles</a>
+                                                <a href="{{ route('product.show', $product->slug) }}">Ver detalles</a>
 
                                             </p>
                                             <div class="options">
@@ -428,7 +428,7 @@
                                                         </g>
                                     </svg>
                                                 </a>--}}
-                                                <a href="{{ route('product.show', $product->id) }}">
+                                                <a href="{{ route('product.show', $product->slug) }}">
                                                     <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 456.029 456.029" style="enable-background:new 0 0 456.029 456.029;" xml:space="preserve">
                                         <g>
                                             <g>
