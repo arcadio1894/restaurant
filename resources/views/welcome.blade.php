@@ -94,6 +94,13 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('about') }}">Nosotros</a>
                                 </li>
+                                @if (Route::has('register'))
+                                    @guest()
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="{{ route('register') }}">Regístrate</a>
+                                        </li>
+                                    @endguest
+                                @endif
                                 @auth
                                     <li class="nav-item">
                                         <a class="nav-link" href="{{ route('orders.index') }}">Pedidos</a>
