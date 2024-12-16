@@ -254,23 +254,29 @@ class CartController extends Controller
     {
         $user = Auth::user();
 
-        $cart = Cart::with('details.product')->where('user_id', $user->id)
+        /*$cart = Cart::with('details.product')->where('user_id', $user->id)
             ->where('status', 'pending')
-            ->first();
+            ->first();*/
 
         $payment_methods = PaymentMethod::active()->get();
 
-        if (!$cart || $cart->details->isEmpty()) {
+        /* if (!$cart || $cart->details->isEmpty()) {
             return redirect()->route('home');
         }
-
-        $defaultAddress = Address::where('user_id', Auth::id())
-            ->where('is_default', true)
-            ->first();
+        */
+        if ( isset($user) )
+        {
+            $defaultAddress = Address::where('user_id', Auth::id())
+                ->where('is_default', true)
+                ->first();
+        } else {
+            $defaultAddress = null;
+        }
 
         $districts = ShippingDistrict::all();
 
-        return view('product.checkout', compact('cart', 'payment_methods', 'defaultAddress', 'districts'));
+        /*return view('product.checkout', compact('cart', 'payment_methods', 'defaultAddress', 'districts'));*/
+        return view('product.checkout2', compact( 'payment_methods', 'defaultAddress', 'districts'));
     }
 
     public function pagar( CheckoutRequest $request )
@@ -308,6 +314,292 @@ class CartController extends Controller
                 ]);
 
                 $shippingAddressId = $address->id;
+            //}
+
+            //$cart = Cart::findOrFail($validatedData['cart_id']);
+            $cart = json_decode($request->input('cart'), true);
+            $totalAmount = $this->getTotalCart($cart);
+
+            // Obtener el distrito seleccionado y su costo de envío
+            $districtId = $request->input('district');
+            if (!$districtId) {
+                DB::rollBack();
+                return response()->json(['success' => false, 'message' => 'Debe seleccionar un distrito para el envío.']);
+            }
+
+            $district = ShippingDistrict::findOrFail($districtId);
+            $shippingCost = $district->shipping_cost;
+
+
+            // Verificar el cupón
+            $couponName = $request->input('coupon_name');
+            $coupon = Coupon::where('name', $couponName)->first();
+
+            $discountAmount = 0;
+
+            if ($coupon) {
+                // Verificar si el cupón ya ha sido utilizado por el usuario
+                $userCoupon = UserCoupon::where('user_id', auth()->id())
+                    ->where('coupon_id', $coupon->id)
+                    ->first();
+
+                if ($userCoupon) {
+                    DB::rollBack();
+                    return response()->json(['success' => false, 'message' => 'El cupón ya ha sido utilizado.']);
+                }
+
+                // Lógica para calcular el descuento
+                if ($coupon->type == 'total') {
+                    // Validar que no haya productos de categoría 'combo' (category_id = 3)
+                    /*$hasCombo = $cart->details->contains(function ($detail) {
+                        return $detail->product->category_id == 3;
+                    });*/
+
+                    $hasCombo = $this->hasCombo($cart);
+
+                    if ($hasCombo) {
+                        DB::rollBack();
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'El cupón no se puede aplicar a carritos que contengan combos.',
+                        ]);
+                    }
+
+                    // Aplicar descuento al total
+                    if ($coupon->amount != 0) {
+                        $discountAmount = $coupon->amount;
+                    } elseif ($coupon->percentage != 0) {
+                        $discountAmount = ($coupon->percentage / 100) * $cart->total_cart;
+                    }
+                } elseif ($coupon->type == 'detail') {
+                    // Verificar si todos los productos son de categoría 'combo' (category_id = 3)
+                    /*$onlyCombos = $cart->details->every(function ($detail) {
+                        return $detail->product->category_id == 3;
+                    });*/
+                    $onlyCombos = $this->onlyCombos($cart);
+
+                    if ($onlyCombos) {
+                        DB::rollBack();
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'El cupón no se puede aplicar porque solo hay combos en el pedido.',
+                        ]);
+                    }
+
+                    // Filtrar los detalles que no sean de categoría 'combo' (category_id = 3)
+                    /*$eligibleDetails = $cart->details->filter(function ($detail) {
+                        return $detail->product->category_id != 3;
+                    });
+
+                    // Buscar el detalle elegible con el subtotal más alto
+                    $maxDetail = $eligibleDetails->sortByDesc('subtotal')->first();*/
+                    $maxDetail = $this->getMaxDetail($cart);
+                    if ($maxDetail) {
+                        if ($coupon->amount != 0) {
+                            $discountAmount = $coupon->amount;
+                        } elseif ($coupon->percentage != 0) {
+                            $discountAmount = ($coupon->percentage / 100) * $maxDetail->subtotal;
+                        }
+                    }
+                }
+            }
+
+            // Crear la orden
+            $order = Order::create([
+                'user_id' => auth()->id(),
+                'shipping_address_id' => $shippingAddressId,
+                'billing_address_id' => $shippingAddressId,
+                'total_amount' => $totalAmount,
+                'status' => 'created',
+                'payment_method_id' => $validatedData['paymentMethod'],
+                'amount_shipping' => $shippingCost,
+                'shipping_district_id' => $districtId,
+                'observations' => $cart->observations
+            ]);
+
+            // Crear los detalles de la orden basados en el carrito
+            foreach ($cart->details as $cartItem) {
+                // Crear el detalle de la orden
+                $orderDetail = OrderDetail::create([
+                    'order_id' => $order->id,
+                    'product_id' => $cartItem->product_id,
+                    'product_type_id' => $cartItem->product_type_id,
+                    'quantity' => $cartItem->quantity,
+                    'price' => $cartItem->price,
+                    'subtotal' => $cartItem->quantity * $cartItem->price,
+                ]);
+
+                // Guardar las opciones relacionadas con este detalle
+                if (!empty($cartItem->options)) {
+                    foreach ($cartItem->options as $option) {
+                        OrderDetailOption::create([
+                            'order_detail_id' => $orderDetail->id, // Relación con el detalle de la orden
+                            'option_id' => $option->id,           // ID de la opción seleccionada
+                            'product_id' => $option->product_id,  // ID del producto asociado a la opción
+                        ]);
+                    }
+                }
+            }
+
+            $cart->status = 'completed';
+            $cart->save();
+
+            // Guardamos la relación del cupón con el usuario, solo si se aplicó
+            if ($coupon) {
+                UserCoupon::create([
+                    'user_id' => auth()->id(),
+                    'coupon_id' => $coupon->id,
+                    'discount_amount' => $discountAmount,
+                    'order_id' => $order->id, // Asociar al pedido
+                ]);
+            }
+
+
+            $method_payment = PaymentMethod::find($validatedData['paymentMethod']);
+
+            // Selección del método de pago
+            switch ($method_payment->code) {
+                /*case 'mercado_pago':
+                    // Procesar pago con Mercado Pago
+                    $payment = new Payment();
+                    $payment->transaction_amount = $totalAmount;
+                    $payment->token = $request->input('token');
+                    $payment->description = "Compra en tienda";
+                    $payment->installments = 1;
+                    $payment->payer = ["email" => $validatedData['email']];
+                    $payment->payment_method_id = "visa";
+
+                    $payment->save();
+
+                    if ($payment->status == 'approved') {
+                        $order->status = 'paid';
+                        $cart->status = 'completed';
+                        $cart->save();
+                        $order->save();
+                        DB::commit();
+
+                        return response()->json(['success' => true, 'message' => 'Pago con Mercado Pago exitoso']);
+                    } else {
+                        DB::rollBack();
+                        return response()->json(['success' => false, 'message' => 'Pago con Mercado Pago rechazado']);
+                    }*/
+
+                case 'pos':
+                    // Lógica para pago POS (Ej. Marca la orden como pagada con POS)
+                    //$order->status = 'paid';
+                    //$order->save();
+                    //$cart->status = 'proc';
+                    //$cart->save();
+                    $data = [
+                        'nameUser' => $order->user->name,
+                        'dateOperation' => $order->created_at->format('d M Y, g:i a'),
+                        'order' => "ORDEN - ".$order->id
+                    ];
+
+                    $telegramController = new TelegramController();
+                    $telegramController->sendNotification('process', $data);
+
+                    DB::commit();
+
+                    return response()->json(['success' => true, 'message' => 'Pago realizado con POS', 'redirect_url' => route('orders.index')]);
+
+                case 'efectivo':
+                    // Lógica para pago en efectivo
+                    $order->payment_amount = $request->input('cashAmount');
+                    $order->save();
+
+                    $data = [
+                        'nameUser' => $order->user->name,
+                        'dateOperation' => $order->created_at->format('d M Y, g:i a'),
+                        'order' => "ORDEN - ".$order->id
+                    ];
+
+                    $telegramController = new TelegramController();
+                    $telegramController->sendNotification('process', $data);
+
+                    DB::commit();
+
+                    return response()->json(['success' => true, 'message' => 'Orden creada. Pago en efectivo pendiente', 'redirect_url' => route('orders.index')]);
+
+                case 'yape_plin':
+                    // Lógica para pago con Yape o Plin
+                    $operationCode = $request->input('operationCode');
+                    if ($operationCode) {
+                        //$order->status = 'paid';
+                        //$order->save();
+                        //$cart->status = 'completed';
+                        //$cart->save();
+                        $order->payment_code = $request->input('operationCode');
+                        $order->save();
+
+                        $data = [
+                            'nameUser' => $order->user->name,
+                            'dateOperation' => $order->created_at->format('d M Y, g:i a'),
+                            'order' => "ORDEN - ".$order->id
+                        ];
+
+                        $telegramController = new TelegramController();
+                        $telegramController->sendNotification('process', $data);
+
+                        DB::commit();
+
+                        return response()->json(['success' => true, 'message' => 'Pago realizado con Yape/Plin', 'redirect_url' => route('orders.index')]);
+                    } else {
+                        DB::rollBack();
+                        return response()->json(['success' => false, 'message' => 'Falta el código de operación para Yape/Plin']);
+                    }
+
+                default:
+                    DB::rollBack();
+                    return response()->json(['success' => false, 'message' => 'Método de pago no válido']);
+            }
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Ocurrió un error al procesar el checkout. Inténtelo nuevamente.',
+                'error' => $e->getMessage(),
+            ], 420);
+        }
+    }
+
+    public function pagarOriginal( CheckoutRequest $request )
+    {
+        DB::beginTransaction();
+
+        try {
+            // Validar los datos y guardarlos
+            $validatedData = $request->validated();
+
+            $shippingAddressId = null;
+
+            // Verificar si 'save-info' está marcado como "on"
+            //if ($request->has('save-info') && $request->input('save-info') === 'on') {
+            $isDefault = true;
+            $existingDefaultAddress = Address::where('user_id', auth()->id())->where('is_default', true)->first();
+            if ($existingDefaultAddress) {
+                $isDefault = false;
+            }
+
+            // Crear la nueva dirección
+            $address = Address::create([
+                'user_id' => auth()->id(),
+                'type' => 'shipping',
+                'phone' => $validatedData['phone'],
+                'first_name' => $validatedData['first_name'],
+                'last_name' => $validatedData['last_name'],
+                'address_line' => $validatedData['address'],
+                'reference' => $request->input('reference', ''),
+                'city' => '',
+                'state' => '',
+                'postal_code' => '',
+                'country' => '',
+                'is_default' => $isDefault
+            ]);
+
+            $shippingAddressId = $address->id;
             //}
 
             $cart = Cart::findOrFail($validatedData['cart_id']);
@@ -555,7 +847,7 @@ class CartController extends Controller
         }
     }
 
-    public function applyCoupon(Request $request)
+    public function applyCouponOriginal(Request $request)
     {
         $code = $request->input('code');
         $cartId = $request->input('cart_id');
@@ -705,6 +997,336 @@ class CartController extends Controller
     }
 
     public function calculateShipping(Request $request)
+    {
+        //dd($request->all());
+        $districtId = $request->district_id;
+        $cart = $request->input('cart');
+        $couponName = $request->coupon_name;
+
+        // Obtener el costo de envío (0 si no hay distrito)
+        $shippingCost = 0;
+        if ($districtId) {
+            $district = ShippingDistrict::find($districtId);
+            if (!$district) {
+                return response()->json(['success' => false, 'message' => 'Distrito no válido.'], 400);
+            }
+            $shippingCost = $district->shipping_cost;
+        }
+
+        // Calcular el subtotal del carrito
+        //$cart = Cart::with('details')->find($cartId);
+        if (!$cart || !is_array($cart)) {
+            return response()->json(['success' => false, 'message' => 'Carrito no encontrado o inválido.'], 400);
+        }
+
+        // Hallar el total del carrito
+        //$total = $cart->total_cart;
+        $total = $this->getTotalCart($cart);
+        //dd($total);
+        $discount = 0;
+
+        // Calcular el descuento si hay un cupón
+        if ($couponName) {
+            $coupon = Coupon::where('name', $couponName)->first();
+
+            /*if ($coupon) {
+                if ($coupon->type == 'total') {
+                    if ($coupon->amount != 0) {
+                        $discount = $coupon->amount;
+                    } elseif ($coupon->percentage != 0) {
+                        $discount = $total * ($coupon->percentage / 100);
+                    }
+                } elseif ($coupon->type == 'detail') {
+                    $maxDetail = $cart->details->sortByDesc('subtotal')->first();
+
+                    if ($maxDetail) {
+                        if ($coupon->amount != 0) {
+                            $discount = $coupon->amount;
+                        } elseif ($coupon->percentage != 0) {
+                            $discount = $maxDetail->subtotal * ($coupon->percentage / 100);
+                        }
+                    }
+                }
+            }*/
+            // Lógica para calcular el descuento
+            if ($coupon->type == 'total') {
+                // Validar que no haya productos de categoría 'combo' (category_id = 3)
+                /*$hasCombo = $cart->details->contains(function ($detail) {
+                    return $detail->product->category_id == 3;
+                });*/
+                $hasCombo = $this->hasCombo($cart);
+
+                if ($hasCombo) {
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'El cupón no se puede aplicar a carritos que contengan combos.',
+                    ]);
+                }
+
+                // Aplicar descuento al total
+                if ($coupon->amount != 0) {
+                    $discount = $coupon->amount;
+                } elseif ($coupon->percentage != 0) {
+                    $discount = ($coupon->percentage / 100) * $cart->total_cart;
+                }
+            } elseif ($coupon->type == 'detail') {
+                // Verificar si todos los productos son de categoría 'combo' (category_id = 3)
+                /*$onlyCombos = $cart->details->every(function ($detail) {
+                    return $detail->product->category_id == 3;
+                });*/
+
+                $onlyCombos = $this->onlyCombos($cart);
+
+                if ($onlyCombos) {
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'El cupón no se puede aplicar porque solo hay combos en el pedido.',
+                    ]);
+                }
+
+                // Filtrar los detalles que no sean de categoría 'combo' (category_id = 3)
+                /*$eligibleDetails = $cart->details->filter(function ($detail) {
+                    return $detail->product->category_id != 3;
+                });*/
+
+                // Buscar el detalle elegible con el subtotal más alto
+                //$maxDetail = $eligibleDetails->sortByDesc('subtotal')->first();
+                $maxDetail = $this->getMaxDetail($cart);
+
+                if ($maxDetail) {
+                    if ($coupon->amount != 0) {
+                        $discount = $coupon->amount;
+                    } elseif ($coupon->percentage != 0) {
+                        $discount = ($coupon->percentage / 100) * $maxDetail['subtotal'];
+                    }
+                }
+            }
+        }
+
+        // Ajustar el descuento si es mayor que el total
+        if ($discount > $total) {
+            $discount = $total;
+        }
+
+        // Calcular el nuevo total
+        $newTotal = $total - $discount + $shippingCost;
+
+        return response()->json([
+            'success' => true,
+            'shipping_cost' => (float)$shippingCost,
+            'new_total' => (float)$newTotal,
+        ]);
+    }
+
+    public function applyCoupon(Request $request)
+    {
+        $cart = json_decode($request->input('cart'), true); // Decodificar cart
+        $districtId = $request->input('district');
+        $code = $request->input('code');
+
+        if (!$cart || !is_array($cart)) {
+            return response()->json(['success' => false, 'message' => 'Carrito no encontrado o inválido.'], 400);
+        }
+
+        // Obtener el costo de envío dependiendo del distrito
+        $shippingCost = 0; // Costo por defecto
+        if ($districtId) {
+            $district = ShippingDistrict::find($districtId); // Buscar el distrito
+            if ($district) {
+                $shippingCost = $district->shipping_cost; // Suponiendo que cada distrito tiene un campo 'shipping_cost'
+            }
+        }
+
+        // Obtener el total con el envío
+        $total = $this->getTotalCart($cart);
+        $totalWithShipping = $total + $shippingCost;
+
+        // Buscar el cupón
+        $coupon = Coupon::where('name', $code)->where('status', 'active')->first();
+
+        if (!$coupon || $code == "") {
+            return response()->json([
+                'success' => false,
+                'message' => 'El código de promoción no es válido o está inactivo.',
+                'new_total' => number_format($totalWithShipping, 2), // Devolver el total con envío sin descuento
+                'coupon_name' => '' // Limpiar el nombre del cupón
+            ]);
+        }
+
+        // Validar si el cupón ya ha sido usado
+        $userCoupon = UserCoupon::where('user_id', auth()->id())
+            ->where('coupon_id', $coupon->id)
+            ->first();
+
+        if ($userCoupon) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El cupón ya ha sido utilizado.',
+                'new_total' => number_format($totalWithShipping, 2), // Devolver el total con envío sin descuento
+                'coupon_name' => '' // Limpiar el nombre del cupón
+            ]);
+        }
+
+        // Cálculo del descuento
+        $total = $totalWithShipping; // Considerar el total con envío
+        $discount = 0;
+
+        /*if ($coupon->type == 'total') {
+            // Si el cupón aplica al total
+            if ($coupon->amount != 0) {
+                $discount = $coupon->amount;
+            } elseif ($coupon->percentage != 0) {
+                $discount = $total * ($coupon->percentage / 100);
+            }
+        } elseif ($coupon->type == 'detail') {
+            // Si el cupón aplica a un detalle
+            $maxDetail = $cart->details->sortByDesc('subtotal')->first();
+
+            if ($maxDetail) {
+                if ($coupon->amount != 0) {
+                    $discount = $coupon->amount;
+                } elseif ($coupon->percentage != 0) {
+                    $discount = $maxDetail->subtotal * ($coupon->percentage / 100);
+                }
+            }
+        }*/
+        if ($coupon->type == 'total') {
+            // Validar que no haya productos de categoría 'combo' (category_id = 3)
+            /*$hasCombo = $cart->details->contains(function ($detail) {
+                return $detail->product->category_id == 3;
+            });*/
+            $hasCombo = $this->hasCombo($cart);
+
+            if ($hasCombo) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El cupón no se puede aplicar a carritos que contengan combos.',
+                    'new_total' => number_format($totalWithShipping, 2), // Devolver el total con envío sin descuento
+                    'coupon_name' => '' // Limpiar el nombre del cupón
+                ]);
+            }
+
+            // Aplicar el descuento al total
+            if ($coupon->amount != 0) {
+                $discount = $coupon->amount;
+            } elseif ($coupon->percentage != 0) {
+                $discount = $total * ($coupon->percentage / 100);
+            }
+        } elseif ($coupon->type == 'detail') {
+            // Verificar si todos los productos son de categoría 'combo' (category_id = 3)
+            /*$onlyCombos = $cart->details->every(function ($detail) {
+                return $detail->product->category_id == 3;
+            });*/
+
+            $onlyCombos = $this->onlyCombos($cart);
+
+            if ($onlyCombos) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El cupón no se puede aplicar porque solo hay combos en el pedido.',
+                    'new_total' => number_format($totalWithShipping, 2), // Devolver el total con envío sin descuento
+                    'coupon_name' => '' // Limpiar el nombre del cupón
+                ]);
+            }
+
+
+
+            // Filtrar los detalles que no sean de categoría 'combo' (category_id = 3)
+            $eligibleDetails = $cart->details->filter(function ($detail) {
+                return $detail->product->category_id != 3;
+            });
+
+            // Buscar el detalle elegible con el subtotal más alto
+            $maxDetail = $this->getMaxDetail($cart);
+
+            if ($maxDetail) {
+                if ($coupon->amount != 0) {
+                    $discount = $coupon->amount;
+                } elseif ($coupon->percentage != 0) {
+                    $discount = ($coupon->percentage / 100) * $maxDetail['subtotal'];
+                }
+            }
+        }
+
+        // Si el descuento es mayor que el total, ajustamos el descuento
+        if ($discount > $total) {
+            $discount = $total;
+        }
+
+        $newTotal = $total - $discount;
+
+        return response()->json([
+            'success' => true,
+            'code_name' => $coupon->name,
+            'discount_display' => '-S/ ' . number_format($discount, 2),
+            'new_total' => number_format($newTotal, 2),
+            'message' => 'Código aplicado. No borre el código.',
+            'coupon_id' => $coupon->id,
+            'district' => $districtId, // Devolver el distrito
+        ]);
+    }
+
+    function getTotalCart($cart)
+    {
+        $total = 0;
+
+        foreach ($cart as $item) {
+            $product = Product::find($item['product_id']);
+            if ($product) {
+                $total += $product->price_default * $item['quantity'];
+            }
+        }
+
+        return $total; // Retorna el total del carrito
+    }
+
+    function hasCombo($cart)
+    {
+        foreach ($cart as $item) {
+            $product = Product::find($item['product_id']);
+            if ($product && $product->category_id == 3) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function onlyCombos($cart)
+    {
+        foreach ($cart as $item) {
+            $product = Product::find($item['product_id']);
+            if ($product && $product->category_id != 3) {
+                return false; // Si hay al menos un producto que no es combo, retornamos false
+            }
+        }
+        return true; // Todos los productos son combos
+    }
+
+    function getMaxDetail($cart)
+    {
+        $maxDetail = null;
+        $maxSubtotal = 0;
+
+        foreach ($cart as $item) {
+            $product = Product::find($item['product_id']);
+            if ($product && $product->category_id != 3) {
+                $subtotal = $product->price * $item['quantity'];
+                if ($subtotal > $maxSubtotal) {
+                    $maxSubtotal = $subtotal;
+                    $maxDetail = [
+                        'product_id' => $item['product_id'],
+                        'subtotal' => $subtotal,
+                    ];
+                }
+            }
+        }
+
+        return $maxDetail; // Retorna el producto con el mayor subtotal elegible
+    }
+
+    public function calculateShippingOriginal(Request $request)
     {
         $districtId = $request->district_id;
         $cartId = $request->cart_id;

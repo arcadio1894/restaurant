@@ -4,16 +4,16 @@ $(document).ready(function() {
     loadCart();
 
     // Evento para aumentar la cantidad
-    $('[data-plus]').on('click', function() {
+    $(document).on('click', '[data-plus]', function() {
         updateQuantity($(this), 1);
     });
 
     // Evento para disminuir la cantidad
-    $('[data-minus]').on('click', function() {
+    $(document).on('click', '[data-minus]', function() {
         updateQuantity($(this), -1);
     });
 
-    $('[data-delete_item]').on('click', function() {
+    $(document).on('click', '[data-delete_item]',function() {
         deleteItem($(this));
     });
 
@@ -33,41 +33,56 @@ $(document).ready(function() {
 
 const TAX_RATE = 0.18; // IGV (18%)
 
-function updateQuantity(button, increment) {
-    let detailId = button.data('detail_id');
-    let quantityInput = $(`[data-quantity][data-detail_id="${detailId}"]`);
-    let newQuantity = parseInt(quantityInput.val()) + increment;
+function updateQuantity(button, change) {
+    // Obtener el índice del detalle desde el atributo data-detail_id
+    const detailIndex = button.data('detail_id');
 
-    // Evitar cantidades menores a 1
-    if (newQuantity < 1) return;
+    // Obtener el carrito desde el localStorage
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-    // Actualizar el valor en el input
-    quantityInput.val(newQuantity);
+    // Verificar si el índice existe en el carrito
+    if (detailIndex !== undefined && cart[detailIndex]) {
+        // Actualizar la cantidad del producto
+        cart[detailIndex].quantity += change;
 
-    // Llamada AJAX para actualizar en el servidor
-    $.ajax({
-        url: '/cart/update-quantity',
-        type: 'POST',
-        data: {
-            detail_id: detailId,
-            quantity: newQuantity,
-            _token: $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function(response) {
-            if (response.success) {
-                // Actualizar subtotal del detalle
-                $(`[data-quantity][data-detail_id="${detailId}"]`).closest('.row').find('.h6').text(`S/ ${response.detail_subtotal}`);
-
-                // Actualizar totales del carrito
-                $('#subtotal_cart').text(`S/ ${response.subtotal_cart}`);
-                $('#taxes_cart').text(`S/ ${response.taxes_cart}`);
-                $('#total_cart').text(`S/ ${response.total_cart}`);
+        // Si la cantidad es menor que 1, mostrar mensaje de confirmación antes de eliminar
+        if (cart[detailIndex].quantity < 1) {
+            if (confirm("¿Desea eliminar este producto del carrito?")) {
+                cart.splice(detailIndex, 1);
+            } else {
+                cart[detailIndex].quantity = 1; // Restaurar la cantidad mínima
             }
-        },
-        error: function(error) {
-            console.error("Error al actualizar la cantidad:", error);
         }
-    });
+
+        // Actualizar el carrito en el localStorage
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+        // Recargar la vista del carrito
+        toastr.success("Detalle actualizado con éxito", 'Éxito',
+            {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "2000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            });
+        setTimeout( function () {
+            loadCart();
+        }, 2000 )
+
+    } else {
+        console.error("Índice del detalle no válido.");
+    }
 }
 
 function loadCart() {
@@ -179,128 +194,81 @@ function loadCart() {
         });
     }
 
-    if ( observations.length === 0 )
-    {
-        var clone3 = activateTemplate('#template-observations');
-        $("#body-observations").append(clone3);
+    const savedObservations = JSON.parse(localStorage.getItem('observations'));
+
+    // Clonar el template para observaciones
+    var cloneO = activateTemplate('#template-observations');
+
+    // Si hay observaciones guardadas, establecer el contenido del textarea
+    if (savedObservations) {
+        cloneO.querySelector("[data-cart_observations]").innerHTML = savedObservations;
     }
 
+    // Agregar el template clonado al contenedor
+    $("#body-observations").append(cloneO);
 
 }
 
 function saveObservations() {
-    let cart_id = $("#cart_id").val();
-    let observation = $("#observations").val();
+    // Obtener el contenido del textarea
+    const observations = $('#observations').val();
 
-    event.preventDefault();
-    $("#btn-observations").attr("disabled", true);
-    // Obtener la URL
+    // Guardar o actualizar el valor en el localStorage
+    localStorage.setItem('observations', JSON.stringify(observations));
 
+    // Mostrar mensaje de confirmación (opcional)
+    console.log("Observaciones guardadas en localStorage:", observations);
+
+    toastr.success("Observaciones guardadas.", 'Éxito',
+        {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "2000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        });
 }
 
 function deleteItem(button) {
-    let detailId = button.data('detail_id');
+    // Obtener el índice del detalle desde el atributo data-detail_id
+    const detailIndex = button.data('detail_id');
 
-    // Confirmación antes de eliminar
-    if (!confirm('¿Estás seguro de que deseas eliminar este ítem del carrito?')) return;
+    // Obtener el carrito desde el localStorage
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-    // Llamada AJAX para eliminar el detalle
-    $.ajax({
-        url: `/cart/delete-detail/${detailId}`,
-        type: 'DELETE',
-        data: {
-            _token: $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function(response) {
-            if (response.status === 'detail_deleted') {
-                toastr.success("Detalle eliminado", 'Éxito',
-                    {
-                        "closeButton": true,
-                        "debug": false,
-                        "newestOnTop": false,
-                        "progressBar": true,
-                        "positionClass": "toast-top-right",
-                        "preventDuplicates": false,
-                        "onclick": null,
-                        "showDuration": "300",
-                        "hideDuration": "1000",
-                        "timeOut": "2000",
-                        "extendedTimeOut": "1000",
-                        "showEasing": "swing",
-                        "hideEasing": "linear",
-                        "showMethod": "fadeIn",
-                        "hideMethod": "fadeOut"
-                    });
-                // Eliminar el ítem visualmente
-                $(`[data-detail_id="${detailId}"]`).closest('.row').remove();
+    // Verificar si el índice existe en el carrito
+    if (detailIndex !== undefined && cart[detailIndex]) {
+        // Eliminar el elemento del carrito
+        cart.splice(detailIndex, 1);
 
-                // Actualizar los totales
-                $('#subtotal_cart').text(`S/ ${response.cart.subtotal}`);
-                $('#taxes_cart').text(`S/ ${response.cart.taxes}`);
-                $('#total_cart').text(`S/ ${response.cart.total}`);
+        // Actualizar el carrito en el localStorage
+        localStorage.setItem('cart', JSON.stringify(cart));
 
-                // Mostrar un mensaje si ya no quedan ítems en el carrito
-                if (response.cart.count === 0) {
-                    $('.container').html(`
-                        <div class="text-center py-5">
-                            <h5>Tu carrito está vacío</h5>
-                            <a href="/" class="btn btn-primary mt-3">Volver a la tienda</a>
-                        </div>
-                    `);
-                }
-            } else if (response.status === 'cart_deleted') {
-                // Manejar caso en el que todo el carrito es eliminado
-                toastr.success("Detalle eliminado", 'Éxito',
-                    {
-                        "closeButton": true,
-                        "debug": false,
-                        "newestOnTop": false,
-                        "progressBar": true,
-                        "positionClass": "toast-top-right",
-                        "preventDuplicates": false,
-                        "onclick": null,
-                        "showDuration": "300",
-                        "hideDuration": "1000",
-                        "timeOut": "2000",
-                        "extendedTimeOut": "1000",
-                        "showEasing": "swing",
-                        "hideEasing": "linear",
-                        "showMethod": "fadeIn",
-                        "hideMethod": "fadeOut"
-                    });
-                setTimeout( function () {
-                    location.reload();
-                }, 2000 )
-                /*$('.container').html(`
-                    <div class="text-center py-5">
-                        <h5>${response.message}</h5>
-                        <a href="/" class="btn btn-primary mt-3">Volver a la tienda</a>
-                    </div>
-                `);*/
-            }
-        },
-        error: function(error) {
-            console.error("Error al eliminar el ítem:", error);
-            toastr.error('Ocurrió un error al eliminar el ítem. Por favor, intenta nuevamente.', 'Error',
-                {
-                    "closeButton": true,
-                    "debug": false,
-                    "newestOnTop": false,
-                    "progressBar": true,
-                    "positionClass": "toast-top-right",
-                    "preventDuplicates": false,
-                    "onclick": null,
-                    "showDuration": "300",
-                    "hideDuration": "1000",
-                    "timeOut": "2000",
-                    "extendedTimeOut": "1000",
-                    "showEasing": "swing",
-                    "hideEasing": "linear",
-                    "showMethod": "fadeIn",
-                    "hideMethod": "fadeOut"
-                });
-        }
-    });
+        // Recargar la vista del carrito
+        loadCart();
+
+        // Mostrar mensaje de éxito
+        toastr.success("Producto eliminado del carrito.", "Éxito", {
+            closeButton: true,
+            progressBar: true,
+            positionClass: "toast-top-right",
+            timeOut: "2000",
+            extendedTimeOut: "1000",
+        });
+    } else {
+        // Mostrar error si el índice no es válido
+        console.error("Índice del detalle no válido.");
+    }
 }
 
 function activateTemplate(id) {

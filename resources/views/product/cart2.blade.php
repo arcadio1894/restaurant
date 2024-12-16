@@ -124,34 +124,6 @@
 
                 <div class="col-lg-3" id="body-summary">
                     <!-- summary -->
-                    {{--@if($cart && $cart->details->isNotEmpty())
-                        <div class="card shadow-0 border">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <p class="mb-2">Sub Total:</p>
-                                    <p class="mb-2" id="subtotal_cart">S/ {{ number_format($cart->subtotal_cart, 2) }}</p>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <p class="mb-2">Descuento:</p>
-                                    <p class="mb-2 text-success">S/ {{ number_format(0, 2) }}</p>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <p class="mb-2">IGV:</p>
-                                    <p class="mb-2" id="taxes_cart">S/ {{ number_format($cart->taxes_cart, 2) }}</p>
-                                </div>
-                                <hr />
-                                <div class="d-flex justify-content-between">
-                                    <p class="mb-2">Precio Total:</p>
-                                    <p class="mb-2 fw-bold" id="total_cart">S/ {{ number_format($cart->total_cart, 2) }}</p>
-                                </div>
-
-                                <div class="mt-3">
-                                    <a href="{{ route('cart.checkout') }}" class="btn btn-success w-100 shadow-0 mb-2"> Completar la compra </a>
-                                    <a href="{{ route('home') }}" class="btn btn-light w-100 border mt-2"> Seguir comprando </a>
-                                </div>
-                            </div>
-                        </div>
-                    @endif--}}
 
                 </div>
 
