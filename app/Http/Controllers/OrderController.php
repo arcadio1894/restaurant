@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\OrderStatusUpdated;
 use App\Models\Address;
 use App\Models\Order;
 use App\Models\ShippingDistrict;
@@ -9,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -124,9 +126,15 @@ class OrderController extends Controller
             $order->status = $state;
             $order->save();
 
+            $order2 = Order::find($order_id);
+
+            Log::info('Emitiendo evento para la orden:', $order2->toArray());
+            broadcast(new OrderStatusUpdated($order2));
+
             DB::commit();
         } catch ( \Throwable $e ) {
             DB::rollBack();
+            Log::error('Error cambiando estado de la orden: ' . $e->getMessage());
             return response()->json(['message' => $e->getMessage()], 422);
         }
         return response()->json(['message' => 'Cambio de estado realizado con éxito'], 200);
