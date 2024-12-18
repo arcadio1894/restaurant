@@ -41,8 +41,9 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::get('/menu', [WelcomeController::class, 'menu'])->name('menu');
 Route::get('/nosotros', [WelcomeController::class, 'about'])->name('about');
 
-Route::get('/producto/{id}', [ProductController::class, 'show'])->name('product.show');
-
+/*Route::get('/producto/{id}', [ProductController::class, 'show'])->name('product.show');*/
+Route::get('/producto/{slug}', [ProductController::class, 'show'])->name('product.show');
+Route::get('/products/fill-slugs', [ProductController::class, 'fillSlugs']);
 /*Route::get('/auth/check', function() {
     return response()->json(['authenticated' => auth()->check()]);
 })->name('auth.check');*/

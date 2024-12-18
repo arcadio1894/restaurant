@@ -90,7 +90,7 @@
 @section('content')
     <div class="row mt-4">
         @foreach($orders as $order)
-            <div class="col-md-4">
+            <div class="col-md-4" id="order-{{ $order->id }}">
                 <article class="card">
                     <header class="card-header text-center"><strong>{{ $order->status_name }}</strong> </header>
                     <div class="card-body">
@@ -131,4 +131,5 @@
 
 @section('scripts')
     <script src="{{ asset('js/cart/cart.js') }}"></script>
+    <script src="{{ asset('js/orderPusher.js') }}"></script>
 @endsection

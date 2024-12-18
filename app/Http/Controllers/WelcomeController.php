@@ -11,7 +11,10 @@ class WelcomeController extends Controller
 {
     public function welcome()
     {
-        $categories = Category::withTrashed()->get(); // Incluye categorías soft-deleted si deseas mostrar todos.
+        $categories = Category::with('products')
+            ->where('visible', 1)
+            ->where('enable_status', 1)
+            ->get();
         $products = Product::where('enable_status', 1)->get(); // Solo productos habilitados
 
         return view('welcome', compact('categories', 'products'));

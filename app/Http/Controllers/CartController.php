@@ -54,6 +54,7 @@ class CartController extends Controller
     {
         $user = Auth::user();
         $product_id = $request->input('product_id');
+        $product = Product::where('slug', $product_id)->first();
         $product_type_id = $request->input('product_type_id'); // Tipo de producto
         $selectedOptions = $request->input('options', []); // Opciones seleccionadas
 
@@ -72,7 +73,7 @@ class CartController extends Controller
 
         // Verificar si el producto con el mismo tipo ya está en el carrito
         $cartDetail = $cart->details()
-            ->where('product_id', $product_id)
+            ->where('product_id', $product->id)
             ->where('product_type_id', $product_type_id)
             ->first();
 
@@ -86,9 +87,9 @@ class CartController extends Controller
             // Si no es combo que haga lo actual
         } else {
             // Si no existe, agregar un nuevo detalle
-            $product = Product::find($product_id);
+            //$product = Product::find($product_id);
             $cartDetail = $cart->details()->create([
-                'product_id' => $product_id,
+                'product_id' => $product->id,
                 'product_type_id' => $product_type_id,
                 'quantity' => 1,
                 'price' => ProductType::find($product_type_id)->price, // Obtener el precio desde ProductType
@@ -120,6 +121,8 @@ class CartController extends Controller
         $user = Auth::user();
         $product_id = $request->input('product_id');
 
+        $product = Product::where('slug', $product_id)->first();
+
         // Verificar si el usuario tiene un carrito pendiente
         $cart = Cart::where('user_id', $user->id)
             ->where('status', 'pending')
@@ -133,11 +136,11 @@ class CartController extends Controller
             ]);
         }
 
-        $product = Product::find($product_id);
+        //$product = Product::find($product_id);
 
         // Verificar si el producto con el mismo tipo ya está en el carrito
         $cartDetail = $cart->details()
-            ->where('product_id', $product_id)
+            ->where('product_id', $product->id)
             ->first();
 
         if ($cartDetail) {
@@ -150,9 +153,9 @@ class CartController extends Controller
             // Si no es combo que haga lo actual
         } else {
             // Si no existe, agregar un nuevo detalle
-            $product = Product::find($product_id);
+            ///$product = Product::find($product_id);
             $cartDetail = $cart->details()->create([
-                'product_id' => $product_id,
+                'product_id' => $product->id,
                 'product_type_id' => null,
                 'quantity' => 1,
                 'price' => $product->price_default, // Obtener el precio desde ProductType
@@ -169,6 +172,8 @@ class CartController extends Controller
         $user = Auth::user();
         $product_id = $request->input('product_id');
 
+        $product = Product::where('slug', $product_id)->first();
+
         // Verificar si el usuario tiene un carrito pendiente
         $cart = Cart::where('user_id', $user->id)
             ->where('status', 'pending')
@@ -182,11 +187,11 @@ class CartController extends Controller
             ]);
         }
 
-        $product = Product::find($product_id);
+        //$product = Product::find($product_id);
 
         // Verificar si el producto con el mismo tipo ya está en el carrito
         $cartDetail = $cart->details()
-            ->where('product_id', $product_id)
+            ->where('product_id', $product->id)
             ->first();
 
         if ($cartDetail) {
@@ -199,9 +204,9 @@ class CartController extends Controller
             // Si no es combo que haga lo actual
         } else {
             // Si no existe, agregar un nuevo detalle
-            $product = Product::find($product_id);
+            //$product = Product::find($product_id);
             $cartDetail = $cart->details()->create([
-                'product_id' => $product_id,
+                'product_id' => $product->id,
                 'product_type_id' => null,
                 'quantity' => 1,
                 'price' => $product->price_default, // Obtener el precio desde ProductType
@@ -758,7 +763,7 @@ class CartController extends Controller
                     foreach ($cartItem->options as $option) {
                         OrderDetailOption::create([
                             'order_detail_id' => $orderDetail->id, // Relación con el detalle de la orden
-                            'option_id' => $option->id,           // ID de la opción seleccionada
+                            'option_id' => $option->option_id,           // ID de la opción seleccionada
                             'product_id' => $option->product_id,  // ID del producto asociado a la opción
                         ]);
                     }

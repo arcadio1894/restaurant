@@ -14,6 +14,7 @@ use App\Models\Type;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -87,7 +88,7 @@ class ProductController extends Controller
                 "estado" => $estado,
                 "textEstado" => $textEstado,
                 "image" => ($product->image == null || $product->image == "" ) ? 'no_image.png':$product->image,
-
+                "slug" => $product->slug,
             ]);
         }
 
@@ -431,9 +432,9 @@ class ProductController extends Controller
 
     }
 
-    public function show($id)
+    public function show($slug)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::where('slug', $slug)->firstOrFail();
 
         // Obtener los tipos relacionados al producto
         $productTypes = $product->productTypes()
@@ -446,7 +447,7 @@ class ProductController extends Controller
         // Obtener el tipo por defecto
         $defaultProductType = $productTypes->where('default', true)->first();
 
-        $options = Option::where('product_id', $id)
+        $options = Option::where('product_id', $product->id)
             ->where('active', 1) // Solo opciones activas
             ->with(['selections' => function ($query) {
                 $query->where('active', 1); // Solo selecciones activas
@@ -454,9 +455,10 @@ class ProductController extends Controller
             ->get();
 
         //dd($options);
-        $adicionales = Product::whereHas('category', function ($query) {
-            $query->where('visible', false);
-        })->orWhere('category_id', 5)->with('category')->get();
+        /*$adicionales = Product::whereHas('category', function ($query) {
+            $query->where('visible', true);
+        })->orWhere('category_id', 5)->orWhere('category_id', 6)->with('category')->get();*/
+        $adicionales = Product::whereIn('category_id', [5, 6])->with('category')->get();
 
         //dd($adicionales);
 
@@ -478,18 +480,16 @@ class ProductController extends Controller
             return response()->json(['error' => 'Producto no encontrado'], 404);
         }
 
-        if ( isset($productType) )
-        {
+        if (isset($productType)) {
             $price = $productType->price;
         } else {
             $price = $product->price_default;
         }
-       //$productType = ProductType::where('product_id', $product->id)->where('default', true)->first();
+        //$productType = ProductType::where('product_id', $product->id)->where('default', true)->first();
 
         $productTypeText = "";
-        if ( $productType )
-        {
-            $productTypeText = "Tipo: ".$productType->type->name." (".$productType->type->size.")";
+        if ($productType) {
+            $productTypeText = "Tipo: " . $productType->type->name . " (" . $productType->type->size . ")";
         }
 
         // Formatear la respuesta
@@ -499,6 +499,26 @@ class ProductController extends Controller
             'price' => (float)$price,
             'image_url' => $product->image,
             'product_type' => $productTypeText
+        ]);
+    }
+
+    public function fillSlugs()
+    {
+        // Obtener los productos que no tienen slug o donde el slug está vacío.
+        $products = Product::whereNull('slug')->orWhere('slug', '')->get();
+
+        foreach ($products as $product) {
+            // Generar el slug a partir del full_name.
+            $product->slug = Str::slug($product->full_name);
+
+            // Guardar los cambios en la base de datos.
+            $product->save();
+        }
+
+        return response()->json([
+            'message' => 'Slugs actualizados correctamente.',
+            'updated_count' => $products->count()
+
         ]);
     }
 

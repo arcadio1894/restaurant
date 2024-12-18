@@ -16,7 +16,8 @@
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.4",
         "mercadopago/dx-php": "^2.6",
-        "mike42/escpos-php": "^4.0"
+        "mike42/escpos-php": "^4.0",
+        "pusher/pusher-php-server": "^7.2"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

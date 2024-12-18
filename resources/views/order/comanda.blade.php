@@ -52,15 +52,20 @@
     </div>
     <p><b>Pedido:</b> {{ $order->formatted_created_date }}</p>
     <p><b>Entrega:</b> {{ $order->formatted_date }}</p>
-    <p><b>Cliente:</b> {{ $order->user->name }}</p>
+    <p><b>Cliente:</b> {{ ($order->shipping_address_id == null) ? 'Incognito':$order->shipping_address->first_name." ".$order->shipping_address->last_name  }}</p>
     <p><b>Telefono:</b> {{ ($order->shipping_address_id == null) ? 'N/A':$order->shipping_address->phone }}</p>
-    <div class="line"></div>
+    {{--<div class="line"></div>--}}
     @foreach ($order->details as $detail)
-        <strong><p style="font-size: 18px">{{ ($detail->product->full_name) }} <span style="float: right;">{{ $detail->quantity }}</span></p></strong>
+        <div class="line"></div>
+        <strong><p style="font-size: 18px">{{ $detail->product->full_name.(( $detail->product_type_id == null ) ? '':"|".$detail->productType->type->name."(".$detail->productType->type->size.")") }} <span style="float: right;">{{ $detail->quantity }}</span></p></strong>
         @foreach( $detail->options as $option )
             <p style="font-size: 16px">- {{ str_pad( ($option->product->full_name), 10, ' ', STR_PAD_LEFT) }} x {{ $detail->quantity }}</p>
         @endforeach
     @endforeach
+    <div class="line"></div>
+    <p class="text-center" style="font-size: 18px"><b>TOTAL: S/. {{ $order->amount_pay }}</b></p>
+    <div class="line"></div>
+    <p class="text-center" style="font-size: 18px"><b>{{($order->payment_method_id == null) ? 'Sin método de pago':$order->payment_method->name }} </b></p>
     <div class="line"></div>
     <div style="border: 0.5px solid black; padding: 3px; margin-top: 10px;">
         <strong>Observaciones:</strong>
