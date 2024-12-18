@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 class LoginController extends Controller
 {
@@ -30,10 +31,24 @@ class LoginController extends Controller
     //protected $redirectTo = RouteServiceProvider::HOME;
     protected function redirectTo()
     {
-        // Comprueba si existe la clave 'redirect_to' en la sesión; si no, usa HOME como predeterminado
+        /*// Comprueba si existe la clave 'redirect_to' en la sesión; si no, usa HOME como predeterminado
         $redirectTo = session('redirect_to', RouteServiceProvider::HOME);
 
         // Limpia la URL de redirección después de usarla
+        session()->forget('redirect_to');
+
+        return $redirectTo;*/
+        // Obtener el valor de redirect_to de la sesión
+        $redirectTo = session('redirect_to', RouteServiceProvider::HOME);
+
+        // Validar nombres de ruta
+        if (Route::has($redirectTo)) {
+            $redirectTo = route($redirectTo);
+        } elseif (!str_starts_with($redirectTo, '/')) {
+            // Asegurar que los paths empiecen con "/"
+            $redirectTo = "/$redirectTo";
+        }
+
         session()->forget('redirect_to');
 
         return $redirectTo;

@@ -48,8 +48,27 @@ $(document).ready(function() {
     // Ocultamos inicialmente el li del código de promoción
     $('#info_code').addClass('hidden'); // Ocultar
 
+    $('#btn-login').click(function () {
+        window.location.href = `/login?redirect_to=checkout`;
+    });
+
+    $('#btn-register').click(function () {
+        window.location.href = `/register?redirect_to=checkout`;
+    });
+
     // Acción al presionar el botón "Aplicar"
     $('#btn-promo_code').click(function () {
+
+        // Mostrar modal para loguearse o registrarse
+        // Variable definida desde Blade para saber si el usuario está autenticado
+        const isAuthenticated = $('#auth-status').data('authenticated') === 'true';
+
+        if (!isAuthenticated) {
+            $('#authModal').modal('show');
+            return;
+        }
+
+
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         $('#info_code').addClass('hidden'); // Ocultar
         $('#coupon_name').val(""); // Limpiar el campo del nombre del cupón
@@ -459,6 +478,7 @@ function submitFormAjax(extraData = {}) {
     if (cart) {
         try {
             cart = JSON.parse(cart); // Convertir el JSON en objeto
+            observations = JSON.parse(observations);
             dataObj.cart = cart; // Agregar el carrito al objeto de datos
             dataObj.observations = observations;
         } catch (error) {

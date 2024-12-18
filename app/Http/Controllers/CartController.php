@@ -15,6 +15,7 @@ use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\ProductType;
 use App\Models\ShippingDistrict;
+use App\Models\User;
 use App\Models\UserCoupon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -281,46 +282,70 @@ class CartController extends Controller
 
     public function pagar( CheckoutRequest $request )
     {
+        //dd($request);
         DB::beginTransaction();
 
         try {
             // Validar los datos y guardarlos
             $validatedData = $request->validated();
 
+            // Manejar user_id
+            $userId = auth()->id();
+            if (!$userId) {
+                $userId = $request->input('user_id');
+            }
+            if (!$userId) {
+                $genericUser = User::where('name', 'generico')->first();
+                if (!$genericUser) {
+                    DB::rollBack();
+                    return response()->json(['success' => false, 'message' => 'Usuario genérico no encontrado.']);
+                }
+                $userId = $genericUser->id;
+            }
+
+
             $shippingAddressId = null;
 
-            // Verificar si 'save-info' está marcado como "on"
-            //if ($request->has('save-info') && $request->input('save-info') === 'on') {
-                $isDefault = true;
-                $existingDefaultAddress = Address::where('user_id', auth()->id())->where('is_default', true)->first();
-                if ($existingDefaultAddress) {
-                    $isDefault = false;
-                }
+            // Guardar la dirección de envío
+            $isDefault = true;
+            $existingDefaultAddress = Address::where('user_id', $userId)->where('is_default', true)->first();
+            if ($existingDefaultAddress) {
+                $isDefault = false;
+            }
 
-                // Crear la nueva dirección
-                $address = Address::create([
-                    'user_id' => auth()->id(),
-                    'type' => 'shipping',
-                    'phone' => $validatedData['phone'],
-                    'first_name' => $validatedData['first_name'],
-                    'last_name' => $validatedData['last_name'],
-                    'address_line' => $validatedData['address'],
-                    'reference' => $request->input('reference', ''),
-                    'city' => '',
-                    'state' => '',
-                    'postal_code' => '',
-                    'country' => '',
-                    'is_default' => $isDefault
-                ]);
+            $address = Address::create([
+                'user_id' => $userId,
+                'type' => 'shipping',
+                'phone' => $validatedData['phone'],
+                'first_name' => $validatedData['first_name'],
+                'last_name' => $validatedData['last_name'],
+                'address_line' => $validatedData['address'],
+                'reference' => $request->input('reference', ''),
+                'city' => '',
+                'state' => '',
+                'postal_code' => '',
+                'country' => '',
+                'is_default' => $isDefault,
+            ]);
 
-                $shippingAddressId = $address->id;
-            //}
+            $shippingAddressId = $address->id;
 
-            //$cart = Cart::findOrFail($validatedData['cart_id']);
-            $cart = json_decode($request->input('cart'), true);
+            // Procesar el carrito enviado
+            $cart = $request->input('cart');
+
+            // Si el carrito no es un array, decodificarlo
+            if (!is_array($cart)) {
+                $cart = json_decode($cart, true);
+            }
+
+            if (!$cart || !is_array($cart)) {
+                DB::rollBack();
+                return response()->json(['success' => false, 'message' => 'El carrito enviado no es válido.']);
+            }
+
             $totalAmount = $this->getTotalCart($cart);
 
-            // Obtener el distrito seleccionado y su costo de envío
+            // Manejar el distrito y el costo de envío
             $districtId = $request->input('district');
             if (!$districtId) {
                 DB::rollBack();
@@ -406,56 +431,68 @@ class CartController extends Controller
 
             // Crear la orden
             $order = Order::create([
-                'user_id' => auth()->id(),
+                'user_id' => $userId,
                 'shipping_address_id' => $shippingAddressId,
                 'billing_address_id' => $shippingAddressId,
-                'total_amount' => $totalAmount,
+                'total_amount' => $totalAmount - $discountAmount + $shippingCost,
                 'status' => 'created',
                 'payment_method_id' => $validatedData['paymentMethod'],
                 'amount_shipping' => $shippingCost,
                 'shipping_district_id' => $districtId,
-                'observations' => $cart->observations
+                'observations' => $request->input('observations', ''),
             ]);
 
-            // Crear los detalles de la orden basados en el carrito
-            foreach ($cart->details as $cartItem) {
-                // Crear el detalle de la orden
+            // Guardar los detalles de la orden
+            foreach ($cart as $cartItem) {
+                $price = 0;
+                if ( $cartItem['product_type_id'] != null )
+                {
+                    $productType = ProductType::find($cartItem['product_type_id']);
+                    if ($productType) {
+                        $price = $productType->price * $cartItem['quantity'];
+                    }
+                } else {
+                    $product = Product::find($cartItem['product_id']);
+                    if ($product) {
+                        $price = $product->price_default * $cartItem['quantity'];
+                    }
+                }
                 $orderDetail = OrderDetail::create([
                     'order_id' => $order->id,
-                    'product_id' => $cartItem->product_id,
-                    'product_type_id' => $cartItem->product_type_id,
-                    'quantity' => $cartItem->quantity,
-                    'price' => $cartItem->price,
-                    'subtotal' => $cartItem->quantity * $cartItem->price,
+                    'product_id' => $cartItem['product_id'],
+                    'product_type_id' => $cartItem['product_type_id'],
+                    'quantity' => $cartItem['quantity'],
+                    'price' => $price,
+                    'subtotal' => $cartItem['quantity'] * $price,
                 ]);
 
-                // Guardar las opciones relacionadas con este detalle
-                if (!empty($cartItem->options)) {
-                    foreach ($cartItem->options as $option) {
-                        OrderDetailOption::create([
-                            'order_detail_id' => $orderDetail->id, // Relación con el detalle de la orden
-                            'option_id' => $option->id,           // ID de la opción seleccionada
-                            'product_id' => $option->product_id,  // ID del producto asociado a la opción
-                        ]);
+                if (!empty($cartItem['options'])) {
+                    foreach ($cartItem['options'] as $optionGroupId => $optionIds) {
+                        foreach ($optionIds as $optionId) {
+                            OrderDetailOption::create([
+                                'order_detail_id' => $orderDetail->id,
+                                'option_id' => $optionId,
+                                'product_id' => $orderDetail->product_id,  // ID del producto asociado a la opción
+                            ]);
+                        }
                     }
                 }
             }
 
-            $cart->status = 'completed';
-            $cart->save();
-
-            // Guardamos la relación del cupón con el usuario, solo si se aplicó
+            // Asociar el cupón al usuario si se aplicó
             if ($coupon) {
                 UserCoupon::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => $userId,
                     'coupon_id' => $coupon->id,
                     'discount_amount' => $discountAmount,
-                    'order_id' => $order->id, // Asociar al pedido
+                    'order_id' => $order->id,
                 ]);
             }
 
 
             $method_payment = PaymentMethod::find($validatedData['paymentMethod']);
+
+            $routeToRedirect = route('orders.index');
 
             // Selección del método de pago
             switch ($method_payment->code) {
@@ -496,8 +533,8 @@ class CartController extends Controller
                         'order' => "ORDEN - ".$order->id
                     ];
 
-                    $telegramController = new TelegramController();
-                    $telegramController->sendNotification('process', $data);
+                   /* $telegramController = new TelegramController();
+                    $telegramController->sendNotification('process', $data);*/
 
                     DB::commit();
 
@@ -1273,10 +1310,19 @@ class CartController extends Controller
         $total = 0;
 
         foreach ($cart as $item) {
-            $product = Product::find($item['product_id']);
-            if ($product) {
-                $total += $product->price_default * $item['quantity'];
+            if ( $item['product_type_id'] != null )
+            {
+                $productType = ProductType::find($item['product_type_id']);
+                if ($productType) {
+                    $total += $productType->price * $item['quantity'];
+                }
+            } else {
+                $product = Product::find($item['product_id']);
+                if ($product) {
+                    $total += $product->price_default * $item['quantity'];
+                }
             }
+
         }
 
         return $total; // Retorna el total del carrito

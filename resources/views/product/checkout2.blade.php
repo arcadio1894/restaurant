@@ -18,6 +18,7 @@
 @endsection
 
 @section('content')
+    <div id="auth-status" data-authenticated="{{ auth()->check() ? 'true' : 'false' }}"></div>
     <div class="container formulario">
         <div class="row mt-4 mb-4 ">
             <div class="col-md-6 order-md-2">
@@ -257,6 +258,26 @@
             <span class="text-muted" data-subtotal>{{--S/ {{ number_format($detail->subtotal, 2, '.', '') }}--}}</span>
         </li>
     </template>
+
+    <!-- Modal de atención -->
+    <div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="authModalLabel">¡Atención!</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <p>Para aplicar cupones, debes iniciar sesión en tu cuenta.</p>
+                    <p>¿Aún no tienes una cuenta? ¡Regístrate ahora y aprovecha nuestras promociones exclusivas!</p>
+                </div>
+                <div class="modal-footer">
+                    <button id="btn-login" class="btn btn-primary">Iniciar Sesión</button>
+                    <button id="btn-register" class="btn btn-success">Registrarse</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('scripts')

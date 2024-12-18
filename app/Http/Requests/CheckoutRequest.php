@@ -24,7 +24,7 @@ class CheckoutRequest extends FormRequest
     public function rules()
     {
         return [
-            'cart_id' => 'required',
+            /*'cart_id' => 'required',*/
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'phone' => 'required|string|max:15',
@@ -36,7 +36,7 @@ class CheckoutRequest extends FormRequest
     public function messages()
     {
         return [
-            'cart_id.required' => 'El id del carrito es obligatorio.',
+            /*'cart_id.required' => 'El id del carrito es obligatorio.',*/
             'first_name.required' => 'El nombre es obligatorio.',
             'first_name.string' => 'El nombre debe ser una cadena de texto.',
             'first_name.max' => 'El nombre no debe superar los 255 caracteres.',
