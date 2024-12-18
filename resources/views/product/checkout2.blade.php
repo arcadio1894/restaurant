@@ -106,6 +106,20 @@
                     </div>
 
                     <div class="mb-3">
+                        <label for="email">Correo Eletrónico</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-envelope-open"></i></span>
+                            </div>
+                            <input type="email" class="form-control" id="email" name="email" placeholder=""
+                                   value="{{ auth()->check() ? ($defaultAddress ? ($defaultAddress->email ?: auth()->user()->email) : auth()->user()->email) : '' }}" required>
+                            <div class="invalid-feedback" style="width: 100%;">
+                                Su email es obligatorio.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
                         <label for="district">Seleccione su Distrito</label>
                         <select class="form-control" name="district" id="district" required>
                             <option value="" selected>Ninguno</option>

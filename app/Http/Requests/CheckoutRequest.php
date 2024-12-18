@@ -28,6 +28,7 @@ class CheckoutRequest extends FormRequest
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'phone' => 'required|string|max:15',
+            'email' => 'required|string|max:255',
             'address' => 'required|string|max:255',
             'paymentMethod' => 'required|integer',
         ];
@@ -46,6 +47,9 @@ class CheckoutRequest extends FormRequest
             'phone.required' => 'El número de teléfono es obligatorio.',
             'phone.string' => 'El número de teléfono debe ser una cadena de texto.',
             'phone.max' => 'El número de teléfono no debe superar los 15 caracteres.',
+            'email.required' => 'El correo es obligatorio.',
+            'email.string' => 'El correo debe ser una cadena de texto.',
+            'email.max' => 'El correo no debe superar los 255 caracteres.',
             'address.required' => 'La dirección es obligatoria.',
             'address.string' => 'La dirección debe ser una cadena de texto.',
             'address.max' => 'La dirección no debe superar los 255 caracteres.',

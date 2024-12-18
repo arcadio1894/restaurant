@@ -28,7 +28,7 @@ $(document).ready(function () {
     $('#add-to-cart-btn').on('click', function (e) {
         e.preventDefault();
 
-        const productId = $(this).data('product-id');
+        const productId = $(this).data('product-id_v2');
         const authCheckUrl = $(this).data('auth-check-url');
         const addCartUrl = $(this).data('add-cart-url');
         const productTypeId = $('#pizza-type-select').val(); // Obtener el tipo de pizza seleccionado
@@ -170,7 +170,7 @@ $(document).ready(function () {
     $(document).on('click', '[data-add_to_cart_adicional]', function (e) {
         e.preventDefault();
 
-        const productId = $(this).data('product-id');
+        const productId = $(this).data('product-id_v2');
         const authCheckUrl = $(this).data('auth-check-url');
         const addCartUrl = $(this).data('add-cart-url');
         const productTypeId = null;

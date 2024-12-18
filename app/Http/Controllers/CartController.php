@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CheckoutRequest;
+use App\Mail\OrderStatusEmail;
 use App\Models\Address;
 use App\Models\Cart;
 use App\Models\CartDetail;
@@ -20,6 +21,8 @@ use App\Models\UserCoupon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use MercadoPago\Item;
 use MercadoPago\Payment;
 use MercadoPago\Preference;
@@ -329,6 +332,7 @@ class CartController extends Controller
                 'first_name' => $validatedData['first_name'],
                 'last_name' => $validatedData['last_name'],
                 'address_line' => $validatedData['address'],
+                'email' => $validatedData['email'],
                 'reference' => $request->input('reference', ''),
                 'city' => '',
                 'state' => '',
@@ -481,8 +485,8 @@ class CartController extends Controller
                         foreach ($optionIds as $optionId) {
                             OrderDetailOption::create([
                                 'order_detail_id' => $orderDetail->id,
-                                'option_id' => $optionId,
-                                'product_id' => $orderDetail->product_id,  // ID del producto asociado a la opción
+                                'option_id' => null,
+                                'product_id' => $optionId,  // ID del producto asociado a la opción
                             ]);
                         }
                     }
@@ -548,6 +552,17 @@ class CartController extends Controller
 
                     DB::commit();
 
+                    // Obtener el correo electrónico según la lógica.
+                    $email = $this->getEmailForOrder($order);
+
+                    if ($email) {
+                        // Enviar correo al cliente con el estado de la orden.
+                        Mail::to($email)->send(new OrderStatusEmail($order));
+                        Log::info('Correo enviado a: ' . $email . ' con el estado de la orden: ');
+                    } else {
+                        Log::warning('No se encontró un correo electrónico para enviar el estado de la orden.');
+                    }
+
                     return response()->json(['success' => true, 'message' => 'Pago realizado con POS', 'redirect_url' => $routeToRedirect]);
 
                 case 'efectivo':
@@ -565,6 +580,17 @@ class CartController extends Controller
                     $telegramController->sendNotification('process', $data);
 
                     DB::commit();
+
+                    // Obtener el correo electrónico según la lógica.
+                    $email = $this->getEmailForOrder($order);
+
+                    if ($email) {
+                        // Enviar correo al cliente con el estado de la orden.
+                        Mail::to($email)->send(new OrderStatusEmail($order));
+                        Log::info('Correo enviado a: ' . $email . ' con el estado de la orden: ');
+                    } else {
+                        Log::warning('No se encontró un correo electrónico para enviar el estado de la orden.');
+                    }
 
                     return response()->json(['success' => true, 'message' => 'Orden creada. Pago en efectivo pendiente', 'redirect_url' => $routeToRedirect]);
 
@@ -590,6 +616,17 @@ class CartController extends Controller
 
                         DB::commit();
 
+                        // Obtener el correo electrónico según la lógica.
+                        $email = $this->getEmailForOrder($order);
+
+                        if ($email) {
+                            // Enviar correo al cliente con el estado de la orden.
+                            Mail::to($email)->send(new OrderStatusEmail($order));
+                            Log::info('Correo enviado a: ' . $email . ' con el estado de la orden: ');
+                        } else {
+                            Log::warning('No se encontró un correo electrónico para enviar el estado de la orden.');
+                        }
+
                         return response()->json(['success' => true, 'message' => 'Pago realizado con Yape/Plin', 'redirect_url' => $routeToRedirect]);
                     } else {
                         DB::rollBack();
@@ -610,6 +647,25 @@ class CartController extends Controller
                 'error' => $e->getMessage(),
             ], 420);
         }
+    }
+
+    private function getEmailForOrder($order)
+    {
+        // Obtener shipping_address si existe
+        $shippingAddress = $order->shipping_address;
+
+        if ($shippingAddress && !empty($shippingAddress->email)) {
+            return $shippingAddress->email; // Usar el email del shipping_address si está disponible.
+        }
+
+        // Obtener email del usuario asociado a la orden si no hay shipping_address o su email está vacío.
+        $user = $order->user;
+        if ($user && !empty($user->email)) {
+            return $user->email;
+        }
+
+        // Si no hay correo en shipping_address ni en el usuario, retornar null.
+        return null;
     }
 
     public function pagarOriginal( CheckoutRequest $request )

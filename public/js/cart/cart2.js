@@ -269,6 +269,15 @@ function deleteItem(button) {
         // Mostrar error si el índice no es válido
         console.error("Índice del detalle no válido.");
     }
+
+    let cartN = JSON.parse(localStorage.getItem('cart')) || [];
+
+    // Contar el número de productos únicos
+    let totalItems = cartN.length;
+
+    // Actualizar el contenido del span
+    $("#quantityCart").html(`(${totalItems})`);
+
 }
 
 function activateTemplate(id) {

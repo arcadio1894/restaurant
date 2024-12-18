@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\OrderStatusUpdated;
+use App\Mail\OrderStatusEmail;
 use App\Models\Address;
 use App\Models\Order;
 use App\Models\ShippingDistrict;
@@ -11,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
@@ -128,6 +130,17 @@ class OrderController extends Controller
 
             $order2 = Order::find($order_id);
 
+            // Obtener el correo electrónico según la lógica.
+            $email = $this->getEmailForOrder($order2);
+
+            if ($email) {
+                // Enviar correo al cliente con el estado de la orden.
+                Mail::to($email)->send(new OrderStatusEmail($order2));
+                Log::info('Correo enviado a: ' . $email . ' con el estado de la orden: ' . $state);
+            } else {
+                Log::warning('No se encontró un correo electrónico para enviar el estado de la orden.');
+            }
+
             Log::info('Emitiendo evento para la orden:', $order2->toArray());
             broadcast(new OrderStatusUpdated($order2));
 
@@ -138,6 +151,25 @@ class OrderController extends Controller
             return response()->json(['message' => $e->getMessage()], 422);
         }
         return response()->json(['message' => 'Cambio de estado realizado con éxito'], 200);
+    }
+
+    private function getEmailForOrder($order)
+    {
+        // Obtener shipping_address si existe
+        $shippingAddress = $order->shipping_address;
+
+        if ($shippingAddress && !empty($shippingAddress->email)) {
+            return $shippingAddress->email; // Usar el email del shipping_address si está disponible.
+        }
+
+        // Obtener email del usuario asociado a la orden si no hay shipping_address o su email está vacío.
+        $user = $order->user;
+        if ($user && !empty($user->email)) {
+            return $user->email;
+        }
+
+        // Si no hay correo en shipping_address ni en el usuario, retornar null.
+        return null;
     }
 
     public function getOrderDetails($orderId)
