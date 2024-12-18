@@ -467,17 +467,24 @@ class ProductController extends Controller
         return view('product.show', compact('product', 'productTypes', 'defaultProductType', 'options', 'adicionales'));
     }
 
-    public function getProduct($id)
+    public function getProduct($id, $productTypeId)
     {
         // Buscar el producto por ID
         $product = Product::find($id);
-
+        $productType = ProductType::find($productTypeId);
+        $price = 0;
         if (!$product) {
             // Si el producto no existe, devolver error 404
             return response()->json(['error' => 'Producto no encontrado'], 404);
         }
 
-        $productType = ProductType::where('product_id', $product->id)->where('default', true)->first();
+        if ( isset($productType) )
+        {
+            $price = $productType->price;
+        } else {
+            $price = $product->price_default;
+        }
+       //$productType = ProductType::where('product_id', $product->id)->where('default', true)->first();
 
         $productTypeText = "";
         if ( $productType )
@@ -489,7 +496,7 @@ class ProductController extends Controller
         return response()->json([
             'id' => $product->id,
             'name' => $product->full_name,
-            'price' => (float)$product->price_default,
+            'price' => (float)$price,
             'image_url' => $product->image,
             'product_type' => $productTypeText
         ]);

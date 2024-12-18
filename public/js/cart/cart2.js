@@ -110,7 +110,7 @@ function loadCart() {
                 var clone2 = activateTemplate('#template-cart_detail');
 
                 $.ajax({
-                    url: `/products/${item.product_id}`,
+                    url: `/products/${item.product_id}/${item.product_type_id}`,
                     type: 'GET',
                     success: function (product) {
                         // Calcular subtotal del producto
@@ -138,7 +138,7 @@ function loadCart() {
                                         var clone3 = activateTemplate('#template-option');
 
                                         $.ajax({
-                                            url: `/products/${productId}`,
+                                            url: `/products/${productId}/null`,
                                             type: 'GET',
                                             success: function (optionProduct) {
                                                 // Renderizar opciones

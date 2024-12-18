@@ -29,7 +29,7 @@ use \App\Http\Controllers\CategoryController;
     return view('welcome');
 });*/
 
-Route::get('/', [WelcomeController::class, 'welcome']);
+Route::get('/', [WelcomeController::class, 'welcome'])->name('welcome');
 
 /*Route::get('/is-authenticated', [WelcomeController::class, 'isAuthenticated']);*/
 Route::get('/auth/check', [WelcomeController::class, 'isAuthenticated'])->name('auth.check');
@@ -54,7 +54,7 @@ Route::get('/carrito', [CartController::class, 'show'])/*->middleware('auth')*/-
 Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])/*->middleware('auth')*/->name('cart.updateQuantity');
 Route::get('/cart/quantity', [CartController::class, 'getCartQuantity'])->name('cart.quantity');
 
-Route::get('/products/{id}', [ProductController::class, 'getProduct'])->name('products.get');
+Route::get('/products/{id_product}/{product_type_id}', [ProductController::class, 'getProduct'])->name('products.get');
 
 Route::get('/checkout', [CartController::class, 'checkout'])/*->middleware('auth')*/->name('cart.checkout');
 Route::post('/checkout/pagar', [CartController::class, 'pagar'])->name('checkout.pagar');

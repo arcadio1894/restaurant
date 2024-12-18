@@ -61,9 +61,9 @@ $(document).ready(function() {
 
         // Mostrar modal para loguearse o registrarse
         // Variable definida desde Blade para saber si el usuario está autenticado
-        const isAuthenticated = $('#auth-status').data('authenticated') === 'true';
-
-        if (!isAuthenticated) {
+        let isAuthenticated = $('#auth-status').data('authenticated');
+        console.log($('#auth-status').data('authenticated'));
+        if (isAuthenticated == 0) {
             $('#authModal').modal('show');
             return;
         }
@@ -293,7 +293,7 @@ function loadCheckout() {
             var clone2 = activateTemplate('#template-detail');
 
             $.ajax({
-                url: `/products/${item.product_id}`,
+                url: `/products/${item.product_id}/${item.product_type_id}`,
                 type: 'GET',
                 success: function (product) {
                     // Calcular subtotal del producto
@@ -525,6 +525,9 @@ function submitFormAjax(extraData = {}) {
                         "showMethod": "fadeIn",
                         "hideMethod": "fadeOut"
                     });
+                // Limpiar las claves específicas del Local Storage
+                localStorage.removeItem('cart');
+                localStorage.removeItem('observations');
                 setTimeout( function () {
                     //location.reload();
                     window.location.href = data.redirect_url;

@@ -289,10 +289,13 @@ class CartController extends Controller
             // Validar los datos y guardarlos
             $validatedData = $request->validated();
 
+            $routeToRedirect = "";
+
             // Manejar user_id
             $userId = auth()->id();
-            if (!$userId) {
-                $userId = $request->input('user_id');
+            if ($userId) {
+                //$userId = $userId;
+                $routeToRedirect = route('orders.index');
             }
             if (!$userId) {
                 $genericUser = User::where('name', 'generico')->first();
@@ -301,6 +304,7 @@ class CartController extends Controller
                     return response()->json(['success' => false, 'message' => 'Usuario genérico no encontrado.']);
                 }
                 $userId = $genericUser->id;
+                $routeToRedirect = route('welcome');
             }
 
 
@@ -419,11 +423,12 @@ class CartController extends Controller
                     // Buscar el detalle elegible con el subtotal más alto
                     $maxDetail = $eligibleDetails->sortByDesc('subtotal')->first();*/
                     $maxDetail = $this->getMaxDetail($cart);
+                    //dd($maxDetail['subtotal']);
                     if ($maxDetail) {
                         if ($coupon->amount != 0) {
                             $discountAmount = $coupon->amount;
                         } elseif ($coupon->percentage != 0) {
-                            $discountAmount = ($coupon->percentage / 100) * $maxDetail->subtotal;
+                            $discountAmount = ($coupon->percentage / 100) * $maxDetail['subtotal'];
                         }
                     }
                 }
@@ -434,7 +439,7 @@ class CartController extends Controller
                 'user_id' => $userId,
                 'shipping_address_id' => $shippingAddressId,
                 'billing_address_id' => $shippingAddressId,
-                'total_amount' => $totalAmount - $discountAmount + $shippingCost,
+                'total_amount' => $totalAmount /*- $discountAmount + $shippingCost*/,
                 'status' => 'created',
                 'payment_method_id' => $validatedData['paymentMethod'],
                 'amount_shipping' => $shippingCost,
@@ -445,7 +450,7 @@ class CartController extends Controller
             // Guardar los detalles de la orden
             foreach ($cart as $cartItem) {
                 $price = 0;
-                if ( $cartItem['product_type_id'] != null )
+                if ( isset($cartItem['product_type_id']) && $cartItem['product_type_id'] != null )
                 {
                     $productType = ProductType::find($cartItem['product_type_id']);
                     if ($productType) {
@@ -460,7 +465,7 @@ class CartController extends Controller
                 $orderDetail = OrderDetail::create([
                     'order_id' => $order->id,
                     'product_id' => $cartItem['product_id'],
-                    'product_type_id' => $cartItem['product_type_id'],
+                    'product_type_id' => (isset($cartItem['product_type_id']) && $cartItem['product_type_id'] != null) ? $cartItem['product_type_id']:null ,
                     'quantity' => $cartItem['quantity'],
                     'price' => $price,
                     'subtotal' => $cartItem['quantity'] * $price,
@@ -492,7 +497,7 @@ class CartController extends Controller
 
             $method_payment = PaymentMethod::find($validatedData['paymentMethod']);
 
-            $routeToRedirect = route('orders.index');
+
 
             // Selección del método de pago
             switch ($method_payment->code) {
@@ -538,7 +543,7 @@ class CartController extends Controller
 
                     DB::commit();
 
-                    return response()->json(['success' => true, 'message' => 'Pago realizado con POS', 'redirect_url' => route('orders.index')]);
+                    return response()->json(['success' => true, 'message' => 'Pago realizado con POS', 'redirect_url' => $routeToRedirect]);
 
                 case 'efectivo':
                     // Lógica para pago en efectivo
@@ -556,7 +561,7 @@ class CartController extends Controller
 
                     DB::commit();
 
-                    return response()->json(['success' => true, 'message' => 'Orden creada. Pago en efectivo pendiente', 'redirect_url' => route('orders.index')]);
+                    return response()->json(['success' => true, 'message' => 'Orden creada. Pago en efectivo pendiente', 'redirect_url' => $routeToRedirect]);
 
                 case 'yape_plin':
                     // Lógica para pago con Yape o Plin
@@ -580,7 +585,7 @@ class CartController extends Controller
 
                         DB::commit();
 
-                        return response()->json(['success' => true, 'message' => 'Pago realizado con Yape/Plin', 'redirect_url' => route('orders.index')]);
+                        return response()->json(['success' => true, 'message' => 'Pago realizado con Yape/Plin', 'redirect_url' => $routeToRedirect]);
                     } else {
                         DB::rollBack();
                         return response()->json(['success' => false, 'message' => 'Falta el código de operación para Yape/Plin']);
@@ -1268,15 +1273,9 @@ class CartController extends Controller
                 ]);
             }
 
-
-
-            // Filtrar los detalles que no sean de categoría 'combo' (category_id = 3)
-            $eligibleDetails = $cart->details->filter(function ($detail) {
-                return $detail->product->category_id != 3;
-            });
-
             // Buscar el detalle elegible con el subtotal más alto
             $maxDetail = $this->getMaxDetail($cart);
+            //dd($maxDetail);
 
             if ($maxDetail) {
                 if ($coupon->amount != 0) {
@@ -1310,15 +1309,17 @@ class CartController extends Controller
         $total = 0;
 
         foreach ($cart as $item) {
-            if ( $item['product_type_id'] != null )
+            if ( isset($item['product_type_id']) && $item['product_type_id'] != null)
             {
                 $productType = ProductType::find($item['product_type_id']);
                 if ($productType) {
+                    //dump($productType->price * $item['quantity']);
                     $total += $productType->price * $item['quantity'];
                 }
             } else {
                 $product = Product::find($item['product_id']);
                 if ($product) {
+                    //dump($product->price_default * $item['quantity']);
                     $total += $product->price_default * $item['quantity'];
                 }
             }
@@ -1357,8 +1358,24 @@ class CartController extends Controller
 
         foreach ($cart as $item) {
             $product = Product::find($item['product_id']);
+            $subtotal = 0;
+            if ( isset($item['product_type_id']) && $item['product_type_id'] != null)
+            {
+                $productType = ProductType::find($item['product_type_id']);
+                if ($productType) {
+                    //dump($productType->price * $item['quantity']);
+                    $subtotal = $productType->price * $item['quantity'];
+                }
+            } else {
+                $product = Product::find($item['product_id']);
+                if ($product) {
+                    //dump($product->price_default * $item['quantity']);
+                    $subtotal = $product->price_default * $item['quantity'];
+                }
+            }
+
             if ($product && $product->category_id != 3) {
-                $subtotal = $product->price * $item['quantity'];
+                //$subtotal = $price * $item['quantity'];
                 if ($subtotal > $maxSubtotal) {
                     $maxSubtotal = $subtotal;
                     $maxDetail = [
