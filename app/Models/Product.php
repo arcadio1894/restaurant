@@ -59,9 +59,9 @@ class Product extends Model
     {
         parent::boot();
 
-        static::creating(function ($post) {
-            if (empty($post->slug)) {
-                $originalSlug = Str::slug($post->title, '-');
+        static::creating(function ($product) {
+            if (empty($product->slug)) {
+                $originalSlug = Str::slug($product->full_name, '-');
                 $slug = $originalSlug;
                 $count = 1;
 
@@ -70,13 +70,13 @@ class Product extends Model
                     $count++;
                 }
 
-                $post->slug = $slug;
+                $product->slug = $slug;
             }
         });
 
-        static::updating(function ($post) {
-            if (empty($post->slug)) {
-                $originalSlug = Str::slug($post->title, '-');
+        static::updating(function ($product) {
+            if (empty($product->slug)) {
+                $originalSlug = Str::slug($product->full_name, '-');
                 $slug = $originalSlug;
                 $count = 1;
 
@@ -85,7 +85,7 @@ class Product extends Model
                     $count++;
                 }
 
-                $post->slug = $slug;
+                $product->slug = $slug;
             }
         });
     }
