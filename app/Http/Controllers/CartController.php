@@ -375,7 +375,7 @@ class CartController extends Controller
                         if ($coupon->amount != 0) {
                             $discountAmount = $coupon->amount;
                         } elseif ($coupon->percentage != 0) {
-                            $discountAmount = ($coupon->percentage / 100) * $maxDetail->subtotal;
+                            $discountAmount = (($coupon->percentage / 100) * $maxDetail->subtotal)/$maxDetail->quantity;
                         }
                     }
                 }
@@ -668,7 +668,7 @@ class CartController extends Controller
                 if ($coupon->amount != 0) {
                     $discount = $coupon->amount;
                 } elseif ($coupon->percentage != 0) {
-                    $discount = $maxDetail->subtotal * ($coupon->percentage / 100);
+                    $discount = ($maxDetail->subtotal * ($coupon->percentage / 100))/$maxDetail->quantity;
                 }
             }
         }
@@ -786,7 +786,7 @@ class CartController extends Controller
                     if ($coupon->amount != 0) {
                         $discount = $coupon->amount;
                     } elseif ($coupon->percentage != 0) {
-                        $discount = ($coupon->percentage / 100) * $maxDetail->subtotal;
+                        $discount = (($coupon->percentage / 100) * $maxDetail->subtotal)/$maxDetail->quantity;
                     }
                 }
             }
