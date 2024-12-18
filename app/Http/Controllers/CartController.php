@@ -369,13 +369,13 @@ class CartController extends Controller
                     });
 
                     // Buscar el detalle elegible con el subtotal más alto
-                    $maxDetail = $eligibleDetails->sortByDesc('subtotal')->first();
+                    $maxDetail = $eligibleDetails->sortByDesc('price')->first();
 
                     if ($maxDetail) {
                         if ($coupon->amount != 0) {
                             $discountAmount = $coupon->amount;
                         } elseif ($coupon->percentage != 0) {
-                            $discountAmount = (($coupon->percentage / 100) * $maxDetail->subtotal)/$maxDetail->quantity;
+                            $discountAmount = (($coupon->percentage / 100) * $maxDetail->price);
                         }
                     }
                 }
@@ -662,13 +662,13 @@ class CartController extends Controller
             });
 
             // Buscar el detalle elegible con el subtotal más alto
-            $maxDetail = $eligibleDetails->sortByDesc('subtotal')->first();
+            $maxDetail = $eligibleDetails->sortByDesc('price')->first();
 
             if ($maxDetail) {
                 if ($coupon->amount != 0) {
                     $discount = $coupon->amount;
                 } elseif ($coupon->percentage != 0) {
-                    $discount = ($maxDetail->subtotal * ($coupon->percentage / 100))/$maxDetail->quantity;
+                    $discount = ($maxDetail->price * ($coupon->percentage / 100));
                 }
             }
         }
@@ -780,13 +780,13 @@ class CartController extends Controller
                 });
 
                 // Buscar el detalle elegible con el subtotal más alto
-                $maxDetail = $eligibleDetails->sortByDesc('subtotal')->first();
+                $maxDetail = $eligibleDetails->sortByDesc('price')->first();
 
                 if ($maxDetail) {
                     if ($coupon->amount != 0) {
                         $discount = $coupon->amount;
                     } elseif ($coupon->percentage != 0) {
-                        $discount = (($coupon->percentage / 100) * $maxDetail->subtotal)/$maxDetail->quantity;
+                        $discount = (($coupon->percentage / 100) * $maxDetail->price);
                     }
                 }
             }
