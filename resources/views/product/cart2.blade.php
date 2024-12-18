@@ -36,6 +36,9 @@
                 <div class="col-lg-9">
                     <div class="card border shadow-0">
                         <div class="m-4" id="body-items">
+                            <div id="loading-indicator" style="display: none;">
+                                <p>Cargando...</p>
+                            </div>
                         {{--@if($cart && $cart->details->isNotEmpty())
                             <!-- cart_detail -->
                             @foreach( $cart->details as $detail )

@@ -27,7 +27,12 @@
                     {{--<span class="badge badge-secondary badge-pill">{{ count($cart->details) }}</span>--}}
                 </h4>
                 <ul class="list-group mb-3">
-                    <div id="body-items"></div>
+
+                    <div id="body-items">
+                        <div id="loading-indicator" style="display: none;">
+                            <p>Cargando...</p>
+                        </div>
+                    </div>
                     {{--@foreach( $cart->details as $detail )
                     <li class="list-group-item d-flex justify-content-between lh-condensed">
                         <div>

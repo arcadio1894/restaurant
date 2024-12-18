@@ -1342,7 +1342,7 @@ class CartController extends Controller
                 if ($coupon->amount != 0) {
                     $discount = $coupon->amount;
                 } elseif ($coupon->percentage != 0) {
-                    $discount = ($coupon->percentage / 100) * $maxDetail['subtotal'];
+                    $discount = ($coupon->percentage / 100) * $maxDetail['subtotal'];//$maxDetail['subtotal'] es el precio no el subtotal
                 }
             }
         }
@@ -1425,13 +1425,15 @@ class CartController extends Controller
                 $productType = ProductType::find($item['product_type_id']);
                 if ($productType) {
                     //dump($productType->price * $item['quantity']);
-                    $subtotal = $productType->price * $item['quantity'];
+                    //$subtotal = $productType->price * $item['quantity'];
+                    $subtotal = $productType->price;
                 }
             } else {
                 $product = Product::find($item['product_id']);
                 if ($product) {
                     //dump($product->price_default * $item['quantity']);
-                    $subtotal = $product->price_default * $item['quantity'];
+                    //$subtotal = $product->price_default * $item['quantity'];
+                    $subtotal = $product->price_default;
                 }
             }
 

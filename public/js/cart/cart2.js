@@ -33,6 +33,130 @@ $(document).ready(function() {
 
 const TAX_RATE = 0.18; // IGV (18%)
 
+async function fetchProduct(productId, productTypeId) {
+    try {
+        const response = await $.ajax({
+            url: `/products/${productId}/${productTypeId}`,
+            type: 'GET'
+        });
+        return response;
+    } catch (error) {
+        console.error(`Error al obtener producto ${productId}:`, error);
+        return null;
+    }
+}
+
+async function fetchOption(optionId) {
+    try {
+        const response = await $.ajax({
+            url: `/products/${optionId}/null`,
+            type: 'GET'
+        });
+        return response;
+    } catch (error) {
+        console.error(`Error al obtener opción ${optionId}:`, error);
+        return null;
+    }
+}
+
+function showLoading() {
+    $("#loading-indicator").show();  // Muestra el indicador de carga
+}
+
+function hideLoading() {
+    $("#loading-indicator").hide();  // Oculta el indicador de carga
+}
+
+async function loadCart() {
+    showLoading();  // Mostrar carga al comenzar
+
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let observations = JSON.parse(localStorage.getItem('observations')) || [];
+
+    // Limpiar los contenedores actuales
+    $('#body-items').empty();
+    $('#body-observations').empty();
+    $('#body-summary').empty();
+
+    // Si el carrito está vacío
+    if (cart.length === 0) {
+        const clone = activateTemplate('#template-cart_empty');
+        $("#body-items").append(clone);
+        hideLoading();
+        return;
+    }
+
+    let total = 0;
+
+    // Promesas de productos
+    const productPromises = cart.map(async (item, index) => {
+        const product = await fetchProduct(item.product_id, item.product_type_id);
+        if (!product) return null;  // Si no conseguimos el producto, lo omitimos
+
+        const clone = activateTemplate('#template-cart_detail');
+        const subtotal = product.price * item.quantity;
+        total += subtotal;
+
+        // Rellenar los datos del producto
+        let url_image = document.location.origin + '/images/products/' + product.image_url;
+        clone.querySelector("[data-image]").setAttribute('src', url_image);
+        clone.querySelector("[data-product_name]").innerHTML = product.name;
+        clone.querySelector("[data-quantity]").value = item.quantity;
+        clone.querySelector("[data-detail_price]").innerHTML = `S/. ${product.price.toFixed(2)} / por item`;
+        clone.querySelector("[data-minus]").setAttribute('data-detail_id', index);
+        clone.querySelector("[data-quantity]").setAttribute('data-detail_id', index);
+        clone.querySelector("[data-quantity]").setAttribute('value', item.quantity);
+        clone.querySelector("[data-plus]").setAttribute('data-detail_id', index);
+        clone.querySelector("[data-detail_subtotal]").innerHTML = "S/. " + subtotal.toFixed(2);
+        clone.querySelector("[data-detail_price]").innerHTML = "S/. " + product.price.toFixed(2) + " / por item";
+        clone.querySelector("[data-delete_item]").setAttribute('data-detail_id', index);
+        clone.querySelector("[data-detail_productType]").innerHTML = product.product_type;
+        // Si tiene opciones
+        if (item.options && Object.keys(item.options).length > 0) {
+            const optionPromises = Object.values(item.options).flat().map(fetchOption);
+            const options = await Promise.all(optionPromises);
+
+            options.forEach(option => {
+                if (option) {
+                    const cloneOption = activateTemplate('#template-option');
+                    cloneOption.querySelector("[data-option]").innerHTML = option.name;
+                    clone.querySelector("[data-body_options]").append(cloneOption);
+                }
+            });
+        }
+
+        return clone;
+    });
+
+    // Esperamos a que todas las promesas se resuelvan
+    const productClones = await Promise.all(productPromises);
+
+    // Filtramos nulls y agregamos los clones de productos al DOM
+    productClones.filter(Boolean).forEach(clone => {
+        $('#body-items').append(clone);
+    });
+
+    // Renderizamos el resumen del carrito
+    const taxesCart = total - (total / (1 + TAX_RATE));
+    const subtotalCart = total - taxesCart;
+    const cloneSummary = activateTemplate('#template-cart_summary');
+    cloneSummary.querySelector("[data-subtotal_cart]").innerHTML = `S/. ${subtotalCart.toFixed(2)}`;
+    cloneSummary.querySelector("[data-taxes_cart]").innerHTML = `S/. ${taxesCart.toFixed(2)}`;
+    cloneSummary.querySelector("[data-total_cart]").innerHTML = `S/. ${total.toFixed(2)}`;
+
+    $('#body-summary').append(cloneSummary);
+
+    // Renderizamos las observaciones
+    const cloneObservations = activateTemplate('#template-observations');
+    if (observations) {
+        cloneObservations.querySelector("[data-cart_observations]").innerHTML = observations;
+    }
+    $('#body-observations').append(cloneObservations);
+
+    // Ocultar indicador de carga una vez todo esté cargado
+    hideLoading();
+}
+
 function updateQuantity(button, change) {
     // Obtener el índice del detalle desde el atributo data-detail_id
     const detailIndex = button.data('detail_id');
@@ -85,7 +209,7 @@ function updateQuantity(button, change) {
     }
 }
 
-function loadCart() {
+/*function loadCart() {
     // Obtener carrito desde localStorage
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
     let observations = JSON.parse(localStorage.getItem('observations')) || [];
@@ -207,7 +331,7 @@ function loadCart() {
     // Agregar el template clonado al contenedor
     $("#body-observations").append(cloneO);
 
-}
+}*/
 
 function saveObservations() {
     // Obtener el contenido del textarea
