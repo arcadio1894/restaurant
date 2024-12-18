@@ -463,7 +463,7 @@
                                                    data-add_to_cart_adicional
                                                    data-product-id="{{ $producto->slug }}"
                                                    data-auth-check-url="{{ route('auth.check') }}"
-                                                   data-add-cart-url="{{ route('cart.manage') }}">
+                                                   data-add-cart-url="{{ route('cart.manage2') }}">
                                                     <i class="me-1 fa fa-shopping-basket"></i> Agregar
                                                 </a>
                                             </div>
