@@ -17,7 +17,7 @@ $(document).ready(function() {
         deleteItem($(this));
     });
 
-    $("#btn-observations").on('click', saveObservations);
+    $(document).on('click', '#btn-observations',saveObservations);
 
     // Eliminar producto del carrito
     $(document).on('click', '.remove-item', function () {
@@ -334,6 +334,7 @@ function updateQuantity(button, change) {
 }*/
 
 function saveObservations() {
+    console.log("Guardar observaciones");
     // Obtener el contenido del textarea
     const observations = $('#observations').val();
 
