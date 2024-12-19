@@ -297,6 +297,28 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="verifyModal" tabindex="-1" aria-labelledby="verifyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="verifyModalLabel">¡Atención! 📢</h5>
+                    <button type="button" class="close closeModalVerify" ><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <p>Antes de finalizar tu compra, asegúrate de que los datos en los campos de celular y correo electrónico estén correctos.</p>
+                    <p>📱: <span id="showPhone"></span></p>
+                    <p>✉: <span id="showEmail"></span></p>
+                    <p>✅ Estos son los medios que utilizaremos para informarte sobre el estado de tu pedido y coordinar la entrega. 🚗🍕</p>
+                    <p>🔄 Verifica tus datos ahora para una experiencia sin inconvenientes.</p>
+                </div>
+                <div class="modal-footer">
+                    <button id="btn-continue" class="btn btn-primary">Continuar</button>
+                    <button id="btn-cancel" class="btn btn-secondary closeModalVerify">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('scripts')

@@ -465,8 +465,8 @@
                                                 <a href="#"
                                                    class="btn btn-primary shadow-0"
                                                    data-add_to_cart_adicional
-                                                   data-product-category="{{ $product->category_id }}"
-                                                   data-product-id_v2="{{ $product->id }}"
+                                                   data-product-category="{{ $producto->category_id }}"
+                                                   data-product-id_v2="{{ $producto->id }}"
                                                    data-product-id="{{ $producto->slug }}"
                                                    data-auth-check-url="{{ route('auth.check') }}"
                                                    data-add-cart-url="{{ route('cart.manage2') }}">

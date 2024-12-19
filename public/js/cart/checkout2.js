@@ -176,9 +176,11 @@ $(document).ready(function() {
         }*/
     });
     // Al hacer clic en el botón de enviar
-    $('#btn-submit').on('click', function(event) {
+    $('#btn-continue').on('click', function(event) {
         event.preventDefault();
         $('#btn-submit').attr("disabled", true);
+        $('#btn-continue').attr("disabled", true);
+        $('#btn-cancel').attr("disabled", true);
         // Llamar al método para verificar horario de atención
         $.ajax({
             url: '/api/business-hours', // Cambia la ruta si es necesario
@@ -191,9 +193,9 @@ $(document).ready(function() {
                     $('#btn-submit').attr("disabled", true); // Deshabilitar el botón
                     return; // Detener el flujo del código
                 } else {
-                    // Si el negocio está abierto, continuar con el flujo
-                    $('#btn-submit').attr("disabled", false); // Habilitar el botón
                     procesarFormulario(); // Llamar a la función para validar y enviar el formulario
+                    // Si el negocio está abierto, continuar con el flujo
+                    //$('#btn-submit').attr("disabled", false); // Habilitar el botón
                 }
             },
             error: function () {
@@ -277,6 +279,20 @@ $(document).ready(function() {
                 }
             });
         }
+    });
+
+    $(".closeModalVerify").on('click', function () {
+        $('#verifyModal').modal('hide');
+        $('#btn-submit').attr("disabled", false);
+    });
+
+    $('#btn-submit').click(function () {
+        var phone = $("#phone").val();
+        var email = $("#email").val();
+        $('#showPhone').html(phone);
+        $('#showEmail').html(email);
+        $('#verifyModal').modal('show');
+        $('#btn-submit').attr("disabled", true);
     });
 });
 
@@ -594,6 +610,9 @@ function submitFormAjax(extraData = {}) {
                 localStorage.removeItem('observations');
                 setTimeout( function () {
                     //location.reload();
+                    $("#verifyModal").modal('hide');
+                    $('#btn-submit').attr("disabled", false);
+                    $('#btn-continue').attr("disabled", false);
                     window.location.href = data.redirect_url;
                 }, 2000 )
             } else {
