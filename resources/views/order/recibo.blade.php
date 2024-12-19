@@ -57,7 +57,7 @@
     <div class="line"></div>
     @foreach ($order->details as $detail)
 
-        <p><b>{{ str_pad( ($detail->product->full_name.(( $detail->product_type_id == null ) ? '':"|".$detail->productType->type->name."(".$detail->productType->type->size.")")), 10, ' ', STR_PAD_LEFT)  }} x {{ $detail->quantity }}</b>  <span style="float: right;">{{ 'S/. ' . number_format($detail->price * $detail->quantity, 2) }}</span></p>
+        <p style="font-size: 10px"><b>{{ str_pad( ($detail->product->full_name.(( $detail->product_type_id == null ) ? '':" | ".$detail->productType->type->name)), 10, ' ', STR_PAD_LEFT)  }} x {{ $detail->quantity }}</b>  <span style="float: right;">{{ 'S/. ' . number_format($detail->price * $detail->quantity, 2) }}</span></p>
         @foreach( $detail->options as $option )
             <p>- {{ str_pad( ($option->product->full_name), 10, ' ', STR_PAD_LEFT) }}</p>
         @endforeach
