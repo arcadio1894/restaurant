@@ -543,6 +543,8 @@ class CartController extends Controller
                     //$cart->save();
                     $data = [
                         'nameUser' => $order->user->name,
+                        'nameUserReal' => $order->shipping_address->first_name." ".$order->shipping_address->last_name,
+                        'phoneUser' => $order->shipping_address->phone,
                         'dateOperation' => $order->created_at->format('d M Y, g:i a'),
                         'order' => "ORDEN - ".$order->id
                     ];
@@ -572,6 +574,8 @@ class CartController extends Controller
 
                     $data = [
                         'nameUser' => $order->user->name,
+                        'nameUserReal' => $order->shipping_address->first_name." ".$order->shipping_address->last_name,
+                        'phoneUser' => $order->shipping_address->phone,
                         'dateOperation' => $order->created_at->format('d M Y, g:i a'),
                         'order' => "ORDEN - ".$order->id
                     ];
@@ -607,6 +611,8 @@ class CartController extends Controller
 
                         $data = [
                             'nameUser' => $order->user->name,
+                            'nameUserReal' => $order->shipping_address->first_name." ".$order->shipping_address->last_name,
+                            'phoneUser' => $order->shipping_address->phone,
                             'dateOperation' => $order->created_at->format('d M Y, g:i a'),
                             'order' => "ORDEN - ".$order->id
                         ];

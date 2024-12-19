@@ -485,6 +485,7 @@ function renderDataTable(data) {
     clone.querySelector("[data-code]").innerHTML = data.code;
     clone.querySelector("[data-date]").innerHTML = data.date;
     clone.querySelector("[data-date_delivery]").innerHTML = data.date_delivery;
+    clone.querySelector("[data-customer]").innerHTML = data.customer;
     clone.querySelector("[data-phone]").innerHTML = data.phone;
     clone.querySelector("[data-address]").innerHTML = data.address;
     clone.querySelector("[data-total]").innerHTML = data.total;

@@ -98,6 +98,7 @@ class OrderController extends Controller
                 "code" => "ORDEN - ".$order->id,
                 "date" => ($order->created_at != null) ? $order->formatted_created_date : "",
                 "date_delivery" => ($order->created_at != null) ? $order->formatted_date : "",
+                "customer" => $direccion->first_name." ".$direccion->last_name,
                 "phone" => $direccion->phone,
                 "address" => $direccion->address_line. " - ".( (!isset($distrito)) ? 'N/A':$distrito->name),
                 "total" => $order->amount_pay,

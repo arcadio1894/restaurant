@@ -48,7 +48,7 @@ class TelegramController extends Controller
             $user = User::find(2);
 
             // Construye el mensaje dinámicamente
-            $message = "Se ha generado un nuevo pedido ".$data['order']." para el cliente " . $data['nameUser'] .
+            $message = "Se ha generado un nuevo pedido ".$data['order']." para el cliente " . $data['nameUser']." - ". $data['nameUserReal']." - ". $data['phoneUser'] .
                 " el " . $data['dateOperation'] . ".";
 
             // Envía la notificación

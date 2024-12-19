@@ -199,6 +199,7 @@
                     <th>Código</th>
                     <th>Fecha Pedido</th>
                     <th>Fecha Entrega</th>
+                    <th>Cliente</th>
                     <th>Teléfono</th>
                     <th>Dirección</th>
                     <th>Total</th>
@@ -263,6 +264,7 @@
             <td data-code></td>
             <td data-date></td>
             <td data-date_delivery></td>
+            <td data-customer></td>
             <td data-phone></td>
             <td data-address></td>
             <td data-total></td>
