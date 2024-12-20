@@ -23,7 +23,7 @@
 @section('content')
 
     <div class="row pt-5">
-        <div class="col-md-6">
+        <div class="col-md-6 pl-5 pr-5">
             <div class="detail-box">
                 <div class="heading_container">
                     <h2>

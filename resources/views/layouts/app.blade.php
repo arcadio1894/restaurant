@@ -72,8 +72,8 @@
 <body>
 <div id="app" class="sub_page">
     <div class="hero_area">
-        <div class="bg-box">
-            <img src="{{ asset('landing/images/hero-bg2.jpg') }}" alt="">
+        <div class="bg-box" style="background-color: #121513">
+
         </div>
         <!-- header section strats -->
         <header class="header_section">
@@ -283,12 +283,10 @@
         </main>
     </div>--}}
 <section class="">
-    <div class="container">
-        <div class="heading_container heading_center pt-5">
-            <h2>
-                @yield('text-header')
-                {{--Our Menu--}}
-            </h2>
+    <div class="{{--container--}}">
+        <div class="heading_container heading_center {{--pt-5--}}">
+            @yield('text-header')
+
         </div>
 
         @yield('content')

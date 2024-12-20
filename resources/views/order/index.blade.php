@@ -3,7 +3,10 @@
 @section('orders-active', 'active')
 
 @section('text-header')
-    Tus pedidos
+    <h2 class="pt-5">
+        Tus pedidos
+    </h2>
+
 @endsection
 
 @section('styles')
@@ -88,7 +91,7 @@
 @endsection
 
 @section('content')
-    <div class="row mt-4">
+    <div class="row mt-4 p-5">
         @foreach($orders as $order)
             <div class="col-md-4" id="order-{{ $order->id }}">
                 <article class="card">

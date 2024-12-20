@@ -65,12 +65,9 @@
 
     </head>
     <body>
-        <div class="hero_area">
-            <div class="bg-box">
-                <img src="{{ asset('landing/images/hero-bg2.jpg') }}" alt="">
-            </div>
+        <div class="">
             <!-- header section strats -->
-            <header class="header_section">
+            <header class="header_section" style="background-color: #121513">
                 <div class="container">
                     <nav class="navbar navbar-expand-lg custom_nav-container ">
                         <a class="navbar-brand" href="{{ url('/') }}">
@@ -199,89 +196,76 @@
             </header>
             <!-- end header section -->
             <!-- slider section -->
-            <section class="slider_section ">
-                <div id="customCarousel1" class="carousel slide" data-ride="carousel">
-                    <div class="carousel-inner">
-                        <div class="carousel-item active">
-                            <div class="container ">
-                                <div class="row">
-                                    <div class="col-md-7 col-lg-6 ">
-                                        <div class="detail-box">
-                                            <h1>
-                                                Paraíso Tropical
-                                            </h1>
-                                            <p>
-                                                Disfruta de una pizza ligera llena de frescura. Margarita del Campo realza la esencia de la albahaca fresca sobre una capa de queso derretido y salsa de tomate, en un bocado que celebra lo natural.
-                                            </p>
-                                            <div class="btn-box">
-                                                <a href="{{ route('home') }}" class="btn1">
-                                                    Ordena ahora
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="carousel-item ">
-                            <div class="container ">
-                                <div class="row">
-                                    <div class="col-md-7 col-lg-6 ">
-                                        <div class="detail-box">
-                                            <h1>
-                                                Aloha Suprema
-                                            </h1>
-                                            <p>
-                                                Una explosión de sabores tropicales. La Aloha Suprema combina el clásico jamón y piña con el toque único del durazno dulce y la intensidad de la aceituna verde. Un festín para los sentidos en cada rebanada, que lleva la experiencia hawaiana a nuevas alturas.
-                                            </p>
-                                            <div class="btn-box">
-                                                <a href="{{ route('home') }}"  class="btn1">
-                                                    Ordena ahora
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="carousel-item">
-                            <div class="container ">
-                                <div class="row">
-                                    <div class="col-md-7 col-lg-6 ">
-                                        <div class="detail-box">
-                                            <h1>
-                                                Chorizo del Huerto
-                                            </h1>
-                                            <p>
-                                                Fusión perfecta de lo intenso y lo fresco. Chorizo del Huerto une el chorizo ahumado con aceitunas verdes sobre una base de salsa de tomate y queso, creando un bocado lleno de sabor y un toque de frescura en cada mordisco.
-                                            </p>
-                                            <div class="btn-box">
-                                                <a href="{{ route('home') }}" class="btn1">
-                                                    Ordena ahora
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="carouselLarge" class="carousel slide d-none d-md-block" data-ride="carousel">
                         <ol class="carousel-indicators">
-                            <li data-target="#customCarousel1" data-slide-to="0" class="active"></li>
-                            <li data-target="#customCarousel1" data-slide-to="1"></li>
-                            <li data-target="#customCarousel1" data-slide-to="2"></li>
+                            <li data-target="#carouselLarge" data-slide-to="0" class="active"></li>
+                            <li data-target="#carouselLarge" data-slide-to="1"></li>
+                            <li data-target="#carouselLarge" data-slide-to="2"></li>
                         </ol>
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <a href="http://restaurant.site:8080/producto/margarita-del-campo">
+                                    <img src="{{ asset('images/slider/slide1_g.webp') }}" class="d-block w-100" alt="...">
+                                </a>
+                            </div>
+
+                            <div class="carousel-item">
+                                <img src="{{ asset('images/slider/slide1_g.webp') }}" class="d-block w-100" alt="...">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="{{ asset('images/slider/slide1_g.webp') }}" class="d-block w-100" alt="...">
+                            </div>
+                        </div>
+                        <a class="carousel-control-prev" href="#carouselLarge" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselLarge" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
+
+                    <!-- Carrusel para dispositivos pequeños -->
+                    <div id="carouselSmall" class="carousel slide d-block d-md-none" data-ride="carousel">
+                        <ol class="carousel-indicators">
+                            <li data-target="#carouselSmall" data-slide-to="0" class="active"></li>
+                            <li data-target="#carouselSmall" data-slide-to="1"></li>
+                            <li data-target="#carouselSmall" data-slide-to="2"></li>
+                        </ol>
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <a href="http://restaurant.site:8080/producto/margarita-del-campo">
+                                    <img src="{{ asset('images/slider/slide1_p.webp') }}" class="d-block w-100" alt="...">
+                                </a>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="{{ asset('images/slider/slide1_p.webp') }}" class="d-block w-100" alt="...">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="{{ asset('images/slider/slide1_p.webp') }}" class="d-block w-100" alt="...">
+                            </div>
+                        </div>
+                        <a class="carousel-control-prev" href="#carouselSmall" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselSmall" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
                     </div>
                 </div>
+            </div>
 
-            </section>
             <!-- end slider section -->
         </div>
 
         <!-- offer section -->
 
-        <section class="offer_section layout_padding-bottom">
+        <section class="offer_section layout_padding-bottom pt-0">
             <div class="offer_container">
                 <div class="container ">
                     <div class="row">
