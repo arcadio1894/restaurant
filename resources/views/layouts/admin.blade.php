@@ -407,6 +407,31 @@
                     </li>
 
                     <li class="nav-header">MANTENEDORES</li>
+
+                    <li class="nav-item has-treeview @yield('openSliders')">
+                        <a href="#" class="nav-link @yield('activeSliders')">
+                            <i class="nav-icon fas fa-images"></i>
+                            <p>
+                                Slider
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{route('sliders.index')}}" class="nav-link @yield('activeListSliders')">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Listado imágenes</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{route('sliders.create')}}" class="nav-link @yield('activeCreateSliders')">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Crear Imagen</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
                     <li class="nav-item has-treeview @yield('openCoupons')">
                         <a href="#" class="nav-link @yield('activeCoupons')">
                             <i class="nav-icon fas fa-ticket-alt"></i>

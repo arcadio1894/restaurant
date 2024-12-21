@@ -13,6 +13,7 @@ use \App\Http\Controllers\BusinessController;
 use \App\Http\Controllers\PrintController;
 use \App\Http\Controllers\TypeController;
 use \App\Http\Controllers\CategoryController;
+use \App\Http\Controllers\SliderController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -158,6 +159,21 @@ Route::middleware('auth')->group(function (){
             ->name('categories.update');
         Route::post('/categories/destroy', [CategoryController::class, 'destroy'])
             ->name('categories.destroy');
+
+        // Rutas Sliders
+        Route::get('/sliders', [SliderController::class, 'index'])
+            ->name('sliders.index');
+        Route::get('/get/all/sliders', [SliderController::class, 'getSliders']);
+        Route::post('/sliders/destroy', [SliderController::class, 'destroy'])
+            ->name('sliders.destroy');
+        Route::get('/sliders/create', [SliderController::class, 'create'])
+            ->name('sliders.create');
+        Route::post('/sliders', [SliderController::class, 'store'])
+            ->name('sliders.store');
+        Route::get('/editar/imagen/slider/{slider}', [SliderController::class, 'edit'])
+            ->name('sliders.edit');
+        Route::post('/sliders/update', [SliderController::class, 'update'])
+            ->name('sliders.update');
     });
 });
 
