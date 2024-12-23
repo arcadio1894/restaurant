@@ -1,19 +1,19 @@
 @extends('layouts.admin')
 
-@section('openProducts')
+@section('openCoupons')
     menu-open
 @endsection
 
-@section('activeProducts')
+@section('activeCoupons')
     active
 @endsection
 
-@section('activeLCreateProducts')
+@section('activeListCoupons')
     active
 @endsection
 
 @section('title')
-    Productos
+    Cupones
 @endsection
 
 @section('styles-plugins')
@@ -34,11 +34,11 @@
 @endsection
 
 @section('page-header')
-    <h1 class="page-title">Productos</h1>
+    <h1 class="page-title">Cupones</h1>
 @endsection
 
 @section('page-title')
-    <h5 class="card-title">Modificar producto {{ $product->code }}</h5>
+    <h5 class="card-title">Modificar cupón</h5>
 @endsection
 
 @section('page-breadcrumb')
@@ -47,143 +47,71 @@
             <a href="{{ route('dashboard.principal') }}"><i class="fa fa-home"></i> Dashboard</a>
         </li>
         <li class="breadcrumb-item">
-            <a href="{{ route('products.list') }}"><i class="fa fa-archive"></i> Productos</a>
+            <a href="{{ route('coupons.index') }}"><i class="fa fa-archive"></i> Cupón</a>
         </li>
         <li class="breadcrumb-item"><i class="fa fa-plus-circle"></i> Editar</li>
     </ol>
 @endsection
 
 @section('content')
-    <form id="formEdit" class="form-horizontal" data-url="{{ route('product.update') }}" enctype="multipart/form-data">
+    <form id="formEdit" class="form-horizontal" data-url="{{ route('coupons.update') }}" enctype="multipart/form-data">
         @csrf
-        <input type="hidden" name="product_id" value="{{ $product->id }}">
+        <input type="hidden" name="coupon_id" value="{{ $coupon->id }}">
 
-        <input type="hidden" id="category_id" value="{{$product->category_id}}">
-
-        <div class="row">
-            <div class="col-md-8">
-                <div class="card card-success">
-                    <div class="card-header">
-                        <h3 class="card-title">Datos generales</h3>
-
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
-                                <i class="fas fa-minus"></i></button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group row">
-                            <div class="col-md-12">
-                                <label for="full_name">Nombre completo <span class="right badge badge-danger">(*)</span></label>
-                                <input type="text" class="form-control rounded-0" id="full_name" name="full_name" value="{{ $product->full_name }}">
-                            </div>
-
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-md-7">
-                                <label for="description">Descripción <span class="right badge badge-danger">(*)</span></label>
-                                <textarea id="description" name="description" class="form-control">{{ $product->description }}</textarea>
-                            </div>
-                            <div class="col-md-5">
-                                <label for="category">Categorías <span class="right badge badge-danger">(*)</span></label>
-                                <select id="category" name="category" class="form-control select2" style="width: 100%;">
-                                    <option></option>
-                                    @foreach( $categories as $category )
-                                        <option value="{{ $category->id }}" {{ ($category->id === $product->category_id) ? 'selected': ''}}>{{ $category->name }}</option>
-                                    @endforeach
-                                </select>
-
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-md-8">
-                                <label for="image">Imagen <span class="right badge badge-danger">(*)</span></label>
-                                <input type="file" id="image" name="image" class="form-control">
-                                <img src="{{ asset('images/products/'.$product->image) }}" width="100px" height="100px" alt="{{ $product->full_name }}">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label for="unit_price">Precio Referencial </label>
-                                <input type="number" id="unit_price" name="unit_price" class="form-control" placeholder="0.00" min="0" value="{{ $product->unit_price }}" step="0.01" pattern="^\d+(?:\.\d{1,2})?$" onblur="
-                                    this.style.borderColor=/^\d+(?:\.\d{1,2})?$/.test(this.value)?'':'red'
-                                    ">
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-md-12">
-                                <label for="observations">Ingredientes </label>
-                                <textarea class="textarea_ingredients" id="ingredients" name="ingredients" placeholder="Place some text here"
-                                          style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;">{{$product->ingredients}}</textarea>
-                            </div>
-                        </div>
-
-                    </div>
-                    <!-- /.card-body -->
+        <div class="form-group row">
+            <div class="col-md-4">
+                <label for="name" class="col-12 col-form-label">Nombre <span class="right badge badge-danger">(*)</span></label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="name" id="name" value="{{ $coupon->name }}">
                 </div>
-                <!-- /.card -->
             </div>
             <div class="col-md-4">
-                <div class="card card-primary">
-                    <div class="card-header">
-                        <h3 class="card-title">Tipos de Productos</h3>
-
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
-                                <i class="fas fa-minus"></i></button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        @foreach($types as $type)
-                            @php
-                                $isChecked = isset($priceTypes[$type->id]);
-                                $price = $isChecked ? $priceTypes[$type->id]['price'] : $type->price;
-                                $isDefault = $isChecked && $priceTypes[$type->id]['default'];
-                            @endphp
-                            <div class="form-group clearfix">
-                                <div class="icheck-success d-inline">
-                                    <input
-                                            type="radio"
-                                            id="radioPrimary{{$type->id}}"
-                                            name="defaultType"
-                                            value="{{$type->id}}"
-                                            {{ $isDefault ? 'checked' : '' }}
-                                    >
-                                    <label for="radioPrimary{{$type->id}}"></label>
-                                </div>
-                                <div class="icheck-primary d-inline">
-                                    <input
-                                            type="checkbox"
-                                            name="type[{{$type->id}}]"
-                                            id="checkboxPrimary{{$type->id}}"
-                                            {{ $isChecked ? 'checked' : '' }}
-                                    >
-                                    <label for="checkboxPrimary{{$type->id}}">
-                                        {{$type->name}} - ( {{ $type->size }} )
-                                    </label>
-                                    <input
-                                            type="number"
-                                            class="form-control form-control-sm d-inline ml-2"
-                                            style="width: 70px;"
-                                            id="productPrice{{$type->id}}"
-                                            name="productPrice[{{$type->id}}]"
-                                            value="{{ $price }}"
-                                            min="0"
-                                    >
-                                </div>
-                            </div>
-                        @endforeach
-
-                    </div>
-                    <!-- /.card-body -->
+                <label for="description" class="col-12 col-form-label">Descripción</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="description" id="description" value="{{ $coupon->description }}">
                 </div>
             </div>
-
+            <div class="col-md-4">
+                <label for="type" class="col-12 col-form-label">Tipo <span class="right badge badge-danger">(*)</span></label>
+                <input type="hidden" name="type" value="off"> <!-- Valor predeterminado si no está seleccionado -->
+                <input id="type" type="checkbox" name="type" data-bootstrap-switch
+                       data-off-color="primary"
+                       data-on-text="TOTAL"
+                       data-off-text="DETALLE"
+                       data-on-color="success"
+                        {{ ($coupon->type == 'total') ? 'checked' : '' }}>
+            </div>
         </div>
+
+        <div class="form-group row">
+            <div class="col-md-4">
+                <label for="amount" class="col-12 col-form-label">Monto <span class="right badge badge-danger">(*)</span></label>
+                <div class="col-sm-10">
+                    <input type="number" class="form-control" name="amount" id="amount" value="{{ $coupon->amount }}">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label for="percentage" class="col-12 col-form-label">Porcentaje <span class="right badge badge-danger">(*)</span></label>
+                <div class="col-sm-10">
+                    <input type="number" class="form-control" name="percentage" id="percentage" value="{{ $coupon->percentage }}">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label for="special" class="col-12 col-form-label">Especial <span class="right badge badge-danger">(*)</span></label>
+                <input type="hidden" name="special" value="off"> <!-- Valor predeterminado si no está seleccionado -->
+                <input id="special" type="checkbox" name="special" value="on" data-bootstrap-switch
+                       data-off-color="primary"
+                       data-on-text="ESPECIAL"
+                       data-off-text="NORMAL"
+                       data-on-color="success"
+                        {{ $coupon->special ? 'checked' : '' }}>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-12">
-                <a href="{{ route('products.list') }}" class="btn btn-outline-secondary">Cancelar</a>
-                <button type="button" id="btn-submit" class="btn btn-outline-success float-right">Guardar material</button>
+                <a href="{{ route('coupons.index') }}" class="btn btn-outline-secondary">Cancelar</a>
+                <button type="button" id="btn-submit" class="btn btn-outline-success float-right">Guardar cupón</button>
             </div>
         </div>
         <!-- /.card-footer -->
@@ -202,27 +130,8 @@
 @section('scripts')
     <script>
         $(function () {
-            //Initialize Select2 Elements
-            $('#category').select2({
-                placeholder: "Selecione categoría",
-            });
-            $('.textarea_ingredients').summernote({
-                lang: 'es-ES',
-                placeholder: 'Ingrese los detalles',
-                tabsize: 2,
-                height: 120,
-                toolbar: [
-                    ['style', ['bold', 'italic', 'underline', 'clear']],
-                    ['fontname', ['fontname']],
-                    ['para', ['ul', 'ol']],
-                    ['insert', ['link']],
-                    ['view', ['codeview', 'help']]
-                ]
-            });
-            $("input[data-bootstrap-switch]").each(function(){
-                $(this).bootstrapSwitch();
-            });
+            $("input[data-bootstrap-switch]").bootstrapSwitch();
         })
     </script>
-    <script src="{{ asset('js/product/edit.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/coupon/edit.js') }}?v={{ time() }}"></script>
 @endsection

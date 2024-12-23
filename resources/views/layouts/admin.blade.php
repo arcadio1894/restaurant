@@ -422,12 +422,12 @@
                                     <p>Listar cupones</p>
                                 </a>
                             </li>
-                            {{--<li class="nav-item">
+                            <li class="nav-item">
                                 <a href="{{route('coupons.create')}}" class="nav-link @yield('activeCreateCoupons')">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Crear cupones</p>
                                 </a>
-                            </li>--}}
+                            </li>
                         </ul>
                     </li>
                     <li class="nav-item has-treeview @yield('openProducts')">

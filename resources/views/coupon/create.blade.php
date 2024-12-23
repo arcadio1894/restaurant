@@ -34,7 +34,7 @@
 @endsection
 
 @section('page-header')
-    <h1 class="page-title">Productos</h1>
+    <h1 class="page-title">Cupones</h1>
 @endsection
 
 @section('page-title')
@@ -54,36 +54,46 @@
 @endsection
 
 @section('content')
-    <form id="formCreate" class="form-horizontal" data-url="{{ route('product.store') }}" enctype="multipart/form-data">
+    <form id="formCreate" class="form-horizontal" data-url="{{ route('coupons.store') }}" enctype="multipart/form-data">
         @csrf
 
         <div class="form-group row">
-            <div class="col-md-6">
-                <label for="inputEmail3" class="col-12 col-form-label">Nombre <span class="right badge badge-danger">(*)</span></label>
+            <div class="col-md-4">
+                <label for="name" class="col-12 col-form-label">Nombre <span class="right badge badge-danger">(*)</span></label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" name="name">
+                    <input type="text" class="form-control" name="name" id="name">
                 </div>
             </div>
-            <div class="col-md-6">
-                <label for="inputEmail3" class="col-12 col-form-label">Descripcion</label>
+            <div class="col-md-4">
+                <label for="description" class="col-12 col-form-label">Descripcion</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" name="description">
+                    <input type="text" class="form-control" name="description" id="description">
                 </div>
+            </div>
+            <div class="col-md-4">
+                <label for="type" class="col-12 col-form-label">Tipo <span class="right badge badge-danger">(*)</span></label>
+                <input type="hidden" name="type" value="off"> <!-- Valor predeterminado si no está seleccionado -->
+                <input id="type" type="checkbox" name="type" data-bootstrap-switch data-off-color="primary" data-on-text="TOTAL" data-off-text="DETALLE" data-on-color="success">
             </div>
         </div>
 
         <div class="form-group row">
-            <div class="col-md-6">
-                <label for="inputEmail3" class="col-12 col-form-label">Monto</label>
+            <div class="col-md-4">
+                <label for="inputEmail3" class="col-12 col-form-label">Monto <span class="right badge badge-danger">(*)</span></label>
                 <div class="col-sm-10">
                     <input type="number" class="form-control" name="amount">
                 </div>
             </div>
-            <div class="col-md-6">
-                <label for="inputEmail3" class="col-12 col-form-label">Porcentaje</label>
+            <div class="col-md-4">
+                <label for="inputEmail3" class="col-12 col-form-label">Porcentaje <span class="right badge badge-danger">(*)</span></label>
                 <div class="col-sm-10">
                     <input type="number" class="form-control" name="percentage">
                 </div>
+            </div>
+            <div class="col-md-4">
+                <label for="special" class="col-12 col-form-label">Especial <span class="right badge badge-danger">(*)</span></label>
+                <input type="hidden" name="special" value="off"> <!-- Valor predeterminado si no está seleccionado -->
+                <input id="special" type="checkbox" name="special" value="on" data-bootstrap-switch data-off-color="primary" data-on-text="ESPECIAL" data-off-text="NORMAL" data-on-color="success">
             </div>
         </div>
 
@@ -109,29 +119,7 @@
 @section('scripts')
     <script>
         $(function () {
-            //Initialize Select2 Elements
-            $('#category').select2({
-                placeholder: "Selecione categoría",
-                allowClear: true,
-            });
-
-            $('.textarea_ingredients').summernote({
-                lang: 'es-ES',
-                placeholder: 'Ingrese los detalles',
-                tabsize: 2,
-                height: 120,
-                toolbar: [
-                    ['style', ['bold', 'italic', 'underline', 'clear']],
-                    ['fontname', ['fontname']],
-                    ['para', ['ul', 'ol']],
-                    ['insert', ['link']],
-                    ['view', ['codeview', 'help']]
-                ]
-            });
-
-            $("input[data-bootstrap-switch]").each(function(){
-                $(this).bootstrapSwitch();
-            });
+            $("input[data-bootstrap-switch]").bootstrapSwitch();
         })
     </script>
     <script src="{{ asset('js/coupon/create.js') }}?v={{ time() }}"></script>
