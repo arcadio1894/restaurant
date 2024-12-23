@@ -381,7 +381,7 @@ class CartController extends Controller
                     ->where('coupon_id', $coupon->id)
                     ->first();
 
-                if ($userCoupon) {
+                if ($userCoupon && !$coupon->special) {
                     DB::rollBack();
                     return response()->json(['success' => false, 'message' => 'El cupón ya ha sido utilizado.']);
                 }
@@ -737,7 +737,7 @@ class CartController extends Controller
                     ->where('coupon_id', $coupon->id)
                     ->first();
 
-                if ($userCoupon) {
+                if ($userCoupon && !$coupon->special) {
                     DB::rollBack();
                     return response()->json(['success' => false, 'message' => 'El cupón ya ha sido utilizado.']);
                 }
@@ -1000,7 +1000,7 @@ class CartController extends Controller
             ->where('coupon_id', $coupon->id)
             ->first();
 
-        if ($userCoupon) {
+        if ($userCoupon && !$coupon->special) {
             return response()->json([
                 'success' => false,
                 'message' => 'El cupón ya ha sido utilizado.',
@@ -1269,7 +1269,7 @@ class CartController extends Controller
             ->where('coupon_id', $coupon->id)
             ->first();
 
-        if ($userCoupon) {
+        if ($userCoupon && !$coupon->special) {
             return response()->json([
                 'success' => false,
                 'message' => 'El cupón ya ha sido utilizado.',
