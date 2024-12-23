@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Slider;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -38,6 +39,9 @@ class HomeController extends Controller
         ->where('enable_status', 1) // Solo productos habilitados
         ->get();
 
-        return view('home', compact('categories', 'products'));
+        $slidersSmalls = Slider::where('size', 's')->orderBy('order', 'asc')->get();
+        $slidersLarges = Slider::where('size', 'l')->orderBy('order', 'asc')->get();
+
+        return view('home', compact('categories', 'products', 'slidersSmalls', 'slidersLarges'));
     }
 }

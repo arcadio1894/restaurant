@@ -25,6 +25,7 @@ class SliderController extends Controller
         $validated = $request->validate([
             'order' => 'required|integer|min:1',
             'size' => 'required|string|in:on,off',
+            'link' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
         ]);
 
@@ -33,7 +34,8 @@ class SliderController extends Controller
         try {
             $slider = Slider::create([
                 'order' => $validated['order'],
-                'size' => $request->get('size') === 'on' ? 's' : 'l'
+                'size' => $request->get('size') === 'on' ? 's' : 'l',
+                'link' => $validated['link'],
             ]);
 
             // TODO: Tratamiento de un archivo de forma tradicional
@@ -81,6 +83,7 @@ class SliderController extends Controller
             'image_id' => 'required|exists:sliders,id',
             'order' => 'required|integer|min:1',
             'size' => 'required|string|in:on,off',
+            'link' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048', // Validación para imágenes
         ]);
 
@@ -92,6 +95,7 @@ class SliderController extends Controller
             // Actualizar los valores básicos
             $slider->order = $request->get('order');
             $slider->size = $request->get('size') === 'on' ? 's' : 'l';
+            $slider->link = $request->get('link');
 
             // Manejo de la imagen
             if ($request->hasFile('image')) {

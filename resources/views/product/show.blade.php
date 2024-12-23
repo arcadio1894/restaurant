@@ -3,7 +3,10 @@
 @section('menu-active', 'active')
 
 @section('text-header')
-    {{ $product->full_name }}
+    <h2 class="pt-5">
+        {{ $product->full_name }}
+    </h2>
+
 @endsection
 
 @section('styles')

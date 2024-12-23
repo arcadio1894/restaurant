@@ -64,6 +64,7 @@
                 <th>Nombre</th>
                 <th>N° Orden</th>
                 <th>Tamaño</th>
+                <th>Link</th>
                 <th>Acciones</th>
             </tr>
             </thead>

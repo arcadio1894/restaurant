@@ -86,6 +86,12 @@
                     <img src="{{ asset('images/slider/'.$slider->image) }}" width="200px"  alt="{{ $slider->image }}">
                 </div>
             </div>
+            <div class="col-md-6">
+                <label for="link" class="col-12 col-form-label">Link <span class="right badge badge-danger">(*)</span></label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="link" id="link" value="{{ $slider->link }}">
+                </div>
+            </div>
         </div>
 
         <div class="row">

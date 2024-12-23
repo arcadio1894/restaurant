@@ -79,6 +79,12 @@
                     <input type="file" class="form-control" name="image" id="image" accept="image/*">
                 </div>
             </div>
+            <div class="col-md-6">
+                <label for="link" class="col-12 col-form-label">Link <span class="right badge badge-danger">(*)</span></label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="link" id="link">
+                </div>
+            </div>
         </div>
 
         <div class="row">
@@ -86,6 +92,7 @@
                 <button type="reset" class="btn btn-outline-secondary">Cancelar</button>
                 <button type="button" id="btn-submit" class="btn btn-outline-success float-right">Guardar iamgen</button>
             </div>
+
         </div>
         <!-- /.card-footer -->
     </form>

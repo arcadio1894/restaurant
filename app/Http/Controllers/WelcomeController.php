@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\DataGeneral;
 use App\Models\Product;
+use App\Models\Slider;
 use Illuminate\Http\Request;
 
 class WelcomeController extends Controller
@@ -17,7 +18,10 @@ class WelcomeController extends Controller
             ->get();
         $products = Product::where('enable_status', 1)->get(); // Solo productos habilitados
 
-        return view('welcome', compact('categories', 'products'));
+        $slidersSmalls = Slider::where('size', 's')->orderBy('order', 'asc')->get();
+        $slidersLarges = Slider::where('size', 'l')->orderBy('order', 'asc')->get();
+
+        return view('welcome', compact('categories', 'products', 'slidersSmalls', 'slidersLarges'));
     }
 
     public function isAuthenticated()

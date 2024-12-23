@@ -30,6 +30,7 @@ $(document).ready(function () {
                     return text;
 
                 }},
+            { data: 'link' },
             { data: null,
                 title: 'Acciones',
                 wrap: true,
