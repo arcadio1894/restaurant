@@ -115,7 +115,7 @@ class CouponController extends Controller
             'type' => 'nullable|string', // Validación para el checkbox status
         ]);
         //dd($request);
-        $validated = $request->validated();
+        //$validated = $request->validated();
 
         DB::beginTransaction();
         try {
