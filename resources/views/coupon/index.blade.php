@@ -167,6 +167,8 @@
                         <th>Descripción</th>
                         <th>Precio</th>
                         <th>Porcentaje</th>
+                        <th>Tipo</th>
+                        <th>Especial</th>
                         <th>Estado</th>
                         <th></th>
                     </tr>
@@ -231,6 +233,8 @@
             <td data-column="descripcion" data-descripcion></td>
             <td data-column="precio" data-precio></td>
             <td data-column="porcentaje" data-porcentaje></td>
+            <td data-column="estado" data-tipo></td>
+            <td data-column="estado" data-especial></td>
             <td data-column="estado" data-estado></td>
             <td>
                 <a data-editar_coupon href="" class="btn btn-outline-warning btn-sm" data-toggle="tooltip" data-placement="top" title="Editar"><i class="fa fa-pen"></i> </a>

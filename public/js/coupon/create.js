@@ -1,20 +1,13 @@
 $(document).ready(function () {
     $formCreate = $('#formCreate');
     //$formCreate.on('submit', storeMaterial);
-    $('#btn-submit').on('click', storeProduct);
+    $('#btn-submit').on('click', storeCoupon);
 
-    $(document).on('click', '[data-delete]', deleteSpecification);
-
-    $selectCategory = $('#category');
-
-    $('#btn-generateCode').on('click', generateCodeProduct);
 });
 
 var $formCreate;
-var $select;
-var $selectCategory;
 
-function storeProduct() {
+function storeCoupon() {
     event.preventDefault();
     $("#btn-submit").attr("disabled", true);
     // Obtener la URL
@@ -48,7 +41,7 @@ function storeProduct() {
                 });
             setTimeout( function () {
                 $("#btn-submit").attr("disabled", false);
-                location.reload();
+                //location.reload();
             }, 2000 )
         },
         error: function (data) {

@@ -315,7 +315,9 @@ function renderDataTable(data, activeColumns) {
     clone.querySelector("[data-descripcion]").innerHTML = data.descripcion;
     clone.querySelector("[data-precio]").innerHTML = data.precio;
     clone.querySelector("[data-porcentaje]").innerHTML = data.porcentaje;
-    clone.querySelector("[data-estado]").innerHTML = data.estado;
+    clone.querySelector("[data-tipo]").innerHTML = data.estado;
+    clone.querySelector("[data-especial]").innerHTML = data.typeText;
+    clone.querySelector("[data-estado]").innerHTML = data.specialText;
 
     // Configurar enlaces y botones según los permisos y datos
     /*if ($.inArray('update_material', $permissions) !== -1) {*/

@@ -2,16 +2,13 @@ $(document).ready(function () {
 
     $formEdit = $('#formEdit');
     //$formEdit.on('submit', updateMaterial);
-    $('#btn-submit').on('click', updateMaterial);
-
-    $selectCategory = $('#category');
+    $('#btn-submit').on('click', updateCoupon);
 
 });
 
 var $formEdit;
-var $selectCategory;
 
-function updateMaterial() {
+function updateCoupon() {
     event.preventDefault();
     $("#btn-submit").attr("disabled", true);
     // Obtener la URL
@@ -73,9 +70,4 @@ function updateMaterial() {
             $("#btn-submit").attr("disabled", false);
         },
     });
-}
-
-function activateTemplate(id) {
-    var t = document.querySelector(id);
-    return document.importNode(t.content, true);
 }

@@ -115,13 +115,11 @@ Route::middleware('auth')->group(function (){
         Route::get('/get/data/coupons/{page}', [CouponController::class, 'getDataCoupons']);
         Route::get('/coupons/create', [CouponController::class, 'create'])
             ->name('coupons.create');
-        Route::post('/coupons', [CouponController::class, 'store'])
+        Route::post('/coupons/store', [CouponController::class, 'store'])
             ->name('coupons.store');
-        Route::get('/coupons/{coupon}', [CouponController::class, 'show'])
-            ->name('coupons.show');
         Route::get('/coupons/{coupon}/edit', [CouponController::class, 'edit'])
             ->name('coupons.edit');
-        Route::put('/coupons/{coupon}', [CouponController::class, 'update'])
+        Route::post('/coupons/update', [CouponController::class, 'update'])
             ->name('coupons.update');
         Route::delete('/coupons/{coupon}', [CouponController::class, 'destroy'])
             ->name('coupons.destroy');
