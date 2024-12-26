@@ -284,7 +284,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <span class="h5">S/. <span id="product-price">{{ isset($defaultProductType->price) ? $defaultProductType->price : $product->unit_price }}</span></span>
+                            <span class="h5">S/. <span data-base-price="{{ isset($defaultProductType->price) ? $defaultProductType->price : $product->price_default }}" id="product-price">{{ isset($defaultProductType->price) ? $defaultProductType->price : $product->price_default }}</span></span>
                             <span class="text-muted">/ por unidad</span>
                         </div>
 
@@ -327,11 +327,18 @@
                                                 <div class="form-check mb-2 custom-radio-checkbox">
                                                     <input class="form-check-input option-input"
                                                            type="checkbox"
+                                                           data-option_id="{{$option->id}}"
+                                                           data-selection_id="{{$selection->id}}"
+                                                           data-selection_price="{{$selection->additional_price}}"
+                                                           data-selection_product_id="{{$selection->product_id}}"
                                                            name="option_{{ $option->id }}[]"
                                                            value="{{ $selection->product_id }}"
                                                            id="checkbox_{{ $option->id }}_{{ $loop->index }}" />
                                                     <label class="form-check-label" for="checkbox_{{ $option->id }}_{{ $loop->index }}">
                                                         {{ $selection->product->full_name }}
+                                                        @if ($selection->additional_price > 0)
+                                                            <span class="text-muted">( + S/. {{ number_format($selection->additional_price, 2) }} )</span>
+                                                        @endif
                                                     </label>
                                                 </div>
                                             @endforeach
