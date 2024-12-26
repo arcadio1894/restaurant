@@ -67,7 +67,7 @@
     <div class="line"></div>
     <p class="text-center" style="font-size: 18px"><b>{{($order->payment_method_id == null) ? 'Sin método de pago':$order->payment_method->name }} </b></p>
     <div class="line"></div>
-    <div style="border: 0.5px solid black; padding: 3px; margin-top: 10px;">
+    <div style="border: 0.5px solid black; padding: 3px; margin-top: 10px; font-size: 18px">
         <strong>Observaciones:</strong>
         {{ $order->observations }}
     </div>
