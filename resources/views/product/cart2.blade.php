@@ -3,7 +3,10 @@
 @section('menu-active', 'active')
 
 @section('text-header')
-    Tu Carrito de compras
+    <h2 class="pt-5">
+        Tu Carrito de compras
+    </h2>
+
 @endsection
 
 @section('styles')
