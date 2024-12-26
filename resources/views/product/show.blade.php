@@ -329,6 +329,7 @@
                                                            type="checkbox"
                                                            data-option_id="{{$option->id}}"
                                                            data-selection_id="{{$selection->id}}"
+                                                           data-selection_product_name="{{$selection->product->full_name}}"
                                                            data-selection_price="{{$selection->additional_price}}"
                                                            data-selection_product_id="{{$selection->product_id}}"
                                                            name="option_{{ $option->id }}[]"

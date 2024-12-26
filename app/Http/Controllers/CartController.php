@@ -459,34 +459,39 @@ class CartController extends Controller
             // Guardar los detalles de la orden
             foreach ($cart as $cartItem) {
                 $price = 0;
-                if ( isset($cartItem['product_type_id']) && $cartItem['product_type_id'] != null )
-                {
+
+                // Obtener el precio base del producto o tipo de producto
+                if (isset($cartItem['product_type_id']) && $cartItem['product_type_id'] != null) {
                     $productType = ProductType::find($cartItem['product_type_id']);
                     if ($productType) {
-                        $price = $productType->price * $cartItem['quantity'];
+                        $price = $productType->price;
                     }
                 } else {
                     $product = Product::find($cartItem['product_id']);
                     if ($product) {
-                        $price = $product->price_default * $cartItem['quantity'];
+                        $price = $product->price_default;
                     }
                 }
+
+                // Crear el detalle de la orden
                 $orderDetail = OrderDetail::create([
                     'order_id' => $order->id,
                     'product_id' => $cartItem['product_id'],
-                    'product_type_id' => (isset($cartItem['product_type_id']) && $cartItem['product_type_id'] != null) ? $cartItem['product_type_id']:null ,
+                    'product_type_id' => ($cartItem['product_type_id'] == null) ? null: $cartItem['product_type_id'],
                     'quantity' => $cartItem['quantity'],
                     'price' => $price,
                     'subtotal' => $cartItem['quantity'] * $price,
                 ]);
 
+                // Guardar las opciones del detalle si existen
                 if (!empty($cartItem['options'])) {
                     foreach ($cartItem['options'] as $optionGroupId => $optionIds) {
                         foreach ($optionIds as $optionId) {
+                            //dd($optionId);
                             OrderDetailOption::create([
                                 'order_detail_id' => $orderDetail->id,
-                                'option_id' => null,
-                                'product_id' => $optionId,  // ID del producto asociado a la opción
+                                'option_id' => null, // Si deseas asociarlo a un `Option`, actualiza este campo.
+                                'product_id' => $optionId['product_id'], // ID del producto asociado a la opción.
                             ]);
                         }
                     }
@@ -503,10 +508,7 @@ class CartController extends Controller
                 ]);
             }
 
-
             $method_payment = PaymentMethod::find($validatedData['paymentMethod']);
-
-
 
             // Selección del método de pago
             switch ($method_payment->code) {
@@ -651,6 +653,7 @@ class CartController extends Controller
                 'success' => false,
                 'message' => 'Ocurrió un error al procesar el checkout. Inténtelo nuevamente.',
                 'error' => $e->getMessage(),
+                'linea' => $e->getTrace(),
             ], 420);
         }
     }
@@ -1231,6 +1234,7 @@ class CartController extends Controller
 
     public function applyCoupon(Request $request)
     {
+        //dd($request);
         $cart = json_decode($request->input('cart'), true); // Decodificar cart
         $districtId = $request->input('district');
         $code = $request->input('code');
@@ -1376,24 +1380,36 @@ class CartController extends Controller
         $total = 0;
 
         foreach ($cart as $item) {
-            if ( isset($item['product_type_id']) && $item['product_type_id'] != null)
-            {
+            $basePrice = 0;
+
+            // Obtener el precio base del producto o tipo de producto
+            if (isset($item['product_type_id']) && $item['product_type_id'] != null) {
                 $productType = ProductType::find($item['product_type_id']);
                 if ($productType) {
-                    //dump($productType->price * $item['quantity']);
-                    $total += $productType->price * $item['quantity'];
+                    $basePrice = $productType->price;
                 }
             } else {
                 $product = Product::find($item['product_id']);
                 if ($product) {
-                    //dump($product->price_default * $item['quantity']);
-                    $total += $product->price_default * $item['quantity'];
+                    $basePrice = $product->price_default;
                 }
             }
 
+            // Calcular el total de las opciones
+            $optionsTotal = 0;
+            if (isset($item['options'])) {
+                foreach ($item['options'] as $optionsGroup) {
+                    foreach ($optionsGroup as $option) {
+                        $optionsTotal += $option['additional_price'];
+                    }
+                }
+            }
+
+            // Sumar precio base + opciones, multiplicado por la cantidad
+            $total += ($basePrice + $optionsTotal) * $item['quantity'];
         }
 
-        return $total; // Retorna el total del carrito
+        return $total;
     }
 
     function hasCombo($cart)
@@ -1424,38 +1440,49 @@ class CartController extends Controller
         $maxSubtotal = 0;
 
         foreach ($cart as $item) {
-            $product = Product::find($item['product_id']);
-            $subtotal = 0;
-            if ( isset($item['product_type_id']) && $item['product_type_id'] != null)
-            {
+            $basePrice = 0;
+
+            // Obtener el precio base del producto o tipo de producto
+            if (isset($item['product_type_id']) && $item['product_type_id'] != null) {
                 $productType = ProductType::find($item['product_type_id']);
                 if ($productType) {
-                    //dump($productType->price * $item['quantity']);
-                    //$subtotal = $productType->price * $item['quantity'];
-                    $subtotal = $productType->price;
+                    $basePrice = $productType->price;
                 }
             } else {
                 $product = Product::find($item['product_id']);
                 if ($product) {
-                    //dump($product->price_default * $item['quantity']);
-                    //$subtotal = $product->price_default * $item['quantity'];
-                    $subtotal = $product->price_default;
+                    $basePrice = $product->price_default;
                 }
             }
 
-            if ($product && $product->category_id != 3) {
-                //$subtotal = $price * $item['quantity'];
+            // Calcular el total de las opciones
+            $optionsTotal = 0;
+            if (isset($item['options'])) {
+                foreach ($item['options'] as $optionsGroup) {
+                    foreach ($optionsGroup as $option) {
+                        $optionsTotal += $option['additional_price'];
+                    }
+                }
+            }
+
+            // Calcular el subtotal unitario incluyendo opciones
+            $subtotal = $basePrice + $optionsTotal;
+
+            // Verificar si este es el mayor subtotal elegible
+            $product = Product::find($item['product_id']);
+            if ($product && $product->category_id != 3) { // Solo considerar productos que no sean combos
                 if ($subtotal > $maxSubtotal) {
                     $maxSubtotal = $subtotal;
                     $maxDetail = [
                         'product_id' => $item['product_id'],
                         'subtotal' => $subtotal,
+                        'quantity' => $item['quantity'], // Incluimos cantidad para mayor contexto si es necesario
                     ];
                 }
             }
         }
 
-        return $maxDetail; // Retorna el producto con el mayor subtotal elegible
+        return $maxDetail; // Devuelve el producto con el mayor subtotal (sin combos)
     }
 
     public function calculateShippingOriginal(Request $request)

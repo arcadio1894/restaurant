@@ -59,7 +59,13 @@ $(document).ready(function () {
             if (optionType === 'checkbox') {
                 // Obtener checkboxes seleccionados
                 const selected = $container.find('.form-check-input:checked').map(function () {
-                    return $(this).val();
+                    return {
+                        option_id: optionId,
+                        selection_id: $(this).data('selection_id'),
+                        product_id: $(this).val(),
+                        selection_name: $(this).data('selection_product_name'), // Capturamos el texto del label como nombre
+                        additional_price: parseFloat($(this).data('selection_price')) || 0
+                    };
                 }).get();
 
                 // Validar selección mínima y máxima

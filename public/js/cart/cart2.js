@@ -68,6 +68,107 @@ function hideLoading() {
 }
 
 async function loadCart() {
+    showLoading(); // Mostrar carga al comenzar
+
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let observations = JSON.parse(localStorage.getItem('observations')) || [];
+
+    // Limpiar los contenedores actuales
+    $('#body-items').empty();
+    $('#body-observations').empty();
+    $('#body-summary').empty();
+
+    // Si el carrito está vacío
+    if (cart.length === 0) {
+        const clone = activateTemplate('#template-cart_empty');
+        $("#body-items").append(clone);
+        hideLoading();
+        return;
+    }
+
+    let total = 0;
+
+    // Promesas de productos
+    const productPromises = cart.map(async (item, index) => {
+        const product = await fetchProduct(item.product_id, item.product_type_id);
+        if (!product) return null; // Si no conseguimos el producto, lo omitimos
+
+        const clone = activateTemplate('#template-cart_detail');
+        let productTotal = product.price * item.quantity;
+
+        // Rellenar los datos del producto
+        let url_image = document.location.origin + '/images/products/' + product.image_url;
+        clone.querySelector("[data-image]").setAttribute('src', url_image);
+        clone.querySelector("[data-product_name]").innerHTML = product.name;
+        clone.querySelector("[data-quantity]").value = item.quantity;
+        clone.querySelector("[data-detail_price]").innerHTML = `S/. ${product.price.toFixed(2)} / por item`;
+        clone.querySelector("[data-minus]").setAttribute('data-detail_id', index);
+        clone.querySelector("[data-quantity]").setAttribute('data-detail_id', index);
+        clone.querySelector("[data-plus]").setAttribute('data-detail_id', index);
+        clone.querySelector("[data-delete_item]").setAttribute('data-detail_id', index);
+        clone.querySelector("[data-detail_productType]").innerHTML = product.product_type;
+
+        // Si tiene opciones
+        if (item.options && Object.keys(item.options).length > 0) {
+            const options = Object.values(item.options).flat(); // Asegurarse de que sea una lista plana
+            let optionTotal = 0;
+
+            options.forEach(option => {
+                const cloneOption = activateTemplate('#template-option');
+                cloneOption.querySelector("[data-option]").innerHTML = `${option.selection_name} (+S/. ${option.additional_price.toFixed(2)})`;
+                clone.querySelector("[data-body_options]").append(cloneOption);
+
+                // Sumar el precio adicional de la opción al total
+                optionTotal += option.additional_price;
+            });
+
+            // Ajustar el precio del producto base sumando las opciones por unidad
+            const adjustedUnitPrice = product.price + optionTotal;
+            clone.querySelector("[data-detail_price]").innerHTML = `S/. ${adjustedUnitPrice.toFixed(2)} / por item`;
+
+            // Calcular el subtotal ajustado
+            productTotal += optionTotal * item.quantity;
+        } else {
+            // Si no tiene opciones, mostrar el precio base
+            clone.querySelector("[data-detail_price]").innerHTML = `S/. ${product.price.toFixed(2)} / por item`;
+        }
+
+        // Actualizar subtotal del producto
+        total += productTotal;
+        clone.querySelector("[data-detail_subtotal]").innerHTML = `S/. ${productTotal.toFixed(2)}`;
+
+        return clone;
+    });
+
+    // Esperamos a que todas las promesas se resuelvan
+    const productClones = await Promise.all(productPromises);
+
+    // Filtramos nulls y agregamos los clones de productos al DOM
+    productClones.filter(Boolean).forEach(clone => {
+        $('#body-items').append(clone);
+    });
+
+    // Renderizamos el resumen del carrito
+    const taxesCart = total - (total / (1 + TAX_RATE));
+    const subtotalCart = total - taxesCart;
+    const cloneSummary = activateTemplate('#template-cart_summary');
+    cloneSummary.querySelector("[data-subtotal_cart]").innerHTML = `S/. ${subtotalCart.toFixed(2)}`;
+    cloneSummary.querySelector("[data-taxes_cart]").innerHTML = `S/. ${taxesCart.toFixed(2)}`;
+    cloneSummary.querySelector("[data-total_cart]").innerHTML = `S/. ${total.toFixed(2)}`;
+
+    $('#body-summary').append(cloneSummary);
+
+    // Renderizamos las observaciones
+    const cloneObservations = activateTemplate('#template-observations');
+    if (observations) {
+        cloneObservations.querySelector("[data-cart_observations]").innerHTML = observations;
+    }
+    $('#body-observations').append(cloneObservations);
+
+    // Ocultar indicador de carga una vez todo esté cargado
+    hideLoading();
+}
+/*async function loadCart() {
     showLoading();  // Mostrar carga al comenzar
 
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -155,7 +256,7 @@ async function loadCart() {
 
     // Ocultar indicador de carga una vez todo esté cargado
     hideLoading();
-}
+}*/
 
 function updateQuantity(button, change) {
     // Obtener el índice del detalle desde el atributo data-detail_id
