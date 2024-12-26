@@ -161,8 +161,8 @@ class SliderController extends Controller
 
     public function getSliders()
     {
-        $sliders = Slider::select('id', 'image', 'order', 'size')->get();
+        $sliders = Slider::select('id', 'image', 'order', 'size', 'link')->get();
         return datatables($sliders)->toJson();
 
-    }
+    }git
 }
