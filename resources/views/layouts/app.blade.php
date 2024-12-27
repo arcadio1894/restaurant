@@ -66,7 +66,78 @@
 
     <!-- Toastr -->
     <link rel="stylesheet" href="{{ asset('plugins/toastr/toastr.min.css') }}">
+    <style>
+        /* Estilos generales del botón WhatsApp */
+        .whatsapp-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            width: 120px; /* Ancho del botón */
+            height: 50px; /* Altura ajustada */
+            background-color: #25D366;
+            display: flex;
+            align-items: center;  /* Alineación vertical centrada */
+            justify-content: center;
+            border-radius: 10px;
+            padding: 0 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            animation: breathe 2s ease-in-out infinite;
+            flex-direction: row; /* Los elementos están en fila */
+            gap: 5px; /* Espacio ajustado entre el texto y el ícono */
+        }
 
+        /* Estilos para el contenedor de texto */
+        .whatsapp-text {
+            display: flex;
+            flex-direction: column; /* Organiza el texto en dos líneas */
+            justify-content: center;
+            align-items: flex-start; /* Alineación del texto al inicio */
+            color: white;
+            font-size: 12px; /* Tamaño del texto */
+            font-weight: bold;
+            text-align: left; /* Alineación del texto a la izquierda */
+            line-height: 14px; /* Espaciado entre las líneas */
+        }
+
+        /* Estilos para cada línea de texto */
+        .whatsapp-line {
+            line-height: 14px; /* Reducir espacio entre líneas de texto */
+        }
+
+        /* Estilos solo al ícono de WhatsApp */
+        .whatsapp-btn i {
+            color: white;
+            font-size: 20px; /* Tamaño del ícono */
+            animation: beat 2s ease-in-out infinite;
+        }
+
+        /* Estilos de animación del contorno respirando */
+        @keyframes breathe {
+            0% {
+                box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.5);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(37, 211, 102, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+            }
+        }
+
+        /* Estilos de animación del ícono latiendo */
+        @keyframes beat {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
     @yield('styles')
 </head>
 <body>
@@ -388,6 +459,14 @@
     <button id="close-business-status" style="background: none; border: none; font-size: 16px; font-weight: bold; color: #fff; float: right; cursor: pointer;">&times;</button>
     <p id="business-message" style="margin: 0; font-size: 14px; font-weight: bold;"></p>
 </div>
+
+<a href="https://wa.me/51906343258?text=Hola%20FUEGO%20Y%20MASA,%20quiero%20comprar%20una%20pizza.%20%F0%9F%8D%95" target="_blank" class="whatsapp-btn">
+            <span class="whatsapp-text">
+                <span class="whatsapp-line">PIDE POR</span>
+                <span class="whatsapp-line">WHATSAPP</span>
+            </span>
+    <i class="fab fa-whatsapp"></i>
+</a>
 
 <!-- jQery -->
 <script src="{{ asset('landing/js/jquery-3.4.1.min.js') }}"></script>
