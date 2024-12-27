@@ -68,6 +68,16 @@
     <link rel="stylesheet" href="{{ asset('plugins/toastr/toastr.min.css') }}">
     <style>
         /* Estilos generales del botón WhatsApp */
+        body, html {
+            height: 100%;
+            overflow-x: hidden; /* Evita desplazamiento horizontal */
+        }
+
+        /* Añadir posición relativa a body */
+        body {
+            position: relative;
+        }
+
         .whatsapp-btn {
             position: fixed;
             bottom: 20px;
