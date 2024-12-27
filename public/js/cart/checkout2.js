@@ -301,6 +301,11 @@ $(document).ready(function() {
         $('#btn-continue').attr("disabled", false);
         $('#btn-cancel').attr("disabled", false);
     });
+
+    $('#verifyModal').on('hidden.bs.modal', function () {
+        // Reactivar el botón
+        $('#btn-submit').prop('disabled', false);
+    });
 });
 
 const TAX_RATE = 0.18; // IGV (18%)
