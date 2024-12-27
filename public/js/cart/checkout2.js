@@ -284,6 +284,10 @@ $(document).ready(function() {
     $(".closeModalVerify").on('click', function () {
         $('#verifyModal').modal('hide');
         $('#btn-submit').attr("disabled", false);
+
+        // btn-continue y cancel
+        $('#btn-continue').attr("disabled", false);
+        $('#btn-cancel').attr("disabled", false);
     });
 
     $('#btn-submit').click(function () {
@@ -293,6 +297,9 @@ $(document).ready(function() {
         $('#showEmail').html(email);
         $('#verifyModal').modal('show');
         $('#btn-submit').attr("disabled", true);
+
+        $('#btn-continue').attr("disabled", false);
+        $('#btn-cancel').attr("disabled", false);
     });
 });
 
