@@ -47,6 +47,11 @@ class RouteServiceProvider extends ServiceProvider
                 ->namespace($this->namespace)
                 ->group(base_path('routes/web.php'));
         });
+
+        RateLimiter::for('checkout', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip())  // Límite por minuto
+            ->maxAttempts(10);  // Hasta 5 intentos antes de bloquear
+        });
     }
 
     /**

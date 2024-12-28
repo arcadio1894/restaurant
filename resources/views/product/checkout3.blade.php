@@ -144,9 +144,9 @@
                         <label for="address">Dirección</label>
                         <input type="text" class="form-control" id="address" name="address" placeholder="Av. Larco 333"
                                value="{{ $defaultAddress ? $defaultAddress->address_line : '' }}" required>
-                        {{--<button type="button" class="btn btn-link" id="btn-selectAddress">
+                        <button type="button" class="btn btn-link" id="btn-selectAddress">
                             Encuentra tu dirección
-                        </button>--}}
+                        </button>
                         <div class="invalid-feedback">
                             Por favor ingrese su dirección de envío.
                         </div>

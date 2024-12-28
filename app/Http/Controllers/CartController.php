@@ -288,6 +288,35 @@ class CartController extends Controller
         return view('product.checkout2', compact( 'payment_methods', 'defaultAddress', 'districts'));
     }
 
+    public function checkout2()
+    {
+        $user = Auth::user();
+
+        /*$cart = Cart::with('details.product')->where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->first();*/
+
+        $payment_methods = PaymentMethod::active()->get();
+
+        /* if (!$cart || $cart->details->isEmpty()) {
+            return redirect()->route('home');
+        }
+        */
+        if ( isset($user) )
+        {
+            $defaultAddress = Address::where('user_id', Auth::id())
+                ->where('is_default', true)
+                ->first();
+        } else {
+            $defaultAddress = null;
+        }
+
+        $districts = ShippingDistrict::all();
+
+        /*return view('product.checkout', compact('cart', 'payment_methods', 'defaultAddress', 'districts'));*/
+        return view('product.checkout3', compact( 'payment_methods', 'defaultAddress', 'districts'));
+    }
+
     public function pagar( CheckoutRequest $request )
     {
         //dd($request);

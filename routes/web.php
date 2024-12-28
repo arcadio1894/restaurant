@@ -59,8 +59,9 @@ Route::get('/cart/quantity', [CartController::class, 'getCartQuantity'])->name('
 Route::get('/products/{id_product}/{product_type_id}', [ProductController::class, 'getProduct'])->name('products.get');
 
 Route::get('/checkout', [CartController::class, 'checkout'])/*->middleware('auth')*/->name('cart.checkout');
+Route::get('/checkout/v2', [CartController::class, 'checkout2'])/*->middleware('auth')*/->name('cart.checkout.v2');
 Route::post('/checkout/pagar', [CartController::class, 'pagar'])
-    ->middleware('throttle:3,1')
+    ->middleware('throttle:checkout')
     ->name('checkout.pagar');
 Route::post('/checkout/crear-preferencia', [CartController::class, 'crearPreferencia'])->name('checkout.crearPreferencia');
 Route::delete('/cart/delete-detail/{id}', [CartController::class, 'deleteDetail'])->name('cart.detail.delete');
