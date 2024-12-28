@@ -353,7 +353,7 @@
     <script src="{{ asset('plugins/select2/js/select2.full.min.js') }}"></script>
     {{--<script src="https://sdk.mercadopago.com/js/v2"></script>--}}
     {{--<script src="{{ asset('js/cart/cart.js') }}"></script>--}}
-    <script src="{{ asset('js/cart/checkout2.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/cart/checkout3.js') }}?v={{ time() }}"></script>
     <!-- Carga la API de Google Maps -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDBG5pTai_rF775fdoi3-9X8K462l1-aMo&libraries=places&callback=initAutocomplete" async defer></script>
 
