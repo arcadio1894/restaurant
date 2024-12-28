@@ -454,6 +454,25 @@ class ProductController extends Controller
             }])
             ->get();
 
+        // Asignar precio basado en el tipo de producto predeterminado
+        if ($defaultProductType) {
+            foreach ($options as $option) {
+                foreach ($option->selections as $selection) {
+                    // Verifica si existe un ProductType asociado, si no, usa el price_default
+                    $price = ProductType::where('product_id', $selection->product_id)
+                        ->where('type_id', $defaultProductType->type_id)
+                        ->value('price');
+
+                    // Asigna el precio desde ProductType o el price_default
+                    $price = ($price !== null) ? $price : $selection->product->price_default;
+
+
+                    // Almacena el precio en la relación (propiedad temporal)
+                    $selection->product_price = $price;
+                }
+            }
+        }
+
         //dd($options);
         /*$adicionales = Product::whereHas('category', function ($query) {
             $query->where('visible', true);

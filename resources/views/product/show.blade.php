@@ -286,6 +286,7 @@
                         <div class="mb-3">
                             <span class="h5">S/. <span data-base-price="{{ isset($defaultProductType->price) ? $defaultProductType->price : $product->price_default }}" id="product-price">{{ isset($defaultProductType->price) ? $defaultProductType->price : $product->price_default }}</span></span>
                             <span class="text-muted">/ por unidad</span>
+                            <small class="ml-5 text-danger" style="text-decoration: line-through;"><span data-real-price="" id="product-price-real"></span></small>
                         </div>
 
                         <p>
@@ -329,6 +330,7 @@
                                                            type="checkbox"
                                                            data-option_id="{{$option->id}}"
                                                            data-selection_id="{{$selection->id}}"
+                                                           data-selection_product_price="{{ isset($selection->product_price) ? $selection->product_price : 0 }}"
                                                            data-selection_product_name="{{$selection->product->full_name}}"
                                                            data-selection_price="{{$selection->additional_price}}"
                                                            data-selection_product_id="{{$selection->product_id}}"

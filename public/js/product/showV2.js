@@ -261,6 +261,8 @@ $(document).ready(function () {
         const checkedCount = $container.find(".form-check-input:checked").length;  // Contar checkboxes seleccionados
         let totalPrice = parseFloat($("#product-price").data("base-price")); // Precio base inicial
 
+        let totalRealPrice = parseFloat($("#product-price-real").data("real-base-price")) || 0; // Precio real base inicial
+
         console.log(`Seleccionados: ${checkedCount}, Máximo permitido: ${maxQuantity}`);
 
         // Verificar si se ha excedido la cantidad permitida
@@ -287,12 +289,18 @@ $(document).ready(function () {
         }
 
         // Recalcular el precio total
+        totalRealPrice = parseFloat($("#product-price-real").data("real-base-price")) || 0; // Reiniciar precio real total
+
         $(".form-check-input:checked").each(function () {
             totalPrice += parseFloat($(this).data("selection_price")) || 0; // Sumar precio adicional
+            totalRealPrice += parseFloat($(this).data("selection_product_price")) || 0; // Sumar precio real adicional
+
         });
 
         // Actualizar el precio mostrado
         $("#product-price").text(totalPrice.toFixed(2));
+        $("#product-price-real").text("Precio normal: S/. "+totalRealPrice.toFixed(2)); // Actualizar el precio real
+
     });
 
     function updateCartQuantity() {
