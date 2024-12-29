@@ -361,7 +361,7 @@
     <!-- Carga la API de Google Maps -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDBG5pTai_rF775fdoi3-9X8K462l1-aMo&libraries=places&callback=initAutocomplete" async defer></script>
     <script>
-        function initAutocomplete() {
+        /*function initAutocomplete() {
             console.log("Google Maps API cargada correctamente.");
 
             // Inicializar el Autocomplete cuando se muestre el modal
@@ -386,6 +386,118 @@
                     });
                 });
             });
+        }*/
+        let map, marker, infowindow, autocomplete;
+
+        // Función para inicializar el mapa
+        function initAutocomplete() {
+            console.log("Google Maps API cargada correctamente.");
+
+            // Inicializamos el mapa en la Plaza de Armas de Trujillo, Perú
+            const trujilloLatLng = { lat: -8.1132, lng: -79.0290 }; // Coordenadas de la Plaza de Armas de Trujillo
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: trujilloLatLng,
+                zoom: 14,
+            });
+
+            // Creamos el marcador
+            marker = new google.maps.Marker({
+                position: trujilloLatLng,
+                map: map,
+                draggable: true, // Permitimos que el marcador sea arrastrado
+                title: "Arrastra el marcador para cambiar la dirección"
+            });
+
+            // Creamos el infowindow
+            infowindow = new google.maps.InfoWindow();
+
+            // Mostrar el infowindow con la dirección actual del marcador
+            google.maps.event.addListener(marker, "dragend", function() {
+                updateMarkerPosition(marker.getPosition());
+            });
+
+            // Permitir colocar el marcador al hacer clic en el mapa
+            map.addListener("click", function(event) {
+                marker.setPosition(event.latLng);
+                updateMarkerPosition(event.latLng);
+            });
+
+            // Inicializar el Autocomplete
+            const input = $("#searchInput")[0];
+            autocomplete = new google.maps.places.Autocomplete(input);
+            autocomplete.bindTo("bounds", map);
+
+            // Escuchar el evento cuando se seleccione una dirección
+            autocomplete.addListener("place_changed", function() {
+                const place = autocomplete.getPlace();
+                if (!place.geometry) {
+                    alert("No se encontró información para esta dirección.");
+                    return;
+                }
+
+                // Colocamos el marcador en la nueva dirección
+                marker.setPosition(place.geometry.location);
+                map.setCenter(place.geometry.location);
+                updateMarkerPosition(place.geometry.location);
+            });
+
+            // Evento para el botón "Seleccionar esta dirección"
+            $("#selectAddress").on("click", function() {
+                // Obtener la dirección y las coordenadas del marcador
+                const address = $("#searchInput").val();
+                const latLng = marker.getPosition();
+                const latitude = latLng.lat();
+                const longitude = latLng.lng();
+
+                // Colocar los valores en los campos de entrada
+                $("#address").val(address);      // Dirección en el campo de texto
+                $("#latitude").val(latitude);    // Latitud en el campo oculto
+                $("#longitude").val(longitude);  // Longitud en el campo oculto
+
+                $("#addressModal").modal("hide");
+            });
         }
+
+        // Actualiza el valor del input y muestra la dirección en el infowindow
+        function updateMarkerPosition(latLng) {
+            // Usamos geocoding para obtener la dirección a partir de las coordenadas
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ location: latLng }, function(results, status) {
+                if (status === "OK" && results[0]) {
+                    const address = results[0].formatted_address;
+
+                    // Establecemos la dirección en el input de búsqueda
+                    $("#searchInput").val(address);
+
+                    // Creamos el contenido HTML para el InfoWindow
+                    const contentString = `
+                        <div style="font-family: Arial, sans-serif;">
+                            <div style="font-size: 14px; font-weight: bold; color: #000;">Dirección:</div>
+                            <div style="font-size: 16px; font-weight: bold; color: #007BFF;">${address}</div>
+                        </div>
+                    `;
+
+                    // Establecemos el contenido en el infowindow
+                    infowindow.setContent(contentString);
+                    infowindow.open(map, marker);
+
+                    // Reducir el tamaño del botón de cerrar (X) después de abrir el infowindow
+                    google.maps.event.addListenerOnce(infowindow, 'domready', function() {
+                        // Seleccionar el botón de cerrar (la "X")
+                        const closeButton = document.querySelector('.gm-ui-hover-effect');
+
+                        // Aplicar un estilo más pequeño al botón de cierre
+                        if (closeButton) {
+                            closeButton.style.fontSize = '8px';  // Cambiar tamaño de la "X"
+                            closeButton.style.width = '50px';     // Ajustar el tamaño del botón
+                            closeButton.style.height = '50px';    // Ajustar el tamaño del botón
+                        }
+                    });
+                }
+            });
+        }
+
+        // Inicializar el mapa y la funcionalidad de autocomplete al cargar el script
+        window.initAutocomplete = initAutocomplete;
     </script>
 @endsection
