@@ -309,7 +309,7 @@ $(document).ready(function() {
 
     $("#btn-selectAddress").on('click', function () {
         console.log("Abri modal");
-        $("#mapModal").modal("show");
+        $("#addressModal").modal("show");
     });
 
     // Seleccionar la dirección al hacer clic en el botón
