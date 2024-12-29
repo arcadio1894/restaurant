@@ -273,7 +273,7 @@ class ProductController extends Controller
                     $product->save();
                 }
             } else {
-                $path = public_path().'/images/products/';
+                $path = public_path('/images/products/');
                 $extension = $request->file('image')->getClientOriginalExtension();
                 $filename = $product->id . '.' . $extension;
                 $request->file('image')->move($path, $filename);
