@@ -49,8 +49,8 @@ class RouteServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('checkout', function (Request $request) {
-            return Limit::perMinute(5)->by($request->ip())  // Límite por minuto
-            ->maxAttempts(10);  // Hasta 5 intentos antes de bloquear
+            return Limit::perMinute(10)->by($request->ip())  // Límite por minuto
+            ->maxAttempts(15);  // Hasta 5 intentos antes de bloquear
         });
     }
 
