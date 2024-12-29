@@ -309,7 +309,7 @@ $(document).ready(function() {
 
     $("#btn-selectAddress").on('click', function () {
         console.log("Abri modal");
-        $("#mapModal").modal("show");
+        $("#addressModal").modal("show");
     });
 
     // Seleccionar la dirección al hacer clic en el botón
@@ -329,29 +329,6 @@ $(document).ready(function() {
 
 let map, marker, geocoder, autocomplete;
 
-function initAutocomplete() {
-    // Log de prueba para verificar que se inicia el script
-    console.log("Inicializando el autocompletado...");
-
-    const input = $("#searchInput")[0]; // Referencia al input
-    const autocomplete = new google.maps.places.Autocomplete(input); // Instanciar Autocomplete
-
-    // Listener para capturar cambios en el autocompletado
-    google.maps.event.addListener(autocomplete, "place_changed", function () {
-        const place = autocomplete.getPlace(); // Obtener lugar seleccionado
-        if (!place.geometry) {
-            alert("No se encontró información para esta dirección.");
-            return;
-        }
-
-        // Mostrar información en la consola
-        console.log("Dirección seleccionada:", place.formatted_address);
-        console.log("Coordenadas:", {
-            lat: place.geometry.location.lat(),
-            lng: place.geometry.location.lng(),
-        });
-    });
-}
 
 // Función para actualizar la dirección y las coordenadas
 function updateAddressAndCoordinates(position) {
@@ -367,7 +344,7 @@ function updateAddressAndCoordinates(position) {
     });
 }
 
-function initMap() {
+/*function initMap() {
     const initialPosition = { lat: -8.111944, lng: -79.028611 }; // Plaza de Armas de Trujillo
 
     // Inicializar el mapa
@@ -425,7 +402,7 @@ function initMap() {
         // Actualizar los inputs
         updateAddressAndCoordinates(position);
     });
-}
+}*/
 
 // Función para actualizar la dirección y las coordenadas
 /*function updateAddressAndCoordinates(position) {

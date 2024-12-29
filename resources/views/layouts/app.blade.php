@@ -63,7 +63,6 @@
     <link href="{{ asset('landing/css/style.css') }}" rel="stylesheet" />
     <!-- responsive style -->
     <link href="{{ asset('landing/css/responsive.css') }}" rel="stylesheet" />
-
     <!-- Toastr -->
     <link rel="stylesheet" href="{{ asset('plugins/toastr/toastr.min.css') }}">
     <style>

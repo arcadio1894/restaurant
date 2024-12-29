@@ -17,6 +17,11 @@
         .hidden {
             display: none !important; /* Asegura que sobreescriba cualquier estilo */
         }
+
+        /* Asegura que las sugerencias aparezcan correctamente */
+        .pac-container {
+            z-index: 1051 !important; /* Mayor que el z-index del modal */
+        }
     </style>
 @endsection
 
@@ -193,7 +198,8 @@
                         <label for="operationCode">Código de operación</label>
                         <input type="text" class="form-control" id="operationCode" placeholder="Ingrese el código de operación">
                     </div>
-
+                    {{--<input type="text" id="searchInput" class="form-control mb-3" placeholder="Escribe tu dirección...">
+--}}
                     <!-- Sección para método de pago Mercado Pago -->
                     {{--<div id="mercado_pago-section" style="display: none; margin-top: 15px;">
 
@@ -328,33 +334,61 @@
         </div>
     </div>
 
-    <div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+    <!-- Modal -->
+    <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="addressModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="mapModalLabel">Encuentra tu dirección</h5>
-                    <button type="button" class="close closeModalVerify" ><span aria-hidden="true">&times;</span></button>
+                    <h5 class="modal-title" id="addressModalLabel">Buscar dirección</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <div class="modal-body">
-                    <!-- Campo de búsqueda -->
+                    <!-- Input para autocompletar -->
                     <input type="text" id="searchInput" class="form-control mb-3" placeholder="Escribe tu dirección...">
-                    <!-- Mapa -->
-                    <div id="map" style="height: 400px; width: 100%;"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="selectAddress">Seleccionar esta dirección</button>
                 </div>
             </div>
         </div>
     </div>
+
 @endsection
 
 @section('scripts')
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDBG5pTai_rF775fdoi3-9X8K462l1-aMo&libraries=places&callback=initAutocomplete" async defer></script>
+
+    <script>
+        function initAutocomplete() {
+            console.log("Google Maps API cargada correctamente.");
+
+            // Inicializar el Autocomplete cuando se muestre el modal
+            $("#addressModal").on("shown.bs.modal", function () {
+                console.log("Modal mostrado, inicializando Autocomplete...");
+
+                const input = $("#searchInput")[0]; // Obtener el input
+                const autocomplete = new google.maps.places.Autocomplete(input); // Crear una nueva instancia de Autocomplete
+
+                // Listener para capturar la selección de lugar
+                autocomplete.addListener("place_changed", function () {
+                    const place = autocomplete.getPlace();
+                    if (!place.geometry) {
+                        alert("No se encontró información para esta dirección.");
+                        return;
+                    }
+
+                    console.log("Dirección seleccionada:", place.formatted_address);
+                    console.log("Coordenadas:", {
+                        lat: place.geometry.location.lat(),
+                        lng: place.geometry.location.lng(),
+                    });
+                });
+            });
+        }
+    </script>
     <script src="{{ asset('plugins/select2/js/select2.full.min.js') }}"></script>
     {{--<script src="https://sdk.mercadopago.com/js/v2"></script>--}}
     {{--<script src="{{ asset('js/cart/cart.js') }}"></script>--}}
     <script src="{{ asset('js/cart/checkout3.js') }}?v={{ time() }}"></script>
     <!-- Carga la API de Google Maps -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDBG5pTai_rF775fdoi3-9X8K462l1-aMo&libraries=places&callback=initAutocomplete" async defer></script>
 
 @endsection
