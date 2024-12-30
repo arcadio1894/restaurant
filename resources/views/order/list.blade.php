@@ -291,6 +291,7 @@
         <button data-completado data-id="" data-state="completed" data-state_name="COMPLETADO" class="btn btn-outline-success btn-sm" data-toggle="tooltip" data-placement="top" title="Completado"><i class="fas fa-home"></i></button>
         <button data-ver_detalles data-id="" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Detalles"><i class="fas fa-list-ol"></i></button>
         <button data-ver_ruta data-id="" data-address="" data-latitude="" data-longitude="" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Ruta"><i class="fas fa-map-marker-alt"></i></button>
+        <button data-ver_ruta_map data-id="" data-address="" data-latitude="" data-longitude="" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Ruta"><i class="fas fa-map-marker-alt" style="color: #e60a0a;"></i></button>
 
     </template>
 
@@ -344,6 +345,22 @@
                 allowClear: true
             });
 
+            $(document).on("click", '[data-ver_ruta_map]', function () {
+                console.log("Botón clicado"); // Asegúrate de que este mensaje aparezca en la consola
+                let latitude = $(this).data("latitude");
+                let longitude = $(this).data("longitude");
+
+                if (latitude && longitude) {
+                    // Construir la URL de Google Maps
+                    const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}&z=15`;
+
+                    // Abrir la URL en una nueva pestaña
+                    window.open(googleMapsUrl, "_blank");
+                } else {
+                    alert("No se encontraron coordenadas.");
+                }
+            });
+
             $(document).on("click", '[data-ver_ruta]', function () {
                 console.log("Botón clicado"); // Asegúrate de que este mensaje aparezca en la consola
                 // Obtener datos del botón
@@ -353,8 +370,8 @@
                 const address = $button.data("address");
 
                 /*const mockLatitude = -8.118733;
-                const mockLongitude = -79.006608;
-*/
+                const mockLongitude = -79.006608;*/
+
                 // Coordenadas de ejemplo para pruebas
                 /*const mockLatitude = -8.115324;
                 const mockLongitude = -79.030759;*/

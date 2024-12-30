@@ -503,6 +503,11 @@ function renderDataTable(data) {
     cloneBtnActive.querySelector("[data-ver_ruta]").setAttribute("data-latitude", data.latitude);
     cloneBtnActive.querySelector("[data-ver_ruta]").setAttribute("data-longitude", data.longitude);
 
+    cloneBtnActive.querySelector("[data-ver_ruta_map]").setAttribute("data-id", data.id);
+    cloneBtnActive.querySelector("[data-ver_ruta_map]").setAttribute("data-address", data.address);
+    cloneBtnActive.querySelector("[data-ver_ruta_map]").setAttribute("data-latitude", data.latitude);
+    cloneBtnActive.querySelector("[data-ver_ruta_map]").setAttribute("data-longitude", data.longitude);
+
     cloneBtnActive.querySelector("[data-cocinando]").setAttribute("data-id", data.id);
     cloneBtnActive.querySelector("[data-enviando]").setAttribute("data-id", data.id);
     cloneBtnActive.querySelector("[data-completado]").setAttribute("data-id", data.id);
