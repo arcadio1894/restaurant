@@ -31,8 +31,13 @@ $(document).ready(function () {
         const productId = $(this).data('product-id_v2');
         const authCheckUrl = $(this).data('auth-check-url');
         const addCartUrl = $(this).data('add-cart-url');
-        const productTypeId = $('#pizza-type-select').val(); // Obtener el tipo de pizza seleccionado
+        let productTypeId = $('#pizza-type-select').val(); // Obtener el tipo de pizza seleccionado
         const category_id = $(this).data('product-category');
+
+        if ( productTypeId == null )
+        {
+            productTypeId = null;
+        }
 
         // Recopilar las opciones seleccionadas
         const options = {};

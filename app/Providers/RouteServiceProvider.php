@@ -48,10 +48,10 @@ class RouteServiceProvider extends ServiceProvider
                 ->group(base_path('routes/web.php'));
         });
 
-        RateLimiter::for('checkout', function (Request $request) {
-            return Limit::perMinute(5)->by($request->ip())  // Límite por minuto
-            ->maxAttempts(10);  // Hasta 5 intentos antes de bloquear
-        });
+        /*RateLimiter::for('checkout', function (Request $request) {
+            return Limit::perMinute(10)->by($request->ip())  // Límite por minuto
+            ->maxAttempts(15);  // Hasta 5 intentos antes de bloquear
+        });*/
     }
 
     /**
