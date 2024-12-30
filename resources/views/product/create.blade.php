@@ -106,6 +106,14 @@
                             </div>
                         </div>
                         <div class="form-group row">
+                            <div class="col-md-6">
+                                <label for="visibility_price_real" class="col-12 col-form-label">Visibilidad de precio tachado</label>
+                                <input type="hidden" name="visibility_price_real" value="off">
+                                <input id="visibility_price_real" type="checkbox" name="visibility_price_real" data-bootstrap-switch data-off-color="primary" data-on-text="VISIBLE" data-off-text="NO VISIBLE" data-on-color="success">
+
+                            </div>
+                        </div>
+                        <div class="form-group row">
                             <div class="col-md-12">
                                 <label for="observations">Ingredientes </label>
                                 <textarea class="textarea_ingredients" id="ingredients" name="ingredients" placeholder="Place some text here"

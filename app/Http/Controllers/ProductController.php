@@ -76,6 +76,13 @@ class ProductController extends Controller
                 $estado = '<span class="badge bg-danger">INACTIVO</span>';
                 $textEstado = "inactivo";
             }
+
+            if ( $product->visibility_price_real == 1 )
+            {
+                $estado_visibility = '<span class="badge bg-success">VISIBLE</span>';
+            } else {
+                $estado_visibility = '<span class="badge bg-primary">NO VISIBLE</span>';
+            }
             array_push($array, [
                 "id" => $product->id,
                 "codigo" => $product->code,
@@ -89,6 +96,7 @@ class ProductController extends Controller
                 "textEstado" => $textEstado,
                 "image" => ($product->image == null || $product->image == "" ) ? 'no_image.png':$product->image,
                 "slug" => $product->slug,
+                "visibility_price_real" => $estado_visibility,
             ]);
         }
 
@@ -137,7 +145,8 @@ class ProductController extends Controller
                 'unit_price' => $request->get('unit_price'),
                 'category_id' => $request->get('category'),
                 'ingredients' => $request->get('ingredients'),
-                'enable_status' => 1
+                'enable_status' => 1,
+                'visibility_price_real' => $request->get('visibility_price_real') === 'on' ? 1 : 0,
             ]);
 
             $length = 5;
@@ -264,6 +273,7 @@ class ProductController extends Controller
             $product->unit_price = $request->get('unit_price');
             $product->category_id = $request->get('category');
             $product->ingredients = $request->get('ingredients');
+            $product->visibility_price_real = $request->get('visibility_price_real') === 'on' ? 1 : 0;
             $product->save();
 
             // TODO: Tratamiento de un archivo de forma tradicional

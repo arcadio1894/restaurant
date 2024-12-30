@@ -286,7 +286,7 @@
                         <div class="mb-3">
                             <span class="h5">S/. <span data-base-price="{{ isset($defaultProductType->price) ? $defaultProductType->price : $product->price_default }}" id="product-price">{{ isset($defaultProductType->price) ? $defaultProductType->price : $product->price_default }}</span></span>
                             <span class="text-muted">/ por unidad</span>
-                            <small class="ml-5 text-danger" style="text-decoration: line-through;"><span data-real-price="" id="product-price-real"></span></small>
+                            <small class="ml-5 text-danger {{ ($product->visibility_price_real == 0) ? 'd-none' : '' }}" style="text-decoration: line-through;"><span data-real-price="" id="product-price-real"></span></small>
                         </div>
 
                         <p>

@@ -18,7 +18,8 @@ class Product extends Model
         'category_id',
         'enable_status',
         'ingredients',
-        'slug'
+        'slug',
+        'visibility_price_real'
     ];
 
     public function options()

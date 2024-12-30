@@ -204,6 +204,10 @@
             <input type="checkbox" checked data-column="imagen" class="custom-control-input" id="customSwitch8">
             <label class="custom-control-label" for="customSwitch8">Imagen</label>
         </div>
+        <div class="col-md-2 custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+            <input type="checkbox" checked data-column="visibility_price_real" class="custom-control-input" id="customSwitch9">
+            <label class="custom-control-label" for="customSwitch9">Ver Precio Tachado</label>
+        </div>
     </div>
 
     <!--begin::Toolbar-->
@@ -255,6 +259,7 @@
             <th data-column="ingredientes" data-ingredientes>Ingredientes</th>
             <th data-column="estado" data-estado>Estado</th>
             <th data-column="imagen" data-imagen>Imagen</th>
+            <th data-column="visibility_price_real" data-visibility_price_real>Ver Precio Tachado</th>
             <th></th>
         </tr>
     </template>
@@ -301,6 +306,7 @@
             <td data-column="imagen" data-imagen>
                 <button data-ver_imagen data-src="" data-image="" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Imagen"><i class="fa fa-image"></i></button>
             </td>
+            <td data-column="visibility_price_real" data-visibility_price_real>Ver precio Tachado</td>
             <td>
                 <a data-editar_product href="{{--'+document.location.origin+ '/dashboard/editar/material/'+item.id+'--}}" class="btn btn-outline-warning btn-sm" data-toggle="tooltip" data-placement="top" title="Editar"><i class="fa fa-pen"></i> </a>
                 <button data-cambiar_estado="" data-product_id="{{--'+item.id+'--}}" data-state="{{--'+item.id+'--}}" data-description="{{--'+item.full_description+'--}}" class="btn btn-outline-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Cambiar de estado"><i class="fas fa-bell-slash"></i> </button>
