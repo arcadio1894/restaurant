@@ -146,6 +146,36 @@
                 transform: scale(1);
             }
         }
+
+        .floating-cart {
+            position: fixed;
+            top: 90px; /* Ajustado para una posición ideal debajo del navbar */
+            right: 20px;
+            width: 50px; /* Reducido para hacerlo más compacto */
+            height: 50px; /* Igual a width para que sea un círculo */
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            z-index: 1100; /* Asegura que el botón esté encima de otros elementos */
+            text-decoration: none;
+        }
+
+        .floating-cart i {
+            font-size: 20px; /* Tamaño reducido del ícono */
+            margin: 0; /* Sin margen */
+        }
+
+        #quantityCart {
+            font-size: 14px; /* Tamaño ajustado del número */
+            font-weight: bold;
+            color: white; /* Mantener el color blanco */
+            margin-left: 5px; /* Espacio entre el ícono y el número */
+        }
     </style>
     @yield('styles')
 </head>
@@ -463,11 +493,12 @@
     </div>
 </footer>
 <!-- footer section -->
-
+@if (request()->routeIs('cart.checkout'))
 <div id="business-status" style="display: none; position: fixed; top: 20px; left: 20px; background-color: rgba(255, 0, 0, 0.9); border: 1px solid #cc0000; padding: 15px; border-radius: 5px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); z-index: 9999; color: #fff;">
     <button id="close-business-status" style="background: none; border: none; font-size: 16px; font-weight: bold; color: #fff; float: right; cursor: pointer;">&times;</button>
     <p id="business-message" style="margin: 0; font-size: 14px; font-weight: bold;"></p>
 </div>
+@endif
 
 <a href="https://wa.me/51906343258?text=Hola%20FUEGO%20Y%20MASA,%20quiero%20comprar%20una%20pizza.%20%F0%9F%8D%95" target="_blank" class="whatsapp-btn">
             <span class="whatsapp-text">
@@ -476,6 +507,14 @@
             </span>
     <i class="fab fa-whatsapp"></i>
 </a>
+
+@if (!request()->routeIs('cart.show') && !request()->routeIs('cart.checkout'))
+    {{-- Botón flotante --}}
+    <a href="{{ route('cart.show') }}" id="cartButton" class="floating-cart d-sm-none">
+        <i class="fas fa-shopping-cart"></i>
+        <span id="quantityCart2">(0)</span>
+    </a>
+@endif
 
 <!-- jQery -->
 <script src="{{ asset('landing/js/jquery-3.4.1.min.js') }}"></script>
@@ -541,6 +580,8 @@
 
                 // Actualizar el contenido del span
                 $("#quantityCart").html(`(${totalItems})`);
+
+                $("#quantityCart2").html(`(${totalItems})`);
 
             },
             error: function (error) {

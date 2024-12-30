@@ -147,7 +147,7 @@
                     <div class="mb-3">
                         <label for="address">Dirección</label>
                         <input type="text" class="form-control" id="address" name="address" placeholder=""
-                               required readonly>
+                               required value="{{ $defaultAddress ? $defaultAddress->address_line : '' }}">
                         <button type="button" class="btn btn-link" id="btn-selectAddress">
                             Encuentra tu dirección
                         </button>

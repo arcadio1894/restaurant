@@ -324,6 +324,7 @@ $(document).ready(function () {
 
                 // Actualizar el contenido del span
                 $("#quantityCart").html(`(${totalItems})`);
+                $("#quantityCart2").html(`(${totalItems})`);
 
             },
             error: function (error) {

@@ -84,6 +84,8 @@ function updateCartQuantity() {
             // Actualizar el contenido del span
             $("#quantityCart").html(`(${totalItems})`);
 
+            $("#quantityCart2").html(`(${totalItems})`);
+
         },
         error: function (error) {
             console.error("Error al verificar autenticación:", error);
