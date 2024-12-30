@@ -374,7 +374,7 @@
                                 //showRoute(mockLatitude, mockLongitude, parseFloat(latitude), parseFloat(longitude));
                             } else if (address) {
                                 // Si no hay coordenadas, buscar la dirección
-                                geocodeAddress(address, mockLatitude, mockLongitude);
+                                geocodeAddress(address, currentLatitude, currentLongitude);
                             } else {
                                 alert("No hay datos suficientes para generar una ruta.");
                             }
