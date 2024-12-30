@@ -368,6 +368,8 @@ class CartController extends Controller
                 'postal_code' => '',
                 'country' => '',
                 'is_default' => $isDefault,
+                'latitude' => $request->input('latitude', null),
+                'longitude' => $request->input('longitude', null),
             ]);
 
             $shippingAddressId = $address->id;

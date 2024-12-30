@@ -15,6 +15,8 @@ class Address extends Model
         'first_name',
         'last_name',
         'address_line',
+        'latitude',
+        'longitude',
         'reference',
 
         'city',

@@ -101,6 +101,8 @@ class OrderController extends Controller
                 "customer" => $direccion->first_name." ".$direccion->last_name,
                 "phone" => $direccion->phone,
                 "address" => $direccion->address_line. " - ".( (!isset($distrito)) ? 'N/A':$distrito->name),
+                "latitude" => $direccion->latitude,
+                "longitude" => $direccion->longitude,
                 "total" => $order->amount_pay,
                 "method" => ($order->payment_method_id == null) ? 'Sin método de pago':$order->payment_method->name ,
                 "state" => $order->status_name,

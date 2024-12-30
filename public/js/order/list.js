@@ -498,6 +498,11 @@ function renderDataTable(data) {
     var cloneBtnActive = activateTemplate('#template-active');
     cloneBtnActive.querySelector("[data-ver_detalles]").setAttribute("data-id", data.id);
 
+    cloneBtnActive.querySelector("[data-ver_ruta]").setAttribute("data-id", data.id);
+    cloneBtnActive.querySelector("[data-ver_ruta]").setAttribute("data-address", data.address);
+    cloneBtnActive.querySelector("[data-ver_ruta]").setAttribute("data-latitude", data.latitude);
+    cloneBtnActive.querySelector("[data-ver_ruta]").setAttribute("data-longitude", data.longitude);
+
     cloneBtnActive.querySelector("[data-cocinando]").setAttribute("data-id", data.id);
     cloneBtnActive.querySelector("[data-enviando]").setAttribute("data-id", data.id);
     cloneBtnActive.querySelector("[data-completado]").setAttribute("data-id", data.id);

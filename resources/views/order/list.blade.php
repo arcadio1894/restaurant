@@ -290,6 +290,7 @@
         <button data-enviando data-id="" data-state="shipped" data-state_name="ENVIADO" class="btn btn-outline-warning btn-sm" data-toggle="tooltip" data-placement="top" title="Enviando"><i class="fa fa-truck"></i></button>
         <button data-completado data-id="" data-state="completed" data-state_name="COMPLETADO" class="btn btn-outline-success btn-sm" data-toggle="tooltip" data-placement="top" title="Completado"><i class="fas fa-home"></i></button>
         <button data-ver_detalles data-id="" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Detalles"><i class="fas fa-list-ol"></i></button>
+        <button data-ver_ruta data-id="" data-address="" data-latitude="" data-longitude="" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Ruta"><i class="fas fa-map-marker-alt"></i></button>
 
     </template>
 
@@ -308,6 +309,19 @@
         </div>
     </div>
 
+    <div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mapModalLabel">Ruta Generada</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <div id="mapContainer" style="width: 100%; height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('plugins')
@@ -321,6 +335,7 @@
 @endsection
 
 @section('scripts')
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDBG5pTai_rF775fdoi3-9X8K462l1-aMo"></script>
     <script>
         $(function () {
             //Initialize Select2 Elements
@@ -329,6 +344,100 @@
                 allowClear: true
             });
 
+            $(document).on("click", '[data-ver_ruta]', function () {
+                console.log("Botón clicado"); // Asegúrate de que este mensaje aparezca en la consola
+                // Obtener datos del botón
+                const $button = $(this);
+                const latitude = $button.data("latitude");
+                const longitude = $button.data("longitude");
+                const address = $button.data("address");
+
+                /*const mockLatitude = -8.118733;
+                const mockLongitude = -79.006608;
+*/
+                // Coordenadas de ejemplo para pruebas
+                /*const mockLatitude = -8.115324;
+                const mockLongitude = -79.030759;*/
+                // Obtener la ubicación actual del usuario
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function (position) {
+                            const currentLatitude = position.coords.latitude;
+                            const currentLongitude = position.coords.longitude;
+                            // Coordenadas de ejemplo para pruebas
+                            //const mockLatitude = -8.115324;
+                            //const mockLongitude = -79.030759;
+
+                            if (latitude && longitude) {
+                                // Si hay coordenadas, mostrar la ruta
+                                showRoute(currentLatitude, currentLongitude, parseFloat(latitude), parseFloat(longitude));
+                                //showRoute(mockLatitude, mockLongitude, parseFloat(latitude), parseFloat(longitude));
+                            } else if (address) {
+                                // Si no hay coordenadas, buscar la dirección
+                                geocodeAddress(address, mockLatitude, mockLongitude);
+                            } else {
+                                alert("No hay datos suficientes para generar una ruta.");
+                            }
+                        },
+                        function (error) {
+                            console.error("Error obteniendo la ubicación:", error);
+                        }
+                    );
+                } else {
+                    alert("Geolocalización no soportada en este navegador.");
+                }
+
+                /*if (latitude && longitude) {
+                    showRoute(mockLatitude, mockLongitude, parseFloat(latitude), parseFloat(longitude));
+                } else if (address) {
+                    geocodeAddress(address, mockLatitude, mockLongitude);
+                } else {
+                    alert("No hay datos suficientes para generar una ruta.");
+                }*/
+            });
+
+            function geocodeAddress(address, originLat, originLng) {
+                const geocoder = new google.maps.Geocoder();
+                geocoder.geocode({ address: address }, function (results, status) {
+                    if (status === "OK") {
+                        const destination = results[0].geometry.location;
+                        showRoute(originLat, originLng, destination.lat(), destination.lng());
+                    } else {
+                        alert("No se pudo encontrar la dirección: " + status);
+                    }
+                });
+            }
+
+            function showRoute(originLat, originLng, destLat, destLng) {
+                // Crear el mapa
+                const map = new google.maps.Map(document.getElementById("mapContainer"), {
+                    center: { lat: originLat, lng: originLng },
+                    zoom: 14,
+                });
+
+                // Configurar servicios de direcciones
+                const directionsService = new google.maps.DirectionsService();
+                const directionsRenderer = new google.maps.DirectionsRenderer();
+                directionsRenderer.setMap(map);
+
+                // Generar la ruta
+                directionsService.route(
+                    {
+                        origin: { lat: originLat, lng: originLng },
+                        destination: { lat: destLat, lng: destLng },
+                        travelMode: "DRIVING",
+                    },
+                    function (response, status) {
+                        if (status === "OK") {
+                            directionsRenderer.setDirections(response);
+                            // Mostrar el modal
+                            $("#mapModal").modal("show");
+                        } else {
+                            alert("No se pudo generar la ruta: " + status);
+                        }
+                    }
+                );
+            }
         })
     </script>
     <script src="{{ asset('js/order/list.js') }}?v={{ time() }}"></script>

@@ -146,16 +146,16 @@
 
                     <div class="mb-3">
                         <label for="address">Dirección</label>
-                        <input type="text" class="form-control" id="address" name="address" placeholder="Av. Larco 333"
-                               value="{{ $defaultAddress ? $defaultAddress->address_line : '' }}" required>
+                        <input type="text" class="form-control" id="address" name="address" placeholder=""
+                               required readonly>
                         <button type="button" class="btn btn-link" id="btn-selectAddress">
                             Encuentra tu dirección
                         </button>
                         <div class="invalid-feedback">
                             Por favor ingrese su dirección de envío.
                         </div>
-                        <input type="hidden" id="latitude">
-                        <input type="hidden" id="longitude">
+                        <input type="hidden" id="latitude" name="latitude">
+                        <input type="hidden" id="longitude" name="longitude">
                     </div>
 
                     <div class="mb-3">
@@ -337,7 +337,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="mapModalLabel">Encuentra tu dirección</h5>
-                    <button type="button" class="close closeModalVerify" ><span aria-hidden="true">&times;</span></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
                     <!-- Campo de búsqueda -->
