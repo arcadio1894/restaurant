@@ -48,6 +48,7 @@ Route::get('/products/fill-slugs', [ProductController::class, 'fillSlugs']);
 /*Route::get('/auth/check', function() {
     return response()->json(['authenticated' => auth()->check()]);
 })->name('auth.check');*/
+Route::get('/personaliza/tu/pizza', [ProductController::class, 'customPizza'])->name('product.custom');
 
 Route::post('/cart/manage', [CartController::class, 'manage'])->name('cart.manage');
 Route::post('/cart/manage/direct', [CartController::class, 'manage2'])->name('cart.manage2');

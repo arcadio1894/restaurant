@@ -498,6 +498,26 @@ class ProductController extends Controller
         return view('product.show', compact('product', 'productTypes', 'defaultProductType', 'options', 'adicionales'));
     }
 
+    public function customPizza()
+    {
+        $product = Product::where('id', 1)->firstOrFail();
+
+        // Obtener los tipos relacionados al producto
+        $productTypes = $product->productTypes()
+            ->whereHas('type', function ($query) {
+                $query->where('active', 1); // Filtra solo los tipos activos
+            })
+            ->with('type')
+            ->get();
+
+        // Obtener el tipo por defecto
+        $defaultProductType = $productTypes->where('default', true)->first();
+
+        $adicionales = Product::whereIn('category_id', [5, 6])->with('category')->get();
+
+        return view('product.custom', compact('product', 'productTypes', 'defaultProductType', 'adicionales'));
+    }
+
     public function getProduct($id, $productTypeId)
     {
         // Buscar el producto por ID
