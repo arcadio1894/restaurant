@@ -23,7 +23,7 @@ function deleteSelection() {
 }
 
 function deleteOption() {
-    $(this).parent().parent().parent().parent().remove();
+    $(this).parent().parent().parent().remove();
 }
 
 function addSelection() {
