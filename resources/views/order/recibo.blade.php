@@ -54,6 +54,7 @@
     {{--<p><b>Entrega:</b> {{ $order->formatted_date }}</p>--}}
     <p><b>Cliente:</b> {{ ($order->shipping_address_id == null) ? 'Incognito':$order->shipping_address->first_name." ".$order->shipping_address->last_name  }}</p>
     <p><b>Telefono:</b> {{ ($order->shipping_address_id == null) ? 'N/A':$order->shipping_address->phone }}</p>
+    <p><b>Dirección:</b> {{ ($order->shipping_address_id == null) ? 'N/A':$order->shipping_address->address_line }}</p>
     <div class="line"></div>
     @foreach ($order->details as $detail)
 
