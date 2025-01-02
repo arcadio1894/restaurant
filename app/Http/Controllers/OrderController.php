@@ -46,6 +46,20 @@ class OrderController extends Controller
 
     }
 
+    public function indexAdminAnnulled()
+    {
+        $registros = Order::all();
+
+        $arrayYears = $registros->pluck('created_at')->map(function ($date) {
+            return Carbon::parse($date)->format('Y');
+        })->unique()->toArray();
+
+        $arrayYears = array_values($arrayYears);
+
+        return view('order.listAnnulled', compact('arrayYears'));
+
+    }
+
     public function getOrdersAdmin(Request $request, $pageNumber = 1)
     {
         $perPage = 10;
@@ -56,13 +70,91 @@ class OrderController extends Controller
 
         if ( $startDate == "" || $endDate == "" )
         {
-            $query = Order::orderBy('created_at', 'DESC');
+            $query = Order::where('state_annulled', 0)->orderBy('created_at', 'DESC');
         } else {
             $fechaInicio = Carbon::createFromFormat('d/m/Y', $startDate);
             $fechaFinal = Carbon::createFromFormat('d/m/Y', $endDate);
 
             $query = Order::whereDate('created_at', '>=', $fechaInicio)
                 ->whereDate('created_at', '<=', $fechaFinal)
+                ->where('state_annulled', 0)
+                ->orderBy('created_at', 'DESC');
+        }
+
+        // Aplicar filtros si se proporcionan
+        if ($code != "") {
+            $query->where('id', 'LIKE', '%'.$code.'%');
+
+        }
+
+        if ($year != "") {
+            $query->whereYear('created_at', $year);
+
+        }
+
+        $totalFilteredRecords = $query->count();
+        $totalPages = ceil($totalFilteredRecords / $perPage);
+
+        $startRecord = ($pageNumber - 1) * $perPage + 1;
+        $endRecord = min($totalFilteredRecords, $pageNumber * $perPage);
+
+        $orders = $query->skip(($pageNumber - 1) * $perPage)
+            ->take($perPage)
+            ->get();
+
+        $arrayGuides = [];
+
+        foreach ( $orders as $order )
+        {
+            $direccion = Address::find($order->shipping_address_id);
+            $distrito = ShippingDistrict::find($order->shipping_district_id);
+            array_push($arrayGuides, [
+                "id" => $order->id,
+                "code" => "ORDEN - ".$order->id,
+                "date" => ($order->created_at != null) ? $order->formatted_created_date : "",
+                "date_delivery" => ($order->created_at != null) ? $order->formatted_date : "",
+                "customer" => $direccion->first_name." ".$direccion->last_name,
+                "phone" => $direccion->phone,
+                "address" => $direccion->address_line. " - ".( (!isset($distrito)) ? 'N/A':$distrito->name),
+                "latitude" => $direccion->latitude,
+                "longitude" => $direccion->longitude,
+                "total" => $order->amount_pay,
+                "method" => ($order->payment_method_id == null) ? 'Sin método de pago':$order->payment_method->name ,
+                "state" => $order->status_name,
+                "data_payment" => $order->data_payment,
+            ]);
+        }
+
+        $pagination = [
+            'currentPage' => (int)$pageNumber,
+            'totalPages' => (int)$totalPages,
+            'startRecord' => $startRecord,
+            'endRecord' => $endRecord,
+            'totalRecords' => $totalFilteredRecords,
+            'totalFilteredRecords' => $totalFilteredRecords
+        ];
+
+        return ['data' => $arrayGuides, 'pagination' => $pagination];
+    }
+
+    public function getOrdersAnnulledAdmin(Request $request, $pageNumber = 1)
+    {
+        $perPage = 10;
+        $code = $request->input('code');
+        $year = $request->input('year');
+        $startDate = $request->input('startDate');
+        $endDate = $request->input('endDate');
+
+        if ( $startDate == "" || $endDate == "" )
+        {
+            $query = Order::where('state_annulled', 1)->orderBy('created_at', 'DESC');
+        } else {
+            $fechaInicio = Carbon::createFromFormat('d/m/Y', $startDate);
+            $fechaFinal = Carbon::createFromFormat('d/m/Y', $endDate);
+
+            $query = Order::whereDate('created_at', '>=', $fechaInicio)
+                ->whereDate('created_at', '<=', $fechaFinal)
+                ->where('state_annulled', 1)
                 ->orderBy('created_at', 'DESC');
         }
 
@@ -154,6 +246,52 @@ class OrderController extends Controller
             return response()->json(['message' => $e->getMessage()], 422);
         }
         return response()->json(['message' => 'Cambio de estado realizado con éxito'], 200);
+    }
+
+    public function anularOrder($order_id)
+    {
+        DB::beginTransaction();
+        try {
+
+            $order = Order::find($order_id);
+            $order->state_annulled = 1;
+            $order->save();
+
+            Log::info('Emitiendo evento para la orden:', $order->toArray());
+
+            DB::commit();
+
+            return response()->json(['message' => 'Orden anulada con éxito'], 200);
+
+        } catch ( \Throwable $e ) {
+            DB::rollBack();
+            Log::error('Error anulando la orden: ' . $e->getMessage());
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+    }
+
+    public function activarOrder($order_id)
+    {
+        DB::beginTransaction();
+        try {
+
+            $order = Order::find($order_id);
+            $order->state_annulled = 0;
+            $order->save();
+
+            Log::info('Emitiendo evento para la orden:', $order->toArray());
+
+            DB::commit();
+
+            return response()->json(['message' => 'Orden anulada con éxito'], 200);
+
+        } catch ( \Throwable $e ) {
+            DB::rollBack();
+            Log::error('Error anulando la orden: ' . $e->getMessage());
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
     }
 
     private function getEmailForOrder($order)

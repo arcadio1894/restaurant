@@ -93,8 +93,13 @@ Route::middleware('auth')->group(function (){
         // TODO: Rutas de Orders (Pedidos Admin)
         Route::get('/listado/pedidos/', [OrderController::class, 'indexAdmin'])
             ->name('orders.list');
+        Route::get('/listado/pedidos/anulados/', [OrderController::class, 'indexAdminAnnulled'])
+            ->name('orders.list.annulled');
         Route::get('/get/data/orders/{numberPage}', [OrderController::class, 'getOrdersAdmin']);
+        Route::get('/get/data/orders/annulled/{numberPage}', [OrderController::class, 'getOrdersAnnulledAdmin']);
         Route::post('/change/order/state/{order}/{state}', [OrderController::class, 'changeIOrderState']);
+        Route::post('/anular/order/{order}', [OrderController::class, 'anularOrder']);
+        Route::post('/activar/order/{order}', [OrderController::class, 'activarOrder']);
         Route::get('/orders/{orderId}/details', [OrderController::class, 'getOrderDetails']);
 
         // TODO: Rutas de Mantenedor de Productos (Productos Admin)
