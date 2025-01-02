@@ -403,6 +403,12 @@
                                     <p>Listar pedidos</p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="{{route('orders.list.annulled')}}" class="nav-link @yield('activeListOrdersAnnulled')">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Pedidos anulados</p>
+                                </a>
+                            </li>
                         </ul>
                     </li>
 

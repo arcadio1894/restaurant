@@ -54,6 +54,7 @@
     {{--<p><b>Entrega:</b> {{ $order->formatted_date }}</p>--}}
     <p><b>Cliente:</b> {{ ($order->shipping_address_id == null) ? 'Incognito':$order->shipping_address->first_name." ".$order->shipping_address->last_name  }}</p>
     <p><b>Telefono:</b> {{ ($order->shipping_address_id == null) ? 'N/A':$order->shipping_address->phone }}</p>
+    <p><b>Dirección:</b> {{ ($order->shipping_address_id == null) ? 'N/A':$order->shipping_address->address_line }}</p>
     <div class="line"></div>
     @foreach ($order->details as $detail)
 
@@ -64,9 +65,10 @@
     @endforeach
     <div class="line"></div>
     <p><b>Sub Total:</b> <span style="float: right;">S/. {{ $amount_subtotal }}</span></p>
+    <p><b>Envío:</b> <span style="float: right;">S/. {{ number_format($amount_shipping, 2, '.', '') }}</span></p>
     <p><b>Descuento:</b> <span style="float: right;">S/. {{ $discount }}</span></p>
-    <p><b>IGV:</b> <span style="float: right;">S/. {{ $amount_igv }}</span></p>
-    <p><b>TOTAL:</b> <span style="float: right;">S/. {{ $order->amount_pay }}</span></p>
+    <p><b>IGV:</b> <span style="float: right;">S/. {{ number_format($amount_igv, 2, '.', '') }}</span></p>
+    <p><b>TOTAL:</b> <span style="float: right;">S/. {{ number_format($order->amount_pay, 2, '.', '') }}</span></p>
     <div class="line"></div>
     <p class="text-center" style="font-size: 18px"><b>{{($order->payment_method_id == null) ? 'Sin método de pago':$order->payment_method->name }} </b></p>
     <div class="line"></div>

@@ -223,10 +223,12 @@ class PrintController extends Controller
         // Totales
 
         $amount_total = round($order->total_amount + $order->amount_shipping, 2);
-        $amount_subtotal = number_format(round($amount_total/1.18, 2), 2, '.', '');
-        $amount_igv = round($amount_total - $amount_subtotal, 2);
+        $amount_shipping = round($order->amount_shipping, 2);
+        $amount_only_total = round($order->total_amount, 2);
+        $amount_subtotal = number_format(round($amount_only_total/1.18, 2), 2, '.', '');
+        $amount_igv = round($amount_only_total - $amount_subtotal, 2);
 
-        $pdf = Pdf::loadView('order.recibo', compact('order','amount_total', 'amount_subtotal', 'amount_igv', 'discount'))
+        $pdf = Pdf::loadView('order.recibo', compact('order','amount_total', 'amount_subtotal', 'amount_igv', 'discount', 'amount_shipping', 'amount_only_total'))
             ->setPaper([0, 0, 226.8, 900], 'portrait'); // 80mm de ancho, altura dinámica
 
         return $pdf->stream("recibo_{$order->id}.pdf");

@@ -23,16 +23,9 @@ $(document).ready(function () {
         selector: '[data-toggle="tooltip"]'
     });
 
-    $(document).on('click', '[data-recibido]', changeStatusOrder);
-    $(document).on('click', '[data-cocinando]', changeStatusOrder);
-    $(document).on('click', '[data-enviando]', changeStatusOrder);
-    $(document).on('click', '[data-completado]', changeStatusOrder);
-
     $(document).on('click', '[data-ver_detalles]', showDetails);
 
-    $(document).on('click', '[data-print_nota]', printOrder);
-
-    $(document).on('click', '[data-anular]', anularOrder);
+    $(document).on('click', '[data-activar]', activarOrder);
 });
 
 var $formDelete;
@@ -43,23 +36,23 @@ var $formDecimals;
 var $permissions;
 var $modalDetraction;
 
-function anularOrder() {
+function activarOrder() {
     var order_id = $(this).data('id');
 
     $.confirm({
-        icon: 'fas fa-trash-alt',
+        icon: 'fas fa-check',
         theme: 'modern',
         closeIcon: true,
         animation: 'zoom',
-        type: 'red',
-        title: '¿Está seguro de anular esta order?',
+        type: 'green',
+        title: '¿Está seguro de activar esta order?',
         content: 'ORDEN - '+order_id,
         buttons: {
             confirm: {
                 text: 'CONFIRMAR',
                 action: function (e) {
                     $.ajax({
-                        url: '/dashboard/anular/order/'+order_id,
+                        url: '/dashboard/activar/order/'+order_id,
                         method: 'POST',
                         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                         processData:false,
@@ -86,80 +79,6 @@ function anularOrder() {
         },
     });
 
-}
-
-function printOrder() {
-    const orderId = $(this).data('id');
-
-    // Realizar una solicitud AJAX para obtener los detalles del pedido
-    $.ajax({
-        url: `/print/order/${orderId}`,
-        method: 'POST',
-        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-        processData:false,
-        contentType:false,
-        success: function (response) {
-            if (response.error) {
-                // Generar dinámicamente el contenido del modal
-                toastr.success(response.message, 'Éxito', {
-                    "closeButton": true,
-                    "debug": false,
-                    "newestOnTop": false,
-                    "progressBar": true,
-                    "positionClass": "toast-top-right",
-                    "preventDuplicates": false,
-                    "onclick": null,
-                    "showDuration": "300",
-                    "hideDuration": "1000",
-                    "timeOut": "2000",
-                    "extendedTimeOut": "1000",
-                    "showEasing": "swing",
-                    "hideEasing": "linear",
-                    "showMethod": "fadeIn",
-                    "hideMethod": "fadeOut"
-                });
-
-            } else {
-                toastr.error(response.message, 'Error', {
-                    "closeButton": true,
-                    "debug": false,
-                    "newestOnTop": false,
-                    "progressBar": true,
-                    "positionClass": "toast-top-right",
-                    "preventDuplicates": false,
-                    "onclick": null,
-                    "showDuration": "300",
-                    "hideDuration": "1000",
-                    "timeOut": "2000",
-                    "extendedTimeOut": "1000",
-                    "showEasing": "swing",
-                    "hideEasing": "linear",
-                    "showMethod": "fadeIn",
-                    "hideMethod": "fadeOut"
-                });
-            }
-        },
-        error: function (xhr) {
-            console.error('Error:', xhr.responseText);
-            toastr.error(xhr.responseText, 'Error', {
-                "closeButton": true,
-                "debug": false,
-                "newestOnTop": false,
-                "progressBar": true,
-                "positionClass": "toast-top-right",
-                "preventDuplicates": false,
-                "onclick": null,
-                "showDuration": "300",
-                "hideDuration": "1000",
-                "timeOut": "2000",
-                "extendedTimeOut": "1000",
-                "showEasing": "swing",
-                "hideEasing": "linear",
-                "showMethod": "fadeIn",
-                "hideMethod": "fadeOut"
-            });
-        }
-    });
 }
 
 function showDetails() {
@@ -242,126 +161,6 @@ function showDetails() {
     });
 }
 
-/*function showDetails() {
-    const orderId = $(this).data('id');
-
-    // Realizar una solicitud AJAX para obtener los detalles del pedido
-    $.ajax({
-        url: `/dashboard/orders/${orderId}/details`,
-        method: 'GET',
-        success: function (response) {
-            if (response.details) {
-                // Generar dinámicamente el contenido del modal
-                let content = '';
-                response.details.forEach((detail, index) => {
-                    content += `
-                        <div class="mb-4">
-                            <h6><strong>Pizza:</strong> ${detail.pizza_name} | ${detail.type} (${detail.size})</h6>
-                            <p><strong>Ingredientes:</strong> </p>
-                            <p>${detail.ingredients}</p>
-                        </div>
-                        <hr />
-                    `;
-                });
-
-                // Insertar el contenido generado en el modal
-                $('#order-details-content').html(content);
-
-                // Mostrar el modal
-                $('#orderDetailsModal').modal('show');
-            } else {
-                //alert('No se encontraron detalles para este pedido.');
-                toastr.error('No se encontraron detalles para este pedido.', 'Error', {
-                    "closeButton": true,
-                    "debug": false,
-                    "newestOnTop": false,
-                    "progressBar": true,
-                    "positionClass": "toast-top-right",
-                    "preventDuplicates": false,
-                    "onclick": null,
-                    "showDuration": "300",
-                    "hideDuration": "1000",
-                    "timeOut": "2000",
-                    "extendedTimeOut": "1000",
-                    "showEasing": "swing",
-                    "hideEasing": "linear",
-                    "showMethod": "fadeIn",
-                    "hideMethod": "fadeOut"
-                });
-
-            }
-        },
-        error: function (xhr) {
-            console.error('Error:', xhr.responseText);
-            //alert('Ocurrió un error al obtener los detalles del pedido.');
-            toastr.error('Ocurrió un error al obtener los detalles del pedido.', 'Error', {
-                "closeButton": true,
-                "debug": false,
-                "newestOnTop": false,
-                "progressBar": true,
-                "positionClass": "toast-top-right",
-                "preventDuplicates": false,
-                "onclick": null,
-                "showDuration": "300",
-                "hideDuration": "1000",
-                "timeOut": "2000",
-                "extendedTimeOut": "1000",
-                "showEasing": "swing",
-                "hideEasing": "linear",
-                "showMethod": "fadeIn",
-                "hideMethod": "fadeOut"
-            });
-        }
-    });
-}*/
-
-function changeStatusOrder() {
-    var order_id = $(this).data('id');
-    var state = $(this).data('state');
-    var state_name = $(this).data('state_name');
-
-    $.confirm({
-        icon: 'fas fa-smile',
-        theme: 'modern',
-        closeIcon: true,
-        animation: 'zoom',
-        type: 'green',
-        title: '¿Está seguro de cambiar el estado a '+ state_name +' ?',
-        content: 'ORDEN - '+order_id,
-        buttons: {
-            confirm: {
-                text: 'CONFIRMAR',
-                action: function (e) {
-                    $.ajax({
-                        url: '/dashboard/change/order/state/'+order_id+'/'+state,
-                        method: 'POST',
-                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                        processData:false,
-                        contentType:false,
-                        success: function (data) {
-                            console.log(data);
-                            $.alert(data.message);
-                            setTimeout( function () {
-                                getDataOrders(1);
-                            }, 2000 )
-                        },
-                        error: function (data) {
-                            $.alert("Sucedió un error en el servidor. Intente nuevamente.");
-                        },
-                    });
-                },
-            },
-            cancel: {
-                text: 'CANCELAR',
-                action: function (e) {
-                    $.alert("Cambio de estado cancelado.");
-                },
-            },
-        },
-    });
-
-}
-
 function showDataSearch() {
     getDataOrders(1)
 }
@@ -383,7 +182,7 @@ function getDataOrders($numberPage) {
     var startDate = $('#start').val();
     var endDate = $('#end').val();
 
-    $.get('/dashboard/get/data/orders/'+$numberPage, {
+    $.get('/dashboard/get/data/orders/annulled/'+$numberPage, {
         code: code,
         year: year,
         startDate: startDate,
@@ -544,30 +343,7 @@ function renderDataTable(data) {
     var cloneBtnActive = activateTemplate('#template-active');
     cloneBtnActive.querySelector("[data-ver_detalles]").setAttribute("data-id", data.id);
 
-    cloneBtnActive.querySelector("[data-ver_ruta]").setAttribute("data-id", data.id);
-    cloneBtnActive.querySelector("[data-ver_ruta]").setAttribute("data-address", data.address);
-    cloneBtnActive.querySelector("[data-ver_ruta]").setAttribute("data-latitude", data.latitude);
-    cloneBtnActive.querySelector("[data-ver_ruta]").setAttribute("data-longitude", data.longitude);
-
-    cloneBtnActive.querySelector("[data-ver_ruta_map]").setAttribute("data-id", data.id);
-    cloneBtnActive.querySelector("[data-ver_ruta_map]").setAttribute("data-address", data.address);
-    cloneBtnActive.querySelector("[data-ver_ruta_map]").setAttribute("data-latitude", data.latitude);
-    cloneBtnActive.querySelector("[data-ver_ruta_map]").setAttribute("data-longitude", data.longitude);
-
-    cloneBtnActive.querySelector("[data-cocinando]").setAttribute("data-id", data.id);
-    cloneBtnActive.querySelector("[data-enviando]").setAttribute("data-id", data.id);
-    cloneBtnActive.querySelector("[data-completado]").setAttribute("data-id", data.id);
-
-    cloneBtnActive.querySelector("[data-print_nota]").setAttribute("data-id", data.id);
-    cloneBtnActive.querySelector("[data-print_comanda]").setAttribute("data-id", data.id);
-
-    let url = document.location.origin + '/imprimir/recibo/' + data.id;
-    cloneBtnActive.querySelector("[data-print_nota]").setAttribute("href", url);
-
-    let url_comanda = document.location.origin + '/imprimir/comanda/' + data.id;
-    cloneBtnActive.querySelector("[data-print_comanda]").setAttribute("href", url_comanda);
-
-    cloneBtnActive.querySelector("[data-anular]").setAttribute("data-id", data.id);
+    cloneBtnActive.querySelector("[data-activar]").setAttribute("data-id", data.id);
 
     botones.append(cloneBtnActive);
 

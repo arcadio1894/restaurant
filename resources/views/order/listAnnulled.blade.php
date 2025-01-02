@@ -8,7 +8,7 @@
     active
 @endsection
 
-@section('activeListOrders')
+@section('activeListOrdersAnnulled')
     active
 @endsection
 
@@ -282,17 +282,8 @@
     </template>
 
     <template id="template-active">
-        {{--<button data-recibido data-id="" data-state="created" data-state_name="RECIBIDO" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Recibido"><i class="far fa-file-alt"></i></button>
-        --}}{{-- El target blank es el recibido Imprimir comanda --}}
-        <a href="" target="_blank" data-print_comanda data-id="" class="btn btn-outline-dark btn-sm" data-toggle="tooltip" data-placement="top" title="Imprimir comanda"><i class="fas fa-print"></i></a>
-        <button data-cocinando data-id="" data-state="processing" data-state_name="COCINANDO" class="btn btn-outline-info btn-sm" data-toggle="tooltip" data-placement="top" title="Cocinando"><i class="fas fa-fire"></i></button>
-        <a href="" target="_blank" data-print_nota data-id="" class="btn btn-outline-dark btn-sm" data-toggle="tooltip" data-placement="top" title="Imprimir boleta"><i class="fas fa-print"></i></a>
-        <button data-enviando data-id="" data-state="shipped" data-state_name="ENVIADO" class="btn btn-outline-warning btn-sm" data-toggle="tooltip" data-placement="top" title="Enviando"><i class="fa fa-truck"></i></button>
-        <button data-completado data-id="" data-state="completed" data-state_name="COMPLETADO" class="btn btn-outline-success btn-sm" data-toggle="tooltip" data-placement="top" title="Completado"><i class="fas fa-home"></i></button>
         <button data-ver_detalles data-id="" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Detalles"><i class="fas fa-list-ol"></i></button>
-        <button data-ver_ruta data-id="" data-address="" data-latitude="" data-longitude="" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Ruta"><i class="fas fa-map-marker-alt"></i></button>
-        <button data-ver_ruta_map data-id="" data-address="" data-latitude="" data-longitude="" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Ruta"><i class="fas fa-map-marker-alt" style="color: #e60a0a;"></i></button>
-        <button data-anular data-id="" class="btn btn-outline-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Anular Orden"><i class="fas fa-trash-alt"></i></button>
+        <button data-activar data-id="" class="btn btn-outline-success btn-sm" data-toggle="tooltip" data-placement="top" title="Activar Orden"><i class="fas fa-check"></i></button>
 
     </template>
 
@@ -458,6 +449,6 @@
             }
         })
     </script>
-    <script src="{{ asset('js/order/list.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/order/listAnnulled.js') }}?v={{ time() }}"></script>
 
 @endsection

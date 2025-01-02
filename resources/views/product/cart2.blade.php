@@ -167,7 +167,7 @@
                 </div>
 
                 <div class="mt-3">
-                    <a href="{{ route('cart.checkout') }}" class="btn btn-success w-100 shadow-0 mb-2"> Completar la compra </a>
+                    <a href="{{ route('cart.checkout') }}" class="btn btn-success w-100 shadow-0 mb-2"> Ir a Pagar </a>
                     @auth()
                         <a href="{{ route('home') }}" class="btn btn-light w-100 border mt-2"> Seguir comprando </a>
                     @else

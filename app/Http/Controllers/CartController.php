@@ -490,6 +490,7 @@ class CartController extends Controller
             // Guardar los detalles de la orden
             foreach ($cart as $cartItem) {
                 $price = 0;
+                $additionalPrice = 0;
 
                 // Obtener el precio base del producto o tipo de producto
                 if (isset($cartItem['product_type_id']) && $cartItem['product_type_id'] != null) {
@@ -504,13 +505,26 @@ class CartController extends Controller
                     }
                 }
 
+                // Calcular el precio adicional de las opciones
+                if (!empty($cartItem['options'])) {
+                    foreach ($cartItem['options'] as $optionGroupId => $optionIds) {
+                        foreach ($optionIds as $optionId) {
+                            $additionalPrice += isset($optionId['additional_price']) ? $optionId['additional_price'] : 0;
+                        }
+                    }
+                }
+
+                // Sumar el precio base y el adicional
+                $totalPrice = $price + $additionalPrice;
+
+
                 // Crear el detalle de la orden
                 $orderDetail = OrderDetail::create([
                     'order_id' => $order->id,
                     'product_id' => $cartItem['product_id'],
                     'product_type_id' => ($cartItem['product_type_id'] == null) ? null: $cartItem['product_type_id'],
                     'quantity' => $cartItem['quantity'],
-                    'price' => $price,
+                    'price' => $totalPrice,
                     'subtotal' => $cartItem['quantity'] * $price,
                 ]);
 
@@ -582,8 +596,8 @@ class CartController extends Controller
                         'order' => "ORDEN - ".$order->id
                     ];
 
-                    $telegramController = new TelegramController();
-                    $telegramController->sendNotification('process', $data);
+                    /*$telegramController = new TelegramController();
+                    $telegramController->sendNotification('process', $data);*/
 
                     DB::commit();
 
