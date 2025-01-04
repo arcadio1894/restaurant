@@ -12,6 +12,15 @@ body {
     overflow: hidden;
 }
 
+.toppings-list {
+    max-width: 400px;
+    margin: 0 auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    overflow: hidden;
+}
+
 .topping-item {
     border-bottom: 1px solid #ddd;
     padding: 15px;
@@ -147,7 +156,7 @@ input:checked + .slider:before {
     display: none;
     width: 20px;
     height: 20px;
-    background-color: red;
+    background-color: green;
     border-radius: 50%;
 }
 
