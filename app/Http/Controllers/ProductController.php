@@ -10,6 +10,7 @@ use App\Models\Option;
 use App\Models\Product;
 use App\Models\ProductType;
 use App\Models\Selection;
+use App\Models\Topping;
 use App\Models\Type;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -515,7 +516,11 @@ class ProductController extends Controller
 
         $adicionales = Product::whereIn('category_id', [5, 6])->with('category')->get();
 
-        return view('product.custom', compact('product', 'productTypes', 'defaultProductType', 'adicionales'));
+        $toppingMeats = Topping::where('type', 'meat')->get();
+
+        $toppingVeggies = Topping::where('type', 'veggie')->get();
+
+        return view('product.custom', compact('product', 'productTypes', 'defaultProductType', 'adicionales', 'toppingMeats', 'toppingVeggies'));
     }
 
     public function getProduct($id, $productTypeId)

@@ -1,0 +1,224 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+}
+
+.toppings-list {
+    max-width: 400px;
+    margin: 0 auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    overflow: hidden;
+}
+
+.topping-item {
+    border-bottom: 1px solid #ddd;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.topping-item:last-child {
+    border-bottom: none;
+}
+
+.topping-item img {
+    width: 40px;
+    height: 40px;
+}
+
+.topping-name {
+    flex-grow: 1;
+    margin-left: 15px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.dropdown-options {
+    display: none;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-top: 1px solid #ddd;
+}
+
+.dropdown-options.active {
+    display: block;
+}
+
+.option-controls {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+}
+
+.option-controls input[type="radio"] {
+    display: none;
+}
+
+/* Quitar el contorno del label cuando recibe foco */
+.option-controls label {
+    outline: none; /* Quita el contorno */
+}
+
+.option-controls label:focus {
+    outline: none;
+}
+
+.option-controls label {
+    padding: 10px 15px;
+    /*border: 1px solid #ddd;*/
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+/* Estilo específico para los inputs dentro de #size-options */
+#size-options input[type="radio"]:checked + label {
+    background-color: #e69c00;
+    color: #fff;
+    border-color: #e69c00;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px; /* Aumenta el ancho */
+    height: 34px; /* Aumenta la altura */
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    border-radius: 34px; /* Ajusta el radio para hacerlo más redondo */
+    transition: 0.4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px; /* Ajusta el tamaño de la bola */
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.4s;
+}
+
+input:checked + .slider {
+    background-color: #4caf50;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px); /* Ajusta la distancia de la bola al cambiar */
+}
+
+/* Estilos para el botón con íconos FontAwesome */
+.action-button {
+    display: flex;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+}
+
+.action-button i {
+    font-size: 20px;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.action-button .circle {
+    display: none;
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    border-radius: 50%;
+}
+
+.action-button.selected .circle {
+    display: block;
+}
+
+.action-button.selected i {
+    background-color: #e69c00;
+    color: #fff;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.meats-header {
+    background-color: #ffbe33;
+    border-bottom: 1px solid #ddd;
+    padding: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.imagen-radio {
+    display: block;
+    width: 35px; /* Tamaño de la imagen */
+    height: 35px; /* Tamaño de la imagen */
+    margin: 0 auto 5px; /* Centra la imagen horizontalmente y agrega espacio inferior */
+    object-fit: cover; /* Asegura que la imagen se ajuste correctamente */
+}
+
+/* Contenedor para las opciones de radio */
+/* Contenedor para las opciones de radio */
+.radio-group {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px; /* Espacio entre los contenedores */
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    height: 80px; /* Establece una altura fija */
+}
+
+/* Contenedor para el switch de "Extra" */
+.extra-group {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+    height: 80px;
+    display: flex;
+    flex-direction: column; /* Alinea los elementos en una columna */
+    justify-content: center; /* Centra verticalmente */
+    align-items: center; /* Centra horizontalmente */
+}
+
+.extra-group p {
+     /* Ajusta el margen superior para que no haya espacio extra */
+    font-size: 14px; /* Ajusta el tamaño del texto */
+}
+
+/* Ajustar los divs internos */
+.radio-group > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-top: 8px !important;
+}
