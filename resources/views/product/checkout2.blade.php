@@ -21,6 +21,16 @@
         .pac-container {
             z-index: 1051 !important; /* Mayor que el z-index del modal */
         }
+        .info-button {
+            font-size: 18px;
+            color: #007bff;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        .info-button:hover {
+            color: #0056b3;
+        }
     </style>
 @endsection
 
@@ -184,7 +194,7 @@
                     <!-- Sección para método de pago en efectivo -->
                     <div id="cash-section" style="display: none; margin-top: 15px;">
                         <label for="cashAmount">Monto con el que paga</label>
-                        <input type="number" class="form-control" id="cashAmount" placeholder="Ingrese monto en efectivo">
+                        <input type="number" class="form-control" step="0.01" min="0" id="cashAmount" placeholder="Ingrese monto en efectivo">
                     </div>
 
                     <!-- Sección para método de pago Yape/Plin -->
@@ -194,7 +204,13 @@
                             <img src="{{ asset('images/checkout/qr_yape.jpg') }}" alt="QR para Yape/Plin" style="width: 200px;">
                         </div>
                         <br>
-                        <label for="operationCode">Código de operación</label>
+                        <label for="operationCode">Código de operación
+                            <!-- Botón de información -->
+                            <button type="button" id="info-button" class="btn btn-link p-0 info-button" title="¿Donde encuentro el número de operación?">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
+                        </label>
+
                         <input type="text" class="form-control" id="operationCode" placeholder="Ingrese el código de operación">
                     </div>
 
@@ -347,6 +363,21 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" id="selectAddress">Seleccionar esta dirección</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Bootstrap -->
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="infoModalLabel">Número de transacción</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img src="{{ asset('images/checkout/numeroOperacion.jpg') }}" alt="Ejemplo de número de transacción" class="img-fluid w-75">
                 </div>
             </div>
         </div>

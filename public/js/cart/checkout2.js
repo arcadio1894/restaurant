@@ -312,6 +312,11 @@ $(document).ready(function() {
         $("#addressModal").modal("show");
     });
 
+    $("#info-button").on('click', function () {
+        console.log("Abri modal");
+        $("#infoModal").modal("show");
+    });
+
 });
 
 const TAX_RATE = 0.18; // IGV (18%)
