@@ -25,7 +25,7 @@
     <div class="row pt-5">
         <div class="col-md-6 pl-5 pr-5">
             <div class="detail-box">
-                <div class="heading_container">
+                <div class="heading_container" style="align-items: center !important;">
                     <h2>
                         Fuego y Masa
                     </h2>
@@ -56,7 +56,7 @@
 
             </div>
         </div>
-        <div class="col-md-6 ">
+        <div class="col-md-6 text-center">
             <div class="img-box">
                 <img style="margin: -80px 0px 0px 0px;" src="{{ asset('landing/images/about-img1.png') }}" alt="" class="img-fluid">
             </div>
