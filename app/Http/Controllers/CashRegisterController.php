@@ -303,6 +303,61 @@ class CashRegisterController extends Controller
         }
     }
 
+    public function regularizeCashRegister( Request $request )
+    {
+        //dd($request);
+        DB::beginTransaction();
+        try {
+            $type = strtolower($request->get('type'));
+            $cash_movement_id = $request->get('cash_movement_id');
+            $amount = round((float)$request->get('amount'), 2);
+
+            $cashRegister = CashRegister::where('type', $type)->latest()->first();
+
+            if ( !isset($cashRegister) )
+            {
+                // TODO: No existe
+                return response()->json(['message' => "No se puede hacer un ingreso a una caja inexistente."], 422);
+            } else {
+                // TODO: Existe
+
+                if ( $cashRegister->status == 1 )
+                {
+                    // abierta
+
+                    // 1. Registrar el movimiento en la tabla `CashMovement`
+                    $cashMovement = CashMovement::find($cash_movement_id);
+                    $cashMovement->amount = $amount;
+                    $cashMovement->regularize = 1;
+                    $cashMovement->save();
+
+                    // 2. Actualizar los datos de `CashRegister`
+                    $cashRegister->current_balance += $amount; // Actualizamos el saldo actual
+                    $cashRegister->total_sales += $amount; // Actualizamos el total de ingresos
+
+                    // Guardar los cambios en la caja
+                    $cashRegister->save();
+                } else {
+                    // cerrada
+                    return response()->json(['message' => "No se puede hacer un ingreso a una caja cerrada."], 422);
+                }
+
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Regularización registrada con éxito.',
+                'balance_total' => round($cashRegister->current_balance, 2)
+            ], 200);
+
+        } catch ( \Throwable $e ) {
+            DB::rollBack();
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+    }
+
     public function getDataMovements(Request $request, $pageNumber = 1)
     {
         $perPage = 10;
@@ -335,9 +390,13 @@ class CashRegisterController extends Controller
 
             foreach ( $movements as $movement )
             {
-                if ( $movement->type == 'income' )
+                if ( $movement->type == 'income')
                 {
                     $tipo = 'Ingreso';
+                } elseif ( $movement->type == 'sale' && $movement->subtype == 'pos' && $movement->regularize == 0 ) {
+                    $tipo = 'Regularizar';
+                } elseif ( $movement->type == 'sale' && $movement->subtype == 'pos' && $movement->regularize == 1 ) {
+                    $tipo = 'Venta';
                 } elseif ( $movement->type == 'expense' ) {
                     $tipo = 'Egreso';
                 } else {

@@ -194,6 +194,8 @@ Route::middleware('auth')->group(function (){
             ->name('income.cashRegister');
         Route::post('expense/cashRegister', [CashRegisterController::class, 'expenseCashRegister'])
             ->name('expense.cashRegister');
+        Route::post('regularize/cashRegister', [CashRegisterController::class, 'regularizeCashRegister'])
+            ->name('regularize.cashRegister');
         Route::get('/get/data/movements/V2/{numberPage}', [CashRegisterController::class, 'getDataMovements']);
 
     });

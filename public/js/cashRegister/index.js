@@ -2,6 +2,7 @@ var $modalOpen;
 var $modalClose;
 var $modalIncome;
 var $modalExpense;
+var $modalRegularize;
 
 $(document).ready(function () {
     getDataMovements(1);
@@ -30,7 +31,124 @@ $(document).ready(function () {
 
     $("#btn_egreso").on("click", egresoCaja);
 
+    $(document).on("click", '[data-regularizar]', regularizeCashRegister);
+
+    $modalRegularize = $("#modalRegularize");
+
+    $("#btn_regularizar").on("click", regularizarCaja);
+
 });
+
+function regularizarCaja() {
+    event.preventDefault();
+
+    // Obtener otros datos del formulario
+    let type = $('#active_regularize').val();
+    let amount = $('#regularize_amount').val();
+    let cash_movement_id = $('#cash_movement_id').val();
+
+    // Armar el objeto con los datos del paquete
+    let packageData = {
+        cash_movement_id: cash_movement_id,
+        type: type,
+        amount: amount
+    };
+    // Enviar los datos al backend mediante AJAX
+    $.ajax({
+        url: $("#formRegularize").data('url'),
+        method: 'POST',
+        data: JSON.stringify(packageData),
+        contentType: 'application/json',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+            console.log('Mensaje: ', response);
+            toastr.success(response.message, 'Éxito',
+                {
+                    "closeButton": true,
+                    "debug": false,
+                    "newestOnTop": false,
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "preventDuplicates": false,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "2000",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                });
+            $("#balance_total").val(response.balance_total);
+            $("#valueBalanceTotal").html("S/."+response.balance_total);
+
+            setTimeout( function () {
+                $modalRegularize.modal('hide');
+                getDataMovements(1);
+            }, 1000 )
+
+        },
+        error: function(data) {
+            console.error('Error al: ', data);
+            if( data.responseJSON.message && !data.responseJSON.errors )
+            {
+                toastr.error(data.responseJSON.message, 'Error',
+                    {
+                        "closeButton": true,
+                        "debug": false,
+                        "newestOnTop": false,
+                        "progressBar": true,
+                        "positionClass": "toast-top-right",
+                        "preventDuplicates": false,
+                        "onclick": null,
+                        "showDuration": "300",
+                        "hideDuration": "1000",
+                        "timeOut": "2000",
+                        "extendedTimeOut": "1000",
+                        "showEasing": "swing",
+                        "hideEasing": "linear",
+                        "showMethod": "fadeIn",
+                        "hideMethod": "fadeOut"
+                    });
+            }
+            for ( var property in data.responseJSON.errors ) {
+                toastr.error(data.responseJSON.errors[property], 'Error',
+                    {
+                        "closeButton": true,
+                        "debug": false,
+                        "newestOnTop": false,
+                        "progressBar": true,
+                        "positionClass": "toast-top-right",
+                        "preventDuplicates": false,
+                        "onclick": null,
+                        "showDuration": "300",
+                        "hideDuration": "1000",
+                        "timeOut": "2000",
+                        "extendedTimeOut": "1000",
+                        "showEasing": "swing",
+                        "hideEasing": "linear",
+                        "showMethod": "fadeIn",
+                        "hideMethod": "fadeOut"
+                    });
+            }
+
+        }
+    });
+}
+
+function regularizeCashRegister() {
+    var cash_movement_id = $(this).data('id');
+
+    var active = $("#active").val();
+
+    $modalRegularize.find('[id=cash_movement_id]').val(cash_movement_id);
+    $modalRegularize.find('[id=active_regularize]').val(active);
+
+    $modalRegularize.modal('show');
+}
 
 function egresoCaja() {
     event.preventDefault();
@@ -652,6 +770,8 @@ function renderDataTable(data) {
             trElement.classList.add('income-row'); // Agregar clase de fondo verde
         } else if (data.type === 'Egreso') {
             trElement.classList.add('expense-row'); // Agregar clase de fondo rojo claro
+        } else if (data.type === 'Regularizar') {
+            trElement.classList.add('regularize-row'); // Agregar clase de fondo rojo claro
         }
     } else {
         console.error('No se encontró el elemento <tr> en el clon.');
@@ -665,6 +785,15 @@ function renderDataTable(data) {
         cloneBtn2.querySelector("[data-print_nota]").setAttribute("data-id", data.id);
         let url = document.location.origin + '/imprimir/recibo/' + data.order_id;
         cloneBtn2.querySelector("[data-print_nota]").setAttribute("href", url);
+
+        // Configuración del segundo botón (mostrar solo si data.type === 'Regularizar')
+        var regularizarBtn = cloneBtn2.querySelector("[data-regularizar]");
+        if (data.type === 'Regularizar') {
+            regularizarBtn.setAttribute("data-id", data.id);
+        } else {
+            // Ocultar el botón si no aplica
+            regularizarBtn.style.display = 'none';
+        }
 
         botones2.append(cloneBtn2);
     }

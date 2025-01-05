@@ -15,7 +15,8 @@ class CashMovement extends Model
         'type',
         'amount',
         'description',
-        'subtype'
+        'subtype',
+        'regularize'
     ];
 
     protected $dates = ['created_at', 'updated_at'];

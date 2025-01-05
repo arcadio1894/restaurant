@@ -626,13 +626,14 @@ class CartController extends Controller
                         'type' => 'sale', // Tipo de movimiento: venta
                         'amount' => (float)$order->amount_pay,
                         'subtype' => 'pos',
-                        'description' => 'Venta registrada con tipo de pago: pos'
+                        'description' => 'Venta registrada con tipo de pago: pos',
+                        'regularize' => 0
                     ]);
 
-                    // Actualizar el saldo actual y el total de ventas en la caja
-                    $cashRegister->current_balance += (float)$cashMovement->amount;
+                    // No Actualizar el saldo actual y el total de ventas en la caja
+                    /*$cashRegister->current_balance += (float)$cashMovement->amount;
                     $cashRegister->total_sales += (float)$cashMovement->amount;
-                    $cashRegister->save();
+                    $cashRegister->save();*/
 
                     DB::commit();
 
