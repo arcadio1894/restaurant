@@ -412,6 +412,32 @@
                         </ul>
                     </li>
 
+                    <li class="nav-header">CAJA</li>
+                    <li class="nav-item has-treeview @yield('openCashRegister')">
+                        <a href="#" class="nav-link @yield('activeCashRegister')">
+                            <i class="nav-icon fas fa-truck-loading"></i>
+                            <p>
+                                MODULO DE CAJA
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+
+                            <li class="nav-item">
+                                <a href="{{ route('index.cashRegister', 'efectivo') }}" class="nav-link @yield('activeCashRegisterEfectivo')">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Caja Efectivo</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('index.cashRegister', 'bancario') }}" class="nav-link @yield('activeCashRegisterBancario')">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Caja Bancario</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
                     <li class="nav-header">MANTENEDORES</li>
 
                     <li class="nav-item has-treeview @yield('openSliders')">

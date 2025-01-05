@@ -14,6 +14,7 @@ use \App\Http\Controllers\PrintController;
 use \App\Http\Controllers\TypeController;
 use \App\Http\Controllers\CategoryController;
 use \App\Http\Controllers\SliderController;
+use \App\Http\Controllers\CashRegisterController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -181,6 +182,20 @@ Route::middleware('auth')->group(function (){
             ->name('sliders.edit');
         Route::post('/sliders/update', [SliderController::class, 'update'])
             ->name('sliders.update');
+
+        //Rutas de la caja
+        Route::get('/ver/caja/{type}', [CashRegisterController::class, 'indexCashRegister'])
+            ->name('index.cashRegister');
+        Route::post('open/cashRegister', [CashRegisterController::class, 'openCashRegister'])
+            ->name('open.cashRegister');
+        Route::post('close/cashRegister', [CashRegisterController::class, 'closeCashRegister'])
+            ->name('close.cashRegister');
+        Route::post('income/cashRegister', [CashRegisterController::class, 'incomeCashRegister'])
+            ->name('income.cashRegister');
+        Route::post('expense/cashRegister', [CashRegisterController::class, 'expenseCashRegister'])
+            ->name('expense.cashRegister');
+        Route::get('/get/data/movements/V2/{numberPage}', [CashRegisterController::class, 'getDataMovements']);
+
     });
 });
 

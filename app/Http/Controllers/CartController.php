@@ -8,6 +8,8 @@ use App\Models\Address;
 use App\Models\Cart;
 use App\Models\CartDetail;
 use App\Models\CartDetailOption;
+use App\Models\CashMovement;
+use App\Models\CashRegister;
 use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -555,6 +557,12 @@ class CartController extends Controller
 
             $method_payment = PaymentMethod::find($validatedData['paymentMethod']);
 
+            // Mapear tipo de pago a los nombres de las cajas
+            $paymentTypeMap = [
+                1 => 'efectivo',
+                2 => 'bancario'
+            ];
+
             // Selección del método de pago
             switch ($method_payment->code) {
                 /*case 'mercado_pago':
@@ -596,8 +604,35 @@ class CartController extends Controller
                         'order' => "ORDEN - ".$order->id
                     ];
 
-                    /*$telegramController = new TelegramController();
-                    $telegramController->sendNotification('process', $data);*/
+                    $telegramController = new TelegramController();
+                    $telegramController->sendNotification('process', $data);
+
+                    // Agregar movimientos a la caja
+                    $paymentType = 2;
+                    // Obtener la caja del tipo de pago
+                    $cashRegister = CashRegister::where('type', $paymentTypeMap[$paymentType])
+                        ->where('status', 1) // Caja abierta
+                        ->latest()
+                        ->first();
+
+                    if (!isset($cashRegister)) {
+                        return response()->json(['message' => 'No hay caja abierta para este tipo de pago.'], 422);
+                    }
+
+                    // Crear el movimiento de ingreso (venta)
+                    $cashMovement = CashMovement::create([
+                        'cash_register_id' => $cashRegister->id,
+                        'order_id' => $order->id,
+                        'type' => 'sale', // Tipo de movimiento: venta
+                        'amount' => (float)$order->amount_pay,
+                        'subtype' => 'pos',
+                        'description' => 'Venta registrada con tipo de pago: pos'
+                    ]);
+
+                    // Actualizar el saldo actual y el total de ventas en la caja
+                    $cashRegister->current_balance += (float)$cashMovement->amount;
+                    $cashRegister->total_sales += (float)$cashMovement->amount;
+                    $cashRegister->save();
 
                     DB::commit();
 
@@ -629,6 +664,61 @@ class CartController extends Controller
 
                     $telegramController = new TelegramController();
                     $telegramController->sendNotification('process', $data);
+
+                    // Agregar movimientos a la caja
+                    $vuelto = (float)$request->input('cashAmount') - (float)$order->amount_pay;
+
+                    // Obtener la caja del tipo de pago
+                    $cashRegister = CashRegister::where('type', $paymentTypeMap[1])
+                        ->where('status', 1) // Caja abierta
+                        ->latest()
+                        ->first();
+
+                    if (!isset($cashRegister)) {
+                        return response()->json(['message' => 'No hay caja abierta para este tipo de pago.'], 422);
+                    }
+
+                    // Crear el movimiento de ingreso (venta)
+                    CashMovement::create([
+                        'cash_register_id' => $cashRegister->id,
+                        'order_id' => $order->id,
+                        'type' => 'sale', // Tipo de movimiento: venta
+                        'amount' => (float)$order->amount_pay,
+                        'description' => 'Venta registrada con tipo de pago: efectivo',
+                    ]);
+
+                    // Actualizar el saldo actual y el total de ventas en la caja
+                    $cashRegister->current_balance += (float)$request->input('cashAmount');
+                    $cashRegister->total_sales += (float)$request->input('cashAmount');
+                    $cashRegister->save();
+
+                    // Registrar el vuelto como egreso si el tipo de pago es efectivo y hay vuelto
+                    if ($vuelto > 0) {
+                        // Mapear el type_vuelto (la caja desde donde se dará el vuelto)
+                        // Obtener la caja para el vuelto
+                        $vueltoCashRegister = CashRegister::where('type', $paymentTypeMap[1])
+                            ->where('status', 1) // Caja abierta
+                            ->latest()
+                            ->first();
+
+                        if (!isset($vueltoCashRegister)) {
+                            return response()->json(['message' => 'No hay caja abierta para dar el vuelto.'], 422);
+                        }
+
+                        // Crear el movimiento de egreso (vuelto)
+                        CashMovement::create([
+                            'cash_register_id' => $vueltoCashRegister->id,
+                            'order_id' => $order->id,
+                            'type' => 'expense', // Tipo de movimiento: egreso
+                            'amount' => $vuelto,
+                            'description' => 'Vuelto entregado de la venta',
+                        ]);
+
+                        // Actualizar el saldo de la caja del vuelto
+                        $vueltoCashRegister->current_balance -= $vuelto;
+                        $vueltoCashRegister->total_expenses += $vuelto;
+                        $vueltoCashRegister->save();
+                    }
 
                     DB::commit();
 
@@ -666,6 +756,33 @@ class CartController extends Controller
 
                         $telegramController = new TelegramController();
                         $telegramController->sendNotification('process', $data);
+
+                        // Agregar movimientos a la caja
+                        $paymentType = 2;
+                        // Obtener la caja del tipo de pago
+                        $cashRegister = CashRegister::where('type', $paymentTypeMap[$paymentType])
+                            ->where('status', 1) // Caja abierta
+                            ->latest()
+                            ->first();
+
+                        if (!isset($cashRegister)) {
+                            return response()->json(['message' => 'No hay caja abierta para este tipo de pago.'], 422);
+                        }
+
+                        // Crear el movimiento de ingreso (venta)
+                        $cashMovement = CashMovement::create([
+                            'cash_register_id' => $cashRegister->id,
+                            'order_id' => $order->id,
+                            'type' => 'sale', // Tipo de movimiento: venta
+                            'amount' => (float)$order->amount_pay,
+                            'subtype' => 'yape',
+                            'description' => 'Venta registrada con tipo de pago: yape/plin'
+                        ]);
+
+                        // Actualizar el saldo actual y el total de ventas en la caja
+                        $cashRegister->current_balance += (float)$cashMovement->amount;
+                        $cashRegister->total_sales += (float)$cashMovement->amount;
+                        $cashRegister->save();
 
                         DB::commit();
 
