@@ -108,7 +108,7 @@
                     @endif
                 </div>
             </div>
-            <div class="row">
+            {{--<div class="row">
                 <div class="col-md-6 offset-md-3">
                     <div class="box ">
                         <div class="img-box">
@@ -127,7 +127,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>--}}
         </div>
     </section>
 
