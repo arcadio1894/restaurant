@@ -683,7 +683,7 @@ class CartController extends Controller
                         'cash_register_id' => $cashRegister->id,
                         'order_id' => $order->id,
                         'type' => 'sale', // Tipo de movimiento: venta
-                        'amount' => (float)$order->amount_pay,
+                        'amount' => (float)$request->input('cashAmount'),
                         'description' => 'Venta registrada con tipo de pago: efectivo',
                     ]);
 
