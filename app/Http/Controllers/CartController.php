@@ -346,7 +346,6 @@ class CartController extends Controller
                 $routeToRedirect = route('welcome');
             }
 
-
             $shippingAddressId = null;
 
             // Guardar la dirección de envío
@@ -473,6 +472,17 @@ class CartController extends Controller
                             $discountAmount = ($coupon->percentage / 100) * $maxDetail['subtotal'];
                         }
                     }
+                }
+            }
+
+            // Validacion del vuelto antes de crear la orden
+            if ( $validatedData['paymentMethod'] == 2 )
+            {
+                $vuelto = (float)$request->input('cashAmount') - (float)( $totalAmount - $discountAmount + $shippingCost );
+
+                if ($vuelto < 0) {
+                    DB::rollBack();
+                    return response()->json(['message' => 'Ingrese un valor mayor a la venta.'], 422);
                 }
             }
 
