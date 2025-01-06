@@ -714,7 +714,9 @@ function submitFormAjax(extraData = {}) {
                         "showMethod": "fadeIn",
                         "hideMethod": "fadeOut"
                     });
+                $("#verifyModal").modal('hide');
                 $('#btn-submit').attr("disabled", false);
+                $('#btn-continue').attr("disabled", false);
             }
         },
         error: function(data) {
@@ -760,7 +762,9 @@ function submitFormAjax(extraData = {}) {
                     });
             }
 
+            $("#verifyModal").modal('hide');
             $('#btn-submit').attr("disabled", false);
+            $('#btn-continue').attr("disabled", false);
         }
     });
 }
