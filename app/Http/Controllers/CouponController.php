@@ -63,8 +63,10 @@ class CouponController extends Controller
             if ( $coupon->type == 'detail' )
             {
                 $typeText = '<span class="badge bg-primary">A DETALLES</span>';
-            } else {
+            } elseif( $coupon->type == 'total' ) {
                 $typeText = '<span class="badge bg-success">AL TOTAL</span>';
+            } elseif( $coupon->type == 'by_pass' ) {
+                $typeText = '<span class="badge bg-warning">BY PASS</span>';
             }
 
             if ( $coupon->special == 1 )
@@ -123,7 +125,7 @@ class CouponController extends Controller
 
 
             // Convertimos el valor de "status" y "special" a booleano
-            $type = $request->get('type') === 'on' ? 'total' : 'detail';
+            //$type = $request->get('type') === 'on' ? 'total' : 'detail';
             $special = $request->get('special') === 'on' ? 1 : 0;
 
             // Creamos el cupón
@@ -133,7 +135,7 @@ class CouponController extends Controller
                 'amount' => $request->get('amount'),
                 'percentage' => $request->get('percentage'),
                 'special' => $special,
-                'type' => $type,
+                'type' => $request->get('type'),
             ]);
 
             DB::commit();
@@ -169,7 +171,7 @@ class CouponController extends Controller
             $coupon = Coupon::findOrFail($request->get('coupon_id'));
 
             // Convertir valores de checkboxes
-            $type = $request->get('type') === 'on' ? 'total' : 'detail';
+            //$type = $request->get('type') === 'on' ? 'total' : 'detail';
             $special = $request->get('special') === 'on' ? 1 : 0;
 
             // Actualizar los datos del cupón
@@ -178,7 +180,7 @@ class CouponController extends Controller
                 'description' => $request->get('description'),
                 'amount' => $request->get('amount'),
                 'percentage' => $request->get('percentage'),
-                'type' => $type,
+                'type' => $request->get('type'),
                 'special' => $special,
             ]);
 

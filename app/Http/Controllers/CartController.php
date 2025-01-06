@@ -439,7 +439,7 @@ class CartController extends Controller
                     if ($coupon->amount != 0) {
                         $discountAmount = $coupon->amount;
                     } elseif ($coupon->percentage != 0) {
-                        $discountAmount = ($coupon->percentage / 100) * $cart->total_cart;
+                        $discountAmount = ($coupon->percentage / 100) * $totalAmount;
                     }
                 } elseif ($coupon->type == 'detail') {
                     // Verificar si todos los productos son de categoría 'combo' (category_id = 3)
@@ -471,6 +471,12 @@ class CartController extends Controller
                         } elseif ($coupon->percentage != 0) {
                             $discountAmount = ($coupon->percentage / 100) * $maxDetail['subtotal'];
                         }
+                    }
+                } elseif ( $coupon->type == 'by_pass' ) {
+                    if ($coupon->amount != 0) {
+                        $discountAmount = $coupon->amount;
+                    } elseif ($coupon->percentage != 0) {
+                        $discountAmount = ($coupon->percentage / 100) * $totalAmount;
                     }
                 }
             }
@@ -1353,7 +1359,7 @@ class CartController extends Controller
                 if ($coupon->amount != 0) {
                     $discount = $coupon->amount;
                 } elseif ($coupon->percentage != 0) {
-                    $discount = ($coupon->percentage / 100) * $cart->total_cart;
+                    $discount = ($coupon->percentage / 100) * $total;
                 }
             } elseif ($coupon->type == 'detail') {
                 // Verificar si todos los productos son de categoría 'combo' (category_id = 3)
@@ -1386,6 +1392,12 @@ class CartController extends Controller
                     } elseif ($coupon->percentage != 0) {
                         $discount = ($coupon->percentage / 100) * $maxDetail['subtotal'];
                     }
+                }
+            } elseif ( $coupon->type == 'by_pass' ) {
+                if ($coupon->amount != 0) {
+                    $discount = $coupon->amount;
+                } elseif ($coupon->percentage != 0) {
+                    $discount = ($coupon->percentage / 100) * $total;
                 }
             }
         }
@@ -1456,7 +1468,7 @@ class CartController extends Controller
         }
 
         // Cálculo del descuento
-        $total = $totalWithShipping; // Considerar el total con envío
+        //$total = $totalWithShipping; // Considerar el total con envío
         $discount = 0;
 
         /*if ($coupon->type == 'total') {
@@ -1527,6 +1539,12 @@ class CartController extends Controller
                 } elseif ($coupon->percentage != 0) {
                     $discount = ($coupon->percentage / 100) * $maxDetail['subtotal'];//$maxDetail['subtotal'] es el precio no el subtotal
                 }
+            }
+        } elseif ( $coupon->type == 'by_pass' ) {
+            if ($coupon->amount != 0) {
+                $discount = $coupon->amount;
+            } elseif ($coupon->percentage != 0) {
+                $discount = $total * ($coupon->percentage / 100);
             }
         }
 

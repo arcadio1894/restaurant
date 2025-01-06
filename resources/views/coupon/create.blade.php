@@ -71,9 +71,17 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <label for="type" class="col-12 col-form-label">Tipo <span class="right badge badge-danger">(*)</span></label>
+                {{--<label for="type" class="col-12 col-form-label">Tipo <span class="right badge badge-danger">(*)</span></label>
                 <input type="hidden" name="type" value="off"> <!-- Valor predeterminado si no está seleccionado -->
                 <input id="type" type="checkbox" name="type" data-bootstrap-switch data-off-color="primary" data-on-text="TOTAL" data-off-text="DETALLE" data-on-color="success">
+            --}}
+                <label for="type">Tipo </label>
+                <select id="type" name="type" class="form-control select2" style="width: 100%;">
+                    <option></option>
+                    <option value="total" selected>TOTAL</option>
+                    <option value="detail">DETALLE</option>
+                    <option value="by_pass">BY PASS</option>
+                </select>
             </div>
         </div>
 
@@ -120,6 +128,11 @@
     <script>
         $(function () {
             $("input[data-bootstrap-switch]").bootstrapSwitch();
+
+            $('#type').select2({
+                placeholder: "Seleccione Tipo",
+                allowClear: true,
+            });
         })
     </script>
     <script src="{{ asset('js/coupon/create.js') }}?v={{ time() }}"></script>
