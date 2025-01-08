@@ -614,6 +614,9 @@
                                 },
                                 success: function (response) {
                                     console.log(response);
+                                    // Logica que inserta en el carrito
+
+
                                     $.alert('Producto agregado al carrito');
                                 },
                                 error: function (xhr, status, error) {

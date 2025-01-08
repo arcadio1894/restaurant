@@ -37,6 +37,8 @@ $(document).ready(function () {
 
     $("#btn_regularizar").on("click", regularizarCaja);
 
+    $(document).on('click', '[data-item]', showData);
+
 });
 
 function regularizarCaja() {
