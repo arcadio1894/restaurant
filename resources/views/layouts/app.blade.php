@@ -65,6 +65,9 @@
     <link href="{{ asset('landing/css/responsive.css') }}" rel="stylesheet" />
     <!-- Toastr -->
     <link rel="stylesheet" href="{{ asset('plugins/toastr/toastr.min.css') }}">
+    <!-- Jquery-confirm -->
+    <link rel="stylesheet" href="{{ asset('plugins/jquery-confirm/jquery-confirm.min.css') }}">
+
     <style>
         /* Estilos generales del botón WhatsApp */
         body, html {
@@ -537,6 +540,8 @@
 <!-- End Google Map -->
 <!-- Toastr -->
 <script src="{{ asset('plugins/toastr/toastr.min.js') }}"></script>
+<!-- Jquery-confirm -->
+<script src="{{ asset('plugins/jquery-confirm/jquery-confirm.min.js') }}"></script>
 
 @yield('scripts')
 

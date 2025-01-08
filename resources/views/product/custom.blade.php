@@ -157,7 +157,7 @@
                             <img src="{{ asset('/images/icons/'.$toppingMeat->image) }}" alt="{{ $toppingMeat->name }}">
                             <div class="topping-name">{{ $toppingMeat->name }}</div>
                         </div>
-                        <div class="action-button" data-meat="{{ $toppingMeat->slug }}" onclick="toggleToppingDropdown('{{ $toppingMeat->slug }}-options', this, 'whole{{ $toppingMeat->slug }}', 'img-whole-{{ $toppingMeat->slug }}', '{{ asset('/images/icons/on_all.webp') }}')">
+                        <div class="action-button" data-meat="{{ $toppingMeat->slug }}" data-realName="{{ $toppingMeat->name }}" onclick="toggleToppingDropdown('{{ $toppingMeat->slug }}-options', this, 'whole{{ $toppingMeat->slug }}', 'img-whole-{{ $toppingMeat->slug }}', '{{ asset('/images/icons/on_all.webp') }}')">
                             <div class="circle mr-2"></div>
                             <i class="far fa-plus-square"></i>
                         </div>
@@ -209,7 +209,7 @@
                             <img src="{{ asset('/images/icons/'.$toppingVeggie->image) }}" alt="{{ $toppingVeggie->name }}">
                             <div class="topping-name">{{ $toppingVeggie->name }}</div>
                         </div>
-                        <div class="action-button" data-veggie="{{ $toppingVeggie->slug }}" onclick="toggleToppingDropdown('{{ $toppingVeggie->slug }}-options', this, 'whole{{ $toppingVeggie->slug }}', 'img-whole-{{ $toppingVeggie->slug }}', '{{ asset('/images/icons/on_all.webp') }}')">
+                        <div class="action-button" data-veggie="{{ $toppingVeggie->slug }}" data-realName="{{ $toppingVeggie->name }}" onclick="toggleToppingDropdown('{{ $toppingVeggie->slug }}-options', this, 'whole{{ $toppingVeggie->slug }}', 'img-whole-{{ $toppingVeggie->slug }}', '{{ asset('/images/icons/on_all.webp') }}')">
                             <div class="circle mr-2"></div>
                             <i class="far fa-plus-square"></i>
                         </div>
@@ -266,6 +266,9 @@
 @endsection
 
 @section('scripts')
+    <script>
+        window.baseImageUrl = "{{ asset('images/icons/') }}";
+    </script>
     <script>
         function toggleDropdown(id, button) {
             const options = document.getElementById(id);
@@ -420,123 +423,214 @@
             // Verificar si el botón de tamaño está activado
             const sizeButton = $(".action-button[data-size]");
             if (!sizeButton.hasClass("selected")) {
-                alert("Por favor, activa el botón de tamaño antes de continuar.");
-                return;
-            }
-
-            // Verificar si el botón de salsa está activado
-            const salsaButton = $(".action-button[data-salsa]");
-            if (!salsaButton.hasClass("selected")) {
-                alert("Por favor, activa el botón de salsa antes de continuar.");
-                return;
-            }
-
-            // Verificar si el botón de queso está activado
-            const cheeseButton = $(".action-button[data-cheese]");
-            if (!cheeseButton.hasClass("selected")) {
-                alert("Por favor, activa el botón de queso antes de continuar.");
+                $.alert({
+                    title: 'Atención',
+                    content: 'Por favor, activa el botón de tamaño antes de continuar.',
+                    type: 'orange', // Tipo de alerta (opciones: blue, green, orange, red)
+                    boxWidth: '350px',
+                    theme: 'modern',
+                    useBootstrap: false,
+                    buttons: {
+                        ok: {
+                            text: 'Entendido',
+                            btnClass: 'btn-orange',
+                        }
+                    }
+                });
                 return;
             }
 
             // Validar el tamaño seleccionado
             const selectedSize = $("input[name='size']:checked").val();
             if (!selectedSize) {
-                alert("Por favor, selecciona un tamaño antes de confirmar.");
+                $.alert({
+                    title: 'Atención',
+                    content: 'Por favor, selecciona un tamaño antes de confirmar.',
+                    type: 'orange',
+                    boxWidth: '350px',
+                    theme: 'modern',
+                    useBootstrap: false,
+                    buttons: {
+                        ok: {
+                            text: 'Entendido',
+                            btnClass: 'btn-orange',
+                        }
+                    }
+                });
                 return;
             }
 
             // Validar la salsa seleccionada
-            const selectedSalsa = $("input[name='Salsa']:checked").val();
-            if (!selectedSalsa) {
-                alert("Por favor, selecciona una salsa antes de confirmar.");
-                return;
-            }
+            const salsaButton = $(".action-button[data-salsa]");
+            let selectedSalsa = "";
+            let extraSalsaChecked = false;
 
-            // Verificar el estado del switch de salsa
-            const extraSalsaChecked = $("#extraSalsa").is(":checked");
+            if (!salsaButton.hasClass("selected")) {
+                selectedSalsa = "No";
+            } else {
+                selectedSalsa = $("input[name='Salsa']:checked").val();
+                extraSalsaChecked = $("#extraSalsa").is(":checked");
+            }
 
             // Validar el queso seleccionado
-            const selectedCheese = $("input[name='Cheese']:checked").val();
-            if (!selectedCheese) {
-                alert("Por favor, selecciona un queso antes de confirmar.");
-                return;
-            }
+            const cheeseButton = $(".action-button[data-cheese]");
+            let selectedCheese = "";
+            let extraCheeseChecked = false;
 
-            // Verificar el estado del switch de queso
-            const extraCheeseChecked = $("#extraCheese").is(":checked");
+            if (!cheeseButton.hasClass("selected")) {
+                selectedCheese = "No";
+            } else {
+                selectedCheese = $("input[name='Cheese']:checked").val();
+                extraCheeseChecked = $("#extraCheese").is(":checked");
+            }
 
             // Procesar las carnes activas
             const meatSelections = [];
-            $("[data-meat].selected").each(function () {
+            $(`[data-meat].selected`).each(function () {
                 const meatSlug = $(this).attr("data-meat");
-
-                // Verificar si tiene un radio seleccionado
+                const meatRealName = $(this).attr("data-realName");
                 const selectedMeat = $(`input[name='${meatSlug}']:checked`).val();
-                if (selectedMeat) {
-                    // Verificar el estado del switch extra
-                    const extraMeatChecked = $(`#extra${meatSlug}`).is(":checked");
+                const extraMeatChecked = $(`#extra${meatSlug}`).is(":checked");
 
-                    // Agregar a la lista de selecciones solo las carnes activas
+                if (selectedMeat) {
                     meatSelections.push({
                         meat: meatSlug,
+                        realName: meatRealName,
                         selection: selectedMeat,
                         extra: extraMeatChecked
                     });
                 }
             });
 
-            // Procesar las carnes activas
+            // Procesar los vegetales activos
             const veggieSelections = [];
-            $("[data-veggie].selected").each(function () {
+            $(`[data-veggie].selected`).each(function () {
                 const veggieSlug = $(this).attr("data-veggie");
-
-                // Verificar si tiene un radio seleccionado
+                const veggieRealName = $(this).attr("data-realName");
                 const selectedVeggie = $(`input[name='${veggieSlug}']:checked`).val();
-                if (selectedVeggie) {
-                    // Verificar el estado del switch extra
-                    const extraVeggieChecked = $(`#extra${veggieSlug}`).is(":checked");
+                const extraVeggieChecked = $(`#extra${veggieSlug}`).is(":checked");
 
-                    // Agregar a la lista de selecciones solo las carnes activas
+                if (selectedVeggie) {
                     veggieSelections.push({
                         veggie: veggieSlug,
+                        realName: veggieRealName,
                         selection: selectedVeggie,
                         extra: extraVeggieChecked
                     });
                 }
             });
 
-            // Imprime los resultados en la consola (o realiza cualquier acción necesaria)
-            console.log("Tamaño seleccionado:", selectedSize);
-            console.log("Salsa seleccionada:", selectedSalsa);
-            console.log("¿Extra salsa activado?:", extraSalsaChecked ? "Sí" : "No");
-            console.log("Queso seleccionado:", selectedCheese);
-            console.log("¿Extra queso activado?:", extraCheeseChecked ? "Sí" : "No");
-            console.log("Carnes seleccionadas:", meatSelections);
-            console.log("Vegetales seleccionadas:", veggieSelections);
+            // Crear el array con el formato solicitado
+            const pizzaData = {
+                size: selectedSize,
+                salsa: {
+                    seleccion: salsaButton.hasClass("selected") ? "Sí" : "No",
+                    elecciones: salsaButton.hasClass("selected") ? {
+                        tipo: selectedSalsa,
+                        extra: extraSalsaChecked ? "Sí" : "No"
+                    } : null
+                },
+                queso: {
+                    seleccion: cheeseButton.hasClass("selected") ? "Sí" : "No",
+                    elecciones: cheeseButton.hasClass("selected") ? {
+                        tipo: selectedCheese,
+                        extra: extraCheeseChecked ? "Sí" : "No"
+                    } : null
+                },
+                meats: meatSelections.map(meat => ({
+                    [meat.meat]: {
+                        seleccion: "Sí",
+                        elecciones: {
+                            tipo: meat.selection,
+                            extra: meat.extra ? "Sí" : "No"
+                        }
+                    }
+                })),
+                veggies: veggieSelections.map(veggie => ({
+                    [veggie.veggie]: {
+                        seleccion: "Sí",
+                        elecciones: {
+                            tipo: veggie.selection,
+                            extra: veggie.extra ? "Sí" : "No"
+                        }
+                    }
+                }))
+            };
 
-            // Mostrar una alerta de resumen
-            let meatSummary = meatSelections.length > 0
-                ? meatSelections.map(meat =>
-                    `- ${meat.meat}: ${meat.selection} (${meat.extra ? "Extra" : "Normal"})`
-                ).join("\n")
-                : "No se seleccionaron carnes.";
+            console.log(pizzaData);
 
-            // Mostrar una alerta de resumen
-            let veggieSummary = veggieSelections.length > 0
-                ? veggieSelections.map(veggie =>
-                    `- ${veggie.veggie}: ${veggie.selection} (${veggie.extra ? "Extra" : "Normal"})`
-                ).join("\n")
-                : "No se seleccionaron carnes.";
+            // Generar el contenido del modal con formato mejorado
+            const formatPosition = (type) => {
+                if (!type) return "";
+                const position = type.match(/left|right|whole/)?.[0]; // Extrae la posición
+                if (position === "left") return "A la izquierda";
+                if (position === "right") return "A la derecha";
+                if (position === "whole") return "En todo";
+                return "";
+            };
 
-            // Mostrar una alerta de resumen
-            alert(`Resumen de tu pizza:\n
-                Tamaño: ${selectedSize}\n
-                Salsa: ${selectedSalsa}\n
-                ¿Extra salsa?: ${extraSalsaChecked ? "Sí" : "No"}\n
-                Queso: ${selectedCheese}\n
-                ¿Extra queso?: ${extraCheeseChecked ? "Sí" : "No"}\n
-                Carnes:\n${meatSummary}\n
-                Vegetales:\n${veggieSummary}`)
+            const meatContent = meatSelections.map(meat => {
+                const icon = `<img src="${window.baseImageUrl}/${meat.meat}.png" alt="${meat.meat}" style="width: 24px; height: 24px;">`;
+                const position = formatPosition(meat.selection);
+                const extra = meat.extra ? "Con extra" : "Sin extra";
+                return `<p>${icon} ${meat.realName}: Sí - ${position} - ${extra}</p>`;
+            }).join("");
+
+            const veggieContent = veggieSelections.map(veggie => {
+                const icon = `<img src="${window.baseImageUrl}/${veggie.veggie}.png" alt="${veggie.veggie}" style="width: 24px; height: 24px;">`;
+                const position = formatPosition(veggie.selection);
+                const extra = veggie.extra ? "Con extra" : "Sin extra";
+                return `<p>${icon} ${veggie.realName}: Sí - ${position} - ${extra}</p>`;
+            }).join("");
+
+            // Mostrar el resumen en un modal
+            $.confirm({
+                title: 'Confirmación de Pizza',
+                content: `
+                    <p><img src="${window.baseImageUrl}/pizza.png" alt="Size" style="width: 24px; height: 24px;"> Tamaño: ${selectedSize}</p>
+                    <p><img src="${window.baseImageUrl}/salsa-de-tomate.png" alt="Salsa" style="width: 24px; height: 24px;"> Salsa: ${pizzaData.salsa.seleccion} - ${formatPosition(pizzaData.salsa.elecciones?.tipo || "Nada")} - ${pizzaData.salsa.elecciones?.extra === "Sí" ? "Con extra" : "Sin extra"}</p>
+                    <p><img src="${window.baseImageUrl}/queso.png" alt="Queso" style="width: 24px; height: 24px;"> Queso: ${pizzaData.queso.seleccion} - ${formatPosition(pizzaData.queso.elecciones?.tipo || "Nada")} - ${pizzaData.queso.elecciones?.extra === "Sí" ? "Con extra" : "Sin extra"}</p>
+                    <p><strong>Carnes:</strong></p>
+                    ${meatContent || "<p>Ninguna seleccionada</p>"}
+                    <p><strong>Vegetales:</strong></p>
+                    ${veggieContent || "<p>Ninguna seleccionada</p>"}
+                `,
+                theme: 'modern', // Puedes probar otros temas como 'bootstrap', 'modern', 'dark'
+                boxWidth: '350px', // Ajusta el ancho de la ventana
+                useBootstrap: false, // Usa estilos independientes de Bootstrap
+                buttons: {
+                    confirmar: {
+                        text: 'Confirmar',
+                        btnClass: 'btn-green',
+                        action: function () {
+                            // Hacer una llamada AJAX para enviar los datos al backend
+                            $.ajax({
+                                url: '/save/custom/product',
+                                method: 'POST',
+                                contentType: 'application/json',
+                                data: JSON.stringify(pizzaData),
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Incluye el token CSRF en los encabezados
+                                },
+                                success: function (response) {
+                                    console.log(response);
+                                    $.alert('Producto agregado al carrito');
+                                },
+                                error: function (xhr, status, error) {
+                                    $.alert('Hubo un problema al confirmar el pedido.');
+                                }
+                            });
+                        }
+                    },
+                    volver: {
+                        text: 'Volver',
+                        btnClass: 'btn-red',
+                        action: function () {
+                            // Cerrar el modal
+                        }
+                    }
+                }
+            });
         }
     </script>
 @endsection

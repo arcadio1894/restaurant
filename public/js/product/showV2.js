@@ -154,6 +154,8 @@ $(document).ready(function () {
                         options: options,
                         quantity: 1,
                         user_id: userId, // Añadir el user_id
+                        custom: false,
+                        total: 0
                     });
                 }
 
@@ -236,6 +238,8 @@ $(document).ready(function () {
                         options: options,
                         quantity: 1,
                         user_id: userId, // Añadir el user_id
+                        custom: false,
+                        total: 0
                     });
                 }
 

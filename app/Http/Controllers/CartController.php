@@ -18,6 +18,7 @@ use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\ProductType;
 use App\Models\ShippingDistrict;
+use App\Models\Topping;
 use App\Models\User;
 use App\Models\UserCoupon;
 use Illuminate\Http\Request;
@@ -1925,5 +1926,287 @@ class CartController extends Controller
         }
 
         return response()->json(['message' => 'Observación guardad con éxito.'], 200);
+    }
+
+    public function saveCustomProduct(Request $request)
+    {
+        //dd($request);
+        $idProductCustom = 21;
+
+        $typePizzas = [
+            'familiar' => 1,
+            'large' => 2,
+            'personal' => 4,
+        ];
+
+        // Obtener todos los datos enviados en la solicitud
+        $data = $request->all();
+
+        // Acceder a propiedades específicas
+        $size = isset($data['size']) ? $data['size'] : null;
+        $salsa = isset($data['salsa']) ? $data['salsa'] : null;
+        $queso = isset($data['queso']) ? $data['queso'] : null;
+        $meats = isset($data['meats']) ? $data['meats'] : [];
+        $veggies = isset($data['veggies']) ? $data['veggies'] : [];
+
+        // Uso de $size
+        $type = $typePizzas[$size];
+
+        $product = Product::find($idProductCustom);
+        $productType = ProductType::where('product_id', $product->id)
+            ->where('type_id', $type)->first();
+
+        // Procesar la salsa
+        if ($salsa) {
+            $toppingSalsa = Topping::where('slug', 'Salsa')->first();
+            if ($toppingSalsa) {
+                $isSelectedSalsa = ($salsa['seleccion'] === 'Sí') ? 1 : 0;
+                $typeSalsa = null;
+                $extraSalsa = 0;
+
+                if (isset($salsa['elecciones'])) {
+                    $tipo = isset($salsa['elecciones']['tipo']) ? $salsa['elecciones']['tipo'] : '';
+                    $extraSalsa = ($salsa['elecciones']['extra'] === 'Sí') ? 1 : 0;
+
+                    if (preg_match('/(left|whole|right)/', $tipo, $matches)) {
+                        $typeSalsa = $matches[1];
+                    }
+                }
+            }
+        }
+
+        // Procesar el queso
+        if ($queso) {
+            $toppingQueso = Topping::where('slug', 'Queso')->first();
+            if ($toppingQueso) {
+                $isSelectedQueso = ($queso['seleccion'] === 'Sí') ? 1 : 0;
+                $typeQueso = null;
+                $extraQueso = 0;
+
+                if (isset($queso['elecciones'])) {
+                    $tipo = isset($queso['elecciones']['tipo']) ? $queso['elecciones']['tipo'] : '';
+                    $extraQueso = ($queso['elecciones']['extra'] === 'Sí') ? 1 : 0;
+
+                    if (preg_match('/(left|whole|right)/', $tipo, $matches)) {
+                        $typeQueso = $matches[1];
+                    }
+                }
+            }
+        }
+
+        // Procesar meats
+        $processedMeats = [];
+        foreach ($meats as $meat) {
+            foreach ($meat as $slug => $details) {
+                $toppingMeat = Topping::where('slug', $slug)->first();
+                if ($toppingMeat) {
+                    $isSelected = ($details['seleccion'] === 'Sí') ? 1 : 0;
+                    $type = null;
+                    $extra = 0;
+
+                    if (isset($details['elecciones'])) {
+                        $tipo = isset($details['elecciones']['tipo']) ? $details['elecciones']['tipo'] : '';
+                        $extra = ($details['elecciones']['extra'] === 'Sí') ? 1 : 0;
+
+                        if (preg_match('/(left|whole|right)/', $tipo, $matches)) {
+                            $type = $matches[1];
+                        }
+                    }
+
+                    $processedMeats[] = [
+                        'topping_id' => $toppingMeat->id,
+                        'topping_name' => $toppingMeat->name,
+                        'topping_price_exception' => $toppingMeat->price_exception,
+                        'topping_price_extra' => $toppingMeat->price_extra,
+                        'slug' => $slug,
+                        'isSelected' => $isSelected,
+                        'type' => $type,
+                        'extra' => $extra,
+                    ];
+                }
+            }
+        }
+
+        // Procesar veggies
+        $processedVeggies = [];
+        foreach ($veggies as $veggie) {
+            foreach ($veggie as $slug => $details) {
+                $toppingVeggie = Topping::where('slug', $slug)->first();
+                if ($toppingVeggie) {
+                    $isSelected = ($details['seleccion'] === 'Sí') ? 1 : 0;
+                    $type = null;
+                    $extra = 0;
+
+                    if (isset($details['elecciones'])) {
+                        $tipo = isset($details['elecciones']['tipo']) ? $details['elecciones']['tipo'] : '';
+                        $extra = ($details['elecciones']['extra'] === 'Sí') ? 1 : 0;
+
+                        if (preg_match('/(left|whole|right)/', $tipo, $matches)) {
+                            $type = $matches[1];
+                        }
+                    }
+
+                    $processedVeggies[] = [
+                        'topping_id' => $toppingVeggie->id,
+                        'topping_name' => $toppingVeggie->name,
+                        'topping_price_exception' => $toppingVeggie->price_exception,
+                        'topping_price_extra' => $toppingVeggie->price_extra,
+                        'slug' => $slug,
+                        'isSelected' => $isSelected,
+                        'type' => $type,
+                        'extra' => $extra,
+                    ];
+                }
+            }
+        }
+
+        $basePrice = 0;
+        $total = $productType->price; // Precio base
+
+        // Caso 1: Sin toppings seleccionados
+        $extraSalsa = isset($extraSalsa) ? $extraSalsa : 0;
+        $extraQueso = isset($extraQueso) ? $extraQueso : 0;
+        // Asegurando que $isSelectedSalsa y $isSelectedQueso siempre tengan valores predeterminados
+        $isSelectedSalsa = isset($isSelectedSalsa) ? $isSelectedSalsa : 0;
+        $isSelectedQueso = isset($isSelectedQueso) ? $isSelectedQueso : 0;
+
+        // Si no se seleccionaron toppings
+        if (empty($processedMeats) && empty($processedVeggies) && !$isSelectedSalsa && !$isSelectedQueso) {
+            // No se hace nada porque $total ya tiene el precio base
+        } else {
+            // Variables para manejar carnes y vegetales seleccionados
+            $meatCount = count($processedMeats);
+            $veggieCount = count($processedVeggies);
+
+            // Establecer el precio base según el tamaño
+            if ($size === 'familiar') {
+                $basePrice = 35;
+            } elseif ($size === 'large') {
+                $basePrice = 30;
+            } elseif ($size === 'personal') {
+                $basePrice = 20;
+            }
+
+            // Caso 2: Una carne y un vegetal, o dos vegetales
+            if (($meatCount == 1 && $veggieCount == 1) || ($veggieCount == 2 && $meatCount == 0)) {
+                //dump("Entre caso 2");
+                $total = $basePrice; // Sumar el precio base al total
+
+                // Sumar excepciones de precio de carnes y vegetales
+                foreach ($processedMeats as $meat) {
+                    $total += $meat['topping_price_exception'];
+                    $total += $meat['extra'] ? $meat['topping_price_extra'] : 0;
+                }
+
+                foreach ($processedVeggies as $veggie) {
+                    $total += $veggie['topping_price_exception'];
+                    $total += $veggie['extra'] ? $veggie['topping_price_extra'] : 0;
+                }
+            } else {
+                // Caso 3: Todas las demás combinaciones
+                $total = $basePrice; // Sumar el precio base
+
+                // Procesar carnes
+                foreach ($processedMeats as $index => $meat) {
+                    $total += $meat['topping_price_exception'];
+                    $total += $meat['extra'] ? $meat['topping_price_extra'] : 0;
+
+                    // +3 soles por cada carne extra a partir de la segunda
+                    if ($index >= 1) {
+                        $total += 3;
+                    }
+                }
+
+                // Procesar vegetales
+                if ($meatCount == 0) {
+                    // Caso especial: Solo vegetales
+                    foreach ($processedVeggies as $index => $veggie) {
+                        $total += $veggie['topping_price_exception'];
+                        $total += $veggie['extra'] ? $veggie['topping_price_extra'] : 0;
+
+                        // +3 soles por cada vegetal extra a partir del tercero
+                        if ($index >= 2) {
+                            $total += 3;
+                        }
+                    }
+                } else {
+                    // Caso general: Carnes y vegetales
+                    foreach ($processedVeggies as $index => $veggie) {
+                        $total += $veggie['topping_price_exception'];
+                        $total += $veggie['extra'] ? $veggie['topping_price_extra'] : 0;
+
+                        // +3 soles por cada vegetal extra a partir del segundo
+                        if ($index >= 1) {
+                            $total += 3;
+                        }
+                    }
+                }
+            }
+
+            // Caso 3: Más de una carne o vegetal
+            /*if (($meatCount > 1 || $veggieCount > 1) && !(($meatCount == 1 && $veggieCount == 1) || $veggieCount == 2)) {
+                dump("Entre caso 3");
+                $total = $basePrice; // Sumar el precio base al total
+
+                // Sumar carnes y considerar extras
+                foreach ($processedMeats as $index => $meat) {
+                    $total += $meat['topping_price_exception'];
+                    $total += $meat['extra'] ? $meat['topping_price_extra'] : 0;
+
+                    // +3 soles por cada carne extra a partir de la segunda
+                    if ($index >= 1) { // Index 1 es la segunda carne
+                        $total += 3;
+                    }
+                }
+
+                // Sumar vegetales y considerar extras
+                foreach ($processedVeggies as $index => $veggie) {
+                    $total += $veggie['topping_price_exception'];
+                    $total += $veggie['extra'] ? $veggie['topping_price_extra'] : 0;
+
+                    // +3 soles por cada vegetal extra a partir del segundo
+                    if ($index >= 1) { // Index 1 es el segundo vegetal
+                        $total += 3;
+                    }
+                }
+            }*/
+
+            // Agregar costos de extras en salsa y queso
+            $total += ($extraSalsa ? 1 : 0) + ($extraQueso ? 1 : 0);
+        }
+
+        // Formato de respuesta
+        return response()->json([
+            'custom' => true,
+            'options' => (object)[], // Objeto vacío como indicastes
+            'product_id' => $product->id,
+            'product_type_id' => $productType->id,
+            'quantity' => 1,
+            'total' => $total,
+            'toppings' => [
+                'salsa' => [
+                    'isSelected' => isset($isSelectedSalsa) ? $isSelectedSalsa : 0,
+                    'type' => isset($typeSalsa) ? $typeSalsa : null,
+                    'topping_id' => isset($toppingSalsa) ? $toppingSalsa->id : null,
+                    'topping_name' => isset($toppingSalsa) ? $toppingSalsa->name : null,
+                    'topping_price_exception' => isset($toppingSalsa) ? $toppingSalsa->price_exception : null,
+                    'topping_price_extra' => isset($toppingSalsa) ? $toppingSalsa->price_extra : null,
+                    'extra' => isset($extraSalsa) ? $extraSalsa : 0,
+                ],
+                'queso' => [
+                    'isSelected' => isset($isSelectedQueso) ? $isSelectedQueso : 0,
+                    'type' => isset($typeQueso) ? $typeQueso : null,
+                    'topping_id' => isset($toppingQueso) ? $toppingQueso->id : null,
+                    'topping_name' => isset($toppingQueso) ? $toppingQueso->name : null,
+                    'topping_price_exception' => isset($toppingQueso) ? $toppingQueso->price_exception : null,
+                    'topping_price_extra' => isset($toppingQueso) ? $toppingQueso->price_extra : null,
+                    'extra' => isset($extraQueso) ? $extraQueso : 0,
+                ],
+                'meats' => $processedMeats,
+                'veggies' => $processedVeggies,
+            ],
+            'user_id' => (Auth::id() !== null) ? Auth::id() : null, // Devuelve el ID del usuario autenticado, o null si no está autenticado
+        ]);
+
     }
 }

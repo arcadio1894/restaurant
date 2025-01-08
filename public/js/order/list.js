@@ -30,7 +30,7 @@ $(document).ready(function () {
 
     $(document).on('click', '[data-ver_detalles]', showDetails);
 
-    $(document).on('click', '[data-print_nota]', printOrder);
+    /*$(document).on('click', '[data-print_nota]', printOrder);*/
 
     $(document).on('click', '[data-anular]', anularOrder);
 });

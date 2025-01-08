@@ -66,7 +66,7 @@ class DataToppingSeeder extends Seeder
             'price_exception' => 0,
             'price_extra' => 1,
             'stateActive' => 1,
-            'image' => 'aceituna-verde.png',
+            'image' => 'aceitunaVerde.png',
             'slug' => 'AceitunaVerde'
         ]);
         Topping::create([
@@ -75,7 +75,7 @@ class DataToppingSeeder extends Seeder
             'price_exception' => 0,
             'price_extra' => 1,
             'stateActive' => 1,
-            'image' => 'champinon.png',
+            'image' => 'champinones.png',
             'slug' => 'Champinones'
         ]);
         Topping::create([
@@ -104,6 +104,26 @@ class DataToppingSeeder extends Seeder
             'stateActive' => 1,
             'image' => 'cebolla.png',
             'slug' => 'Cebolla'
+        ]);
+
+        Topping::create([
+            'name' => 'Queso',
+            'type' => 'special',
+            'price_exception' => 0,
+            'price_extra' => 1,
+            'stateActive' => 1,
+            'image' => 'queso.png',
+            'slug' => 'Queso'
+        ]);
+
+        Topping::create([
+            'name' => 'Salsa',
+            'type' => 'special',
+            'price_exception' => 0,
+            'price_extra' => 1,
+            'stateActive' => 1,
+            'image' => 'salsa-de-tomate.png',
+            'slug' => 'Salsa'
         ]);
     }
 }

@@ -87,6 +87,7 @@ Route::get('/get/orders/{page}', [OrderController::class, 'getOrders']);
 
 Route::get('/api/business-hours', [BusinessController::class, 'getBusinessHours']);
 
+Route::post('/save/custom/product', [CartController::class, 'saveCustomProduct']);
 
 Route::middleware('auth')->group(function (){
     Route::prefix('dashboard')->group(function (){
@@ -206,6 +207,6 @@ Route::get('/telegram/send', [TelegramController::class, 'sendMessage']);
 Route::post('/dashboard/toggle-store-status', [BusinessController::class, 'toggleStoreStatus']);
 
 Route::post('/dashboard/print', [PrintController::class, 'imprimir']);
-Route::post('/print/order/{order_id}', [PrintController::class, 'printOrder']);
+/*Route::post('/print/order/{order_id}', [PrintController::class, 'printOrder']);*/
 Route::get('/imprimir/recibo/{id}', [PrintController::class, 'generarRecibo']);
 Route::get('/imprimir/comanda/{id}', [PrintController::class, 'generarComanda']);
