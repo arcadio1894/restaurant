@@ -360,7 +360,7 @@ class CashRegisterController extends Controller
 
     public function getDataMovements(Request $request, $pageNumber = 1)
     {
-        $perPage = 10;
+        $perPage = 50;
 
         $type = strtolower($request->input('type'));
 
