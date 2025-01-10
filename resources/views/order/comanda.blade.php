@@ -62,6 +62,29 @@
         @foreach( $detail->options as $option )
             <p style="font-size: 16px">- {{ str_pad( ($option->product->full_name), 10, ' ', STR_PAD_LEFT) }} x {{ $detail->quantity }}</p>
         @endforeach
+
+        @if ($detail->toppings->isNotEmpty())
+            @php
+                // Agrupamos los toppings por su tipo con una colección
+                $groupedToppings = collect($detail->toppings)->groupBy(function ($topping) {
+                    return $topping->type === 'whole' ? 'En todo' :
+                           ($topping->type === 'left' ? 'A la izquierda' :
+                           ($topping->type === 'right' ? 'A la derecha' : 'Otros'));
+                });
+            @endphp
+
+            @foreach ($groupedToppings as $typeTitle => $toppings)
+                <p style="font-size: 16px; font-weight: bold;">Toppings {{ $typeTitle }}</p>
+                @foreach ($toppings as $topping)
+                    <p style="font-size: 16px">
+                        - {{ $topping->topping_name }}
+                        @if ($topping->extra)
+                            <span>[Extra]</span>
+                        @endif
+                    </p>
+                @endforeach
+            @endforeach
+        @endif
     @endforeach
     {{-- Mostrar toppings si existen --}}
     {{--@if ($detail->toppings->isNotEmpty())
@@ -84,28 +107,7 @@
         @endforeach
     @endif--}}
 
-    @if ($detail->toppings->isNotEmpty())
-        @php
-            // Agrupamos los toppings por su tipo con una colección
-            $groupedToppings = collect($detail->toppings)->groupBy(function ($topping) {
-                return $topping->type === 'whole' ? 'En todo' :
-                       ($topping->type === 'left' ? 'A la izquierda' :
-                       ($topping->type === 'right' ? 'A la derecha' : 'Otros'));
-            });
-        @endphp
 
-        @foreach ($groupedToppings as $typeTitle => $toppings)
-            <p style="font-size: 16px; font-weight: bold;">Toppings {{ $typeTitle }}</p>
-            @foreach ($toppings as $topping)
-                <p style="font-size: 16px">
-                    - {{ $topping->topping_name }}
-                    @if ($topping->extra)
-                        <span>[Extra]</span>
-                    @endif
-                </p>
-            @endforeach
-        @endforeach
-    @endif
 
     <div class="line"></div>
     <p class="text-center" style="font-size: 18px"><b>TOTAL: S/. {{ $order->amount_pay }}</b></p>

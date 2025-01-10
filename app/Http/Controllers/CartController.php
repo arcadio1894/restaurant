@@ -11,6 +11,7 @@ use App\Models\CartDetailOption;
 use App\Models\CashMovement;
 use App\Models\CashRegister;
 use App\Models\Coupon;
+use App\Models\DataGeneral;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderDetailOption;
@@ -1957,13 +1958,14 @@ class CartController extends Controller
 
     public function saveCustomProduct(Request $request)
     {
+        $dataGeneral = DataGeneral::where('name', 'product_id_custom')->first();
         //dd($request);
-        $idProductCustom = 21;
+        $idProductCustom = $dataGeneral->valueNumber;
 
         $typePizzas = [
             'familiar' => 1,
             'large' => 2,
-            'personal' => 4,
+            'personal' => 3,
         ];
 
         // Obtener todos los datos enviados en la solicitud

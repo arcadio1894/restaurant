@@ -62,22 +62,24 @@
         @foreach( $detail->options as $option )
             <p>- {{ str_pad( ($option->product->full_name), 10, ' ', STR_PAD_LEFT) }}</p>
         @endforeach
+
+        {{-- Mostrar toppings si existen --}}
+        @if ($detail->toppings->isNotEmpty())
+            <p style="font-style: italic;">Toppings:</p>
+            @foreach ($detail->toppings as $topping)
+                <p>
+                    • {{ $topping->topping_name }}
+                    @if ($topping->type)
+                        ({{ $topping->type === 'left' ? 'A la izquierda' : ($topping->type === 'right' ? 'A la derecha' : ($topping->type === 'whole' ? 'En todo' : $topping->type)) }})
+                    @endif
+                    @if ($topping->extra)
+                        <span>[Extra]</span>
+                    @endif
+                </p>
+            @endforeach
+        @endif
     @endforeach
-    {{-- Mostrar toppings si existen --}}
-    @if ($detail->toppings->isNotEmpty())
-        <p style="font-style: italic;">Toppings:</p>
-        @foreach ($detail->toppings as $topping)
-            <p>
-                • {{ $topping->topping_name }}
-                @if ($topping->type)
-                    ({{ $topping->type === 'left' ? 'A la izquierda' : ($topping->type === 'right' ? 'A la derecha' : ($topping->type === 'whole' ? 'En todo' : $topping->type)) }})
-                @endif
-                @if ($topping->extra)
-                    <span>[Extra]</span>
-                @endif
-            </p>
-        @endforeach
-    @endif
+
     <div class="line"></div>
     <p><b>Sub Total:</b> <span style="float: right;">S/. {{ $amount_subtotal }}</span></p>
     <p><b>Envío:</b> <span style="float: right;">S/. {{ number_format($amount_shipping, 2, '.', '') }}</span></p>
