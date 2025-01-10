@@ -14,6 +14,7 @@ use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderDetailOption;
+use App\Models\OrderDetailTopping;
 use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\ProductType;
@@ -511,31 +512,37 @@ class CartController extends Controller
                 $price = 0;
                 $additionalPrice = 0;
 
-                // Obtener el precio base del producto o tipo de producto
-                if (isset($cartItem['product_type_id']) && $cartItem['product_type_id'] != null) {
-                    $productType = ProductType::find($cartItem['product_type_id']);
-                    if ($productType) {
-                        $price = $productType->price;
-                    }
+                if ($cartItem['custom'] === true) {
+                    // Si el producto es custom, tomar el total directamente
+                    $totalPrice = $cartItem['total'];
+                    $price = $totalPrice;
                 } else {
-                    $product = Product::find($cartItem['product_id']);
-                    if ($product) {
-                        $price = $product->price_default;
-                    }
-                }
 
-                // Calcular el precio adicional de las opciones
-                if (!empty($cartItem['options'])) {
-                    foreach ($cartItem['options'] as $optionGroupId => $optionIds) {
-                        foreach ($optionIds as $optionId) {
-                            $additionalPrice += isset($optionId['additional_price']) ? $optionId['additional_price'] : 0;
+                    // Obtener el precio base del producto o tipo de producto
+                    if (isset($cartItem['product_type_id']) && $cartItem['product_type_id'] != null) {
+                        $productType = ProductType::find($cartItem['product_type_id']);
+                        if ($productType) {
+                            $price = $productType->price;
+                        }
+                    } else {
+                        $product = Product::find($cartItem['product_id']);
+                        if ($product) {
+                            $price = $product->price_default;
                         }
                     }
+
+                    // Calcular el precio adicional de las opciones
+                    if (!empty($cartItem['options'])) {
+                        foreach ($cartItem['options'] as $optionGroupId => $optionIds) {
+                            foreach ($optionIds as $optionId) {
+                                $additionalPrice += isset($optionId['additional_price']) ? $optionId['additional_price'] : 0;
+                            }
+                        }
+                    }
+
+                    // Sumar el precio base y el adicional
+                    $totalPrice = $price + $additionalPrice;
                 }
-
-                // Sumar el precio base y el adicional
-                $totalPrice = $price + $additionalPrice;
-
 
                 // Crear el detalle de la orden
                 $orderDetail = OrderDetail::create([
@@ -558,6 +565,19 @@ class CartController extends Controller
                                 'product_id' => $optionId['product_id'], // ID del producto asociado a la opción.
                             ]);
                         }
+                    }
+                }
+
+                // Guardar los toppings si el producto es custom y tiene toppings
+                if ($cartItem['custom'] === true && !empty($cartItem['toppings'])) {
+                    foreach ($cartItem['toppings'] as $topping) {
+                        OrderDetailTopping::create([
+                            'order_detail_id' => $orderDetail->id,
+                            'topping_id' => $topping['topping_id'],
+                            'topping_name' => $topping['topping_name'],
+                            'type' => $topping['type'],
+                            'extra' => isset($topping['extra']) ? $topping['extra'] : 0,
+                        ]);
                     }
                 }
             }
@@ -621,8 +641,8 @@ class CartController extends Controller
                         'order' => "ORDEN - ".$order->id
                     ];
 
-                    $telegramController = new TelegramController();
-                    $telegramController->sendNotification('process', $data);
+                    /*$telegramController = new TelegramController();
+                    $telegramController->sendNotification('process', $data);*/
 
                     // Agregar movimientos a la caja
                     $paymentType = 2;
@@ -1572,6 +1592,13 @@ class CartController extends Controller
         $total = 0;
 
         foreach ($cart as $item) {
+            if (isset($item['custom']) && $item['custom']) {
+                // Si el producto es custom, usar directamente el total del item
+                $total += ($item['total']*$item['quantity']);
+                continue;
+            }
+
+            // Productos normales
             $basePrice = 0;
 
             // Obtener el precio base del producto o tipo de producto
@@ -1953,7 +1980,7 @@ class CartController extends Controller
         $type = $typePizzas[$size];
 
         $product = Product::find($idProductCustom);
-        $productType = ProductType::where('product_id', $product->id)
+        $productType = ProductType::with('type')->where('product_id', $product->id)
             ->where('type_id', $type)->first();
 
         // Procesar la salsa
@@ -2177,10 +2204,12 @@ class CartController extends Controller
 
         // Formato de respuesta
         return response()->json([
+            'url_redirect' => route('cart.show'),
             'custom' => true,
             'options' => (object)[], // Objeto vacío como indicastes
             'product_id' => $product->id,
             'product_type_id' => $productType->id,
+            'product_type_name' => $productType->type->name."(".$productType->type->size.")",
             'quantity' => 1,
             'total' => $total,
             'toppings' => [

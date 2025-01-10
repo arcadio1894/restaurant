@@ -35,4 +35,9 @@ class OrderDetail extends Model
     {
         return $this->hasMany(OrderDetailOption::class);
     }
+
+    public function toppings()
+    {
+        return $this->hasMany(OrderDetailTopping::class);
+    }
 }

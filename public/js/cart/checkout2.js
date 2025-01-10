@@ -351,6 +351,23 @@ async function loadCheckout() {
     $('#body-items').empty(); // Limpiar el contenedor antes de renderizar
 
     const itemPromises = cart.map(async (item, index) => {
+        // Si el producto es custom
+        if (item.custom) {
+            const clone = activateTemplate('#template-detail');
+            let subtotal = item.total * item.quantity;
+            // Usar imagen y nombre genérico para productos custom
+            let urlImage = document.location.origin + '/images/icons/default_custom_image.png';
+            clone.querySelector("[data-image]").setAttribute('src', urlImage);
+            clone.querySelector("[data-full_name]").innerHTML = `Producto Personalizado x${item.quantity}`;
+            clone.querySelector("[data-subtotal]").innerHTML = `S/. ${subtotal.toFixed(2)}`;
+
+            // Sumar al total general
+            total += subtotal;
+
+            return clone;
+        }
+
+        // Para productos normales, obtener los datos desde el servidor
         const product = await fetchProduct(item.product_id, item.product_type_id);
         if (!product) return null; // Si no conseguimos el producto, lo omitimos
 
@@ -377,6 +394,32 @@ async function loadCheckout() {
         clone.querySelector("[data-subtotal]").innerHTML = `S/. ${subtotal.toFixed(2)}`;
 
         return clone;
+        /*const product = await fetchProduct(item.product_id, item.product_type_id);
+        if (!product) return null; // Si no conseguimos el producto, lo omitimos
+
+        const clone = activateTemplate('#template-detail');
+        let subtotal = product.price * item.quantity;
+
+        // Incluir el precio de las opciones seleccionadas
+        if (item.options && Object.keys(item.options).length > 0) {
+            const options = Object.values(item.options).flat();
+
+            const optionTotal = options.reduce((sum, option) => {
+                return sum + option.additional_price;
+            }, 0);
+
+            subtotal += optionTotal * item.quantity; // Sumamos el precio total de las opciones
+        }
+
+        total += subtotal; // Actualizamos el total general
+
+        // Rellenar los datos del producto en el clon
+        const urlImage = document.location.origin + '/images/products/' + product.image_url;
+        clone.querySelector("[data-image]").setAttribute('src', urlImage);
+        clone.querySelector("[data-full_name]").innerHTML = `${product.name} x${item.quantity}`;
+        clone.querySelector("[data-subtotal]").innerHTML = `S/. ${subtotal.toFixed(2)}`;
+
+        return clone;*/
     });
 
     // Esperamos a que todas las promesas de los productos se resuelvan

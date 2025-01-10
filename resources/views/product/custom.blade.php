@@ -615,9 +615,48 @@
                                 success: function (response) {
                                     console.log(response);
                                     // Logica que inserta en el carrito
+                                    // Procesar los toppings del backend
+                                    let toppings = [];
+                                    $.each(response.toppings, function (key, value) {
+                                        if (Array.isArray(value)) {
+                                            toppings = toppings.concat(value);
+                                        } else {
+                                            toppings.push(value);
+                                        }
+                                    });
 
+                                    // Obtener el carrito del localStorage
+                                    let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-                                    $.alert('Producto agregado al carrito');
+                                    // Crear el nuevo producto a agregar al carrito
+                                    let newCartItem = {
+                                        product_id: response.product_id,
+                                        product_type_id: response.product_type_id,
+                                        product_type_name: response.product_type_name,
+                                        options: null, // Según tu especificación
+                                        quantity: response.quantity,
+                                        user_id: response.user_id,
+                                        custom: response.custom,
+                                        total: response.total,
+                                        toppings: toppings
+                                    };
+
+                                    // Agregar el nuevo producto al carrito
+                                    cart.push(newCartItem);
+
+                                    // Guardar el carrito actualizado en el localStorage
+                                    localStorage.setItem('cart', JSON.stringify(cart));
+
+                                    // Actualizar la cantidad del carrito
+                                    updateCartQuantity();
+
+                                    $.alert({
+                                        title: 'Éxito',
+                                        content: 'Producto agregado al carrito',
+                                        onClose: function () {
+                                            window.location.href = response.url_redirect; // Redirigir a la ruta del carrito
+                                        }
+                                    });
                                 },
                                 error: function (xhr, status, error) {
                                     $.alert('Hubo un problema al confirmar el pedido.');
@@ -634,6 +673,18 @@
                     }
                 }
             });
+        }
+
+        function updateCartQuantity() {
+            // Si no está autenticado, obtener la cantidad desde localStorage
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+            // Contar el número de productos únicos
+            let totalItems = cart.length;
+
+            // Actualizar el contenido del span
+            $("#quantityCart").html(`(${totalItems})`);
+            $("#quantityCart2").html(`(${totalItems})`);
         }
     </script>
 @endsection

@@ -90,7 +90,97 @@ async function loadCart() {
 
     // Promesas de productos
     const productPromises = cart.map(async (item, index) => {
-        const product = await fetchProduct(item.product_id, item.product_type_id);
+        if (item.custom) {
+            // Caso de producto custom
+            const clone = activateTemplate('#template-cart_detail');
+            let productTotal = item.total * item.quantity;
+            // Setear datos comunes del producto custom
+            let url_image = document.location.origin + '/images/icons/default_custom_image.png'; // Usa una imagen genérica para productos custom
+            clone.querySelector("[data-image]").setAttribute('src', url_image);
+            clone.querySelector("[data-product_name]").innerHTML = "Producto Personalizado";
+            clone.querySelector("[data-quantity]").value = item.quantity;
+            clone.querySelector("[data-detail_subtotal]").innerHTML = `S/. ${productTotal.toFixed(2)}`;
+            clone.querySelector("[data-detail_price]").innerHTML = `S/. ${productTotal.toFixed(2)} / por item`;
+            clone.querySelector("[data-minus]").setAttribute('data-detail_id', index);
+            clone.querySelector("[data-quantity]").setAttribute('data-detail_id', index);
+            clone.querySelector("[data-plus]").setAttribute('data-detail_id', index);
+            clone.querySelector("[data-delete_item]").setAttribute('data-detail_id', index);
+            clone.querySelector("[data-detail_productType]").innerHTML = "Tipo: "+item.product_type_name;
+
+            // Procesar toppings
+            if (item.toppings && item.toppings.length > 0) {
+                item.toppings.forEach(topping => {
+                    const cloneOption = activateTemplate('#template-option');
+                    const selected = topping.isSelected ? 'Sí' : 'No';
+                    const position =
+                        topping.type === 'whole'
+                            ? 'En todo'
+                            : topping.type === 'left'
+                            ? 'A la izquierda'
+                            : 'A la derecha';
+                    const extra = topping.extra === 1 ? 'Extra' : 'Normal';
+
+                    cloneOption.querySelector("[data-option]").innerHTML = `${topping.topping_name} (${selected} - ${position} - ${extra})`;
+                    clone.querySelector("[data-body_options]").append(cloneOption);
+                });
+            }
+
+            // Incrementar el total general
+            total += productTotal;
+
+            return clone;
+        } else {
+            // Caso de producto normal
+            const product = await fetchProduct(item.product_id, item.product_type_id);
+            if (!product) return null; // Si no conseguimos el producto, lo omitimos
+
+            const clone = activateTemplate('#template-cart_detail');
+            let productTotal = product.price * item.quantity;
+
+            // Rellenar los datos del producto
+            let url_image = document.location.origin + '/images/products/' + product.image_url;
+            clone.querySelector("[data-image]").setAttribute('src', url_image);
+            clone.querySelector("[data-product_name]").innerHTML = product.name;
+            clone.querySelector("[data-quantity]").value = item.quantity;
+            clone.querySelector("[data-detail_price]").innerHTML = `S/. ${product.price.toFixed(2)} / por item`;
+            clone.querySelector("[data-minus]").setAttribute('data-detail_id', index);
+            clone.querySelector("[data-quantity]").setAttribute('data-detail_id', index);
+            clone.querySelector("[data-plus]").setAttribute('data-detail_id', index);
+            clone.querySelector("[data-delete_item]").setAttribute('data-detail_id', index);
+            clone.querySelector("[data-detail_productType]").innerHTML = product.product_type;
+
+            // Si tiene opciones
+            if (item.options && Object.keys(item.options).length > 0) {
+                const options = Object.values(item.options).flat(); // Asegurarse de que sea una lista plana
+                let optionTotal = 0;
+
+                options.forEach(option => {
+                    const cloneOption = activateTemplate('#template-option');
+                    cloneOption.querySelector("[data-option]").innerHTML = `${option.selection_name} (+S/. ${option.additional_price.toFixed(2)})`;
+                    clone.querySelector("[data-body_options]").append(cloneOption);
+
+                    // Sumar el precio adicional de la opción al total
+                    optionTotal += option.additional_price;
+                });
+
+                // Ajustar el precio del producto base sumando las opciones por unidad
+                const adjustedUnitPrice = product.price + optionTotal;
+                clone.querySelector("[data-detail_price]").innerHTML = `S/. ${adjustedUnitPrice.toFixed(2)} / por item`;
+
+                // Calcular el subtotal ajustado
+                productTotal += optionTotal * item.quantity;
+            } else {
+                // Si no tiene opciones, mostrar el precio base
+                clone.querySelector("[data-detail_price]").innerHTML = `S/. ${product.price.toFixed(2)} / por item`;
+            }
+
+            // Actualizar subtotal del producto
+            total += productTotal;
+            clone.querySelector("[data-detail_subtotal]").innerHTML = `S/. ${productTotal.toFixed(2)}`;
+
+            return clone;
+        }
+        /*const product = await fetchProduct(item.product_id, item.product_type_id);
         if (!product) return null; // Si no conseguimos el producto, lo omitimos
 
         const clone = activateTemplate('#template-cart_detail');
@@ -137,7 +227,7 @@ async function loadCart() {
         total += productTotal;
         clone.querySelector("[data-detail_subtotal]").innerHTML = `S/. ${productTotal.toFixed(2)}`;
 
-        return clone;
+        return clone;*/
     });
 
     // Esperamos a que todas las promesas se resuelvan
