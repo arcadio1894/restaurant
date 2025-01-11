@@ -270,6 +270,11 @@
         window.baseImageUrl = "{{ asset('images/icons/') }}";
     </script>
     <script>
+        let toppingsLeft = 0;
+        let toppingsRight = 0;
+        let maxToppingsLeft = 4;
+        let maxToppingsRight = 4;
+
         function toggleDropdown(id, button) {
             const options = document.getElementById(id);
             const isActive = options.classList.contains('active');
@@ -350,8 +355,26 @@
         }
 
         function toggleToppingDropdown(id, button, defaultInputId, defaultImageId, defaultImageSrc) {
+            // Verificar si el size está seleccionado
+            const selectedSize = $('[data-size].selected');
+            if (selectedSize.length === 0) {
+                $.confirm({
+                    title: 'Tamaño no seleccionado',
+                    content: 'Por favor selecciona el tamaño de la pizza antes de añadir ingredientes.',
+                    type: 'red',
+                    buttons: {
+                        ok: {
+                            text: 'Entendido',
+                            btnClass: 'btn-red',
+                        }
+                    }
+                });
+                return; // Salir de la función si no se ha seleccionado un tamaño
+            }
+
             const options = document.getElementById(id);
             const isActive = options.classList.contains('active');
+
             // Alternar el despliegue del contenido
             options.classList.toggle('active');
 
@@ -360,16 +383,27 @@
             const circle = button.querySelector('.circle');
 
             if (isActive) {
+                // Cerrar el dropdown
                 icon.classList.remove('fa-check-square');
                 icon.classList.add('fa-plus-square');
                 button.classList.remove('selected');
 
-                // 💡 Resetear los inputs y las imágenes
+                // Resetear los inputs y las imágenes
                 resetToppingOptions(defaultInputId, defaultImageId, defaultImageSrc, id);
             } else {
+                // Abrir el dropdown
                 icon.classList.remove('fa-plus-square');
                 icon.classList.add('fa-check-square');
                 button.classList.add('selected');
+
+                // Verificar si el valor por defecto está seleccionado
+                const defaultInput = document.getElementById(defaultInputId);
+                if (defaultInput && defaultInput.checked) {
+                    // Sumar +1 a ambos lados si el valor por defecto es "whole"
+                    toppingsLeft++;
+                    toppingsRight++;
+                    //verificarRestricciones();
+                }
             }
         }
 
@@ -686,5 +720,8 @@
             $("#quantityCart").html(`(${totalItems})`);
             $("#quantityCart2").html(`(${totalItems})`);
         }
+
+
+
     </script>
 @endsection
