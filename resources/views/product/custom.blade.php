@@ -189,7 +189,7 @@
                             </div>
                             <div class="extra-group ml-1">
                                 <label class="switch mt-3">
-                                    <input type="checkbox" id="extra{{ $toppingMeat->slug }}">
+                                    <input type="checkbox" id="extra{{ $toppingMeat->slug }}" onclick="toggleExtra('{{ $toppingMeat->slug }}')">
                                     <span class="slider"></span>
                                 </label>
                                 <p>Extra</p>
@@ -244,7 +244,7 @@
                             <!-- Contenedor con borde para el switch de "Extra" -->
                             <div class="extra-group ml-1">
                                 <label class="switch mt-3">
-                                    <input type="checkbox" id="extra{{ $toppingVeggie->slug }}">
+                                    <input type="checkbox" id="extra{{ $toppingVeggie->slug }}" onclick="toggleExtra('{{ $toppingVeggie->slug }}')">
                                     <span class="slider"></span>
                                 </label>
                                 <p>Extra</p>
@@ -274,6 +274,8 @@
         let toppingsRight = 0;
         let maxToppingsLeft = 4;
         let maxToppingsRight = 4;
+
+        let arrayToppings = [];
 
         function toggleDropdown(id, button) {
             const options = document.getElementById(id);
@@ -331,17 +333,77 @@
         }
 
         function changeImage(slug, position) {
-            console.log(slug);
+            //console.log(slug);
+            // Buscar el topping en el arrayToppings
+            const toppingIndex = arrayToppings.findIndex(topping => topping.slug === slug);
+
+            if (toppingIndex !== -1) {
+                const currentTopping = arrayToppings[toppingIndex];
+                const previousPosition = currentTopping.position; // Posición anterior
+                const extra = currentTopping.extra; // Estado del extra
+                let newPosition = null;
+
+                // Obtener todos los radio buttons del grupo correspondiente
+                const radioButtons = document.getElementsByName(slug);
+
+                // Detectar cuál posición está actualmente seleccionada
+                radioButtons.forEach(radio => {
+                    if (radio.checked) {
+                        const radioId = radio.id; // Obtener el id del radio seleccionado
+                        if (radioId.startsWith('left')) {
+                            newPosition = 'left';
+                        } else if (radioId.startsWith('right')) {
+                            newPosition = 'right';
+                        } else if (radioId.startsWith('whole')) {
+                            newPosition = 'whole';
+                        }
+                    }
+                });
+
+                // Asegurarse de que se haya detectado una nueva posición
+                //console.log(newPosition);
+                if (newPosition) {
+                    // Restar de las variables globales según la posición anterior
+                    if (previousPosition === 'left') {
+                        toppingsLeft -= extra ? 1.5 : 1; // Restar 1.5 si extra está activado, de lo contrario 1
+                    } else if (previousPosition === 'right') {
+                        toppingsRight -= extra ? 1.5 : 1;
+                    } else if (previousPosition === 'whole') {
+                        toppingsLeft -= extra ? 1.5 : 1;
+                        toppingsRight -= extra ? 1.5 : 1;
+                    }
+
+                    // Sumar a las variables globales según la nueva posición
+                    if (newPosition === 'left') {
+                        toppingsLeft += extra ? 1.5 : 1; // Sumar 1.5 si extra está activado, de lo contrario 1
+                    } else if (newPosition === 'right') {
+                        toppingsRight += extra ? 1.5 : 1;
+                    } else if (newPosition === 'whole') {
+                        toppingsLeft += extra ? 1.5 : 1;
+                        toppingsRight += extra ? 1.5 : 1;
+                    }
+
+                    // Actualizar la posición en el elemento del array
+                    currentTopping.position = newPosition;
+
+                }
+
+                console.log(arrayToppings);
+                console.log("ToppingsLeft: "+toppingsLeft);
+                console.log("ToppingsRight: "+toppingsRight);
+                verificarToppings();
+            }
+
             // Obtener todos los radio buttons del grupo correspondiente
             const radioButtons = document.getElementsByName(slug);
-            console.log(radioButtons);
+            //console.log(radioButtons);
             // Iterar sobre cada radio button en el grupo
             radioButtons.forEach(radio => {
-                console.log(radio.id);
+                //console.log(radio.id);
                 const imageId = `img-${radio.id.replace(slug, '').toLowerCase()}-${slug}`;
                 const imageElement = document.getElementById(imageId);
-                console.log(imageId);
-                console.log(imageElement);
+                //console.log(imageId);
+                //console.log(imageElement);
                 if (imageElement) {
                     if (radio.checked) {
                         // Cambiar a la imagen activa si está seleccionado
@@ -374,6 +436,7 @@
 
             const options = document.getElementById(id);
             const isActive = options.classList.contains('active');
+            const slug = id.replace('-options', ''); // Obtener el slug del topping a partir del ID del dropdown
 
             // Alternar el despliegue del contenido
             options.classList.toggle('active');
@@ -382,11 +445,50 @@
             const icon = button.querySelector('i');
             const circle = button.querySelector('.circle');
 
+            // Verificar si es un ingrediente excluido (salsa o queso)
+            const isExcluded = button.hasAttribute('data-salsa') || button.hasAttribute('data-cheese');
+
             if (isActive) {
                 // Cerrar el dropdown
                 icon.classList.remove('fa-check-square');
                 icon.classList.add('fa-plus-square');
                 button.classList.remove('selected');
+
+                if (!isExcluded) {
+                    // Buscar el topping en el arrayToppings
+                    const toppingIndex = arrayToppings.findIndex(topping => topping.slug === slug);
+
+                    if (toppingIndex !== -1) {
+                        // Obtener los datos actuales del topping
+                        const currentTopping = arrayToppings[toppingIndex];
+                        const position = currentTopping.position; // Posición actual ('left', 'right', 'whole')
+                        const extra = currentTopping.extra; // Estado actual de 'extra' (0 o 1)
+
+                        // Ajustar las variables según la posición y el estado de extra
+                        if (position === 'left') {
+                            toppingsLeft -= (extra === 1) ? 1.5 : 1;
+                        } else if (position === 'right') {
+                            toppingsRight -= (extra === 1) ? 1.5 : 1;
+                        } else if (position === 'whole') {
+                            toppingsLeft -= (extra === 1) ? 1.5 : 1;
+                            toppingsRight -= (extra === 1) ? 1.5 : 1;
+                        }
+
+                        // Asegurarse de no tener valores negativos
+                        toppingsLeft = Math.max(toppingsLeft, 0);
+                        toppingsRight = Math.max(toppingsRight, 0);
+
+                        // Eliminar el topping del array
+                        arrayToppings.splice(toppingIndex, 1);
+
+                        // Mostrar el estado actualizado del array en la consola
+                        //console.log(`Topping eliminado: ${slug}`);
+                        console.log(arrayToppings);
+                        console.log("ToppingsLeft: "+toppingsLeft);
+                        console.log("ToppingsRight: "+toppingsRight);
+                        verificarToppings();
+                    }
+                }
 
                 // Resetear los inputs y las imágenes
                 resetToppingOptions(defaultInputId, defaultImageId, defaultImageSrc, id);
@@ -396,14 +498,125 @@
                 icon.classList.add('fa-check-square');
                 button.classList.add('selected');
 
-                // Verificar si el valor por defecto está seleccionado
-                const defaultInput = document.getElementById(defaultInputId);
-                if (defaultInput && defaultInput.checked) {
-                    // Sumar +1 a ambos lados si el valor por defecto es "whole"
-                    toppingsLeft++;
-                    toppingsRight++;
-                    //verificarRestricciones();
+                if (!isExcluded) {
+                    // Verificar si el topping ya existe en el array
+                    const existingTopping = arrayToppings.find(topping => topping.slug === slug);
+                    if (!existingTopping) {
+                        // Si no existe, agregarlo con valores por defecto
+                        arrayToppings.push({
+                            slug: slug,
+                            position: 'whole', // Por defecto la posición es 'whole'
+                            extra: 0 // Por defecto 'extra' no está seleccionado
+                        });
+                    }
+
+                    // Verificar si el valor por defecto está seleccionado
+                    const defaultInput = document.getElementById(defaultInputId);
+                    if (defaultInput && defaultInput.checked) {
+                        // Sumar +1 a ambos lados si el valor por defecto es "whole"
+                        toppingsLeft++;
+                        toppingsRight++;
+                    }
+
+                    // Mostrar el estado actualizado del array en la consola
+                    console.log(arrayToppings);
+                    console.log("ToppingsLeft: " + toppingsLeft);
+                    console.log("ToppingsRight: " + toppingsRight);
+                    verificarToppings();
                 }
+            }
+        }
+
+        function toggleExtra(slug) {
+            // Buscar el topping en el arrayToppings
+            const toppingIndex = arrayToppings.findIndex(topping => topping.slug === slug);
+
+            if (toppingIndex !== -1) {
+                const currentTopping = arrayToppings[toppingIndex];
+                const currentPosition = currentTopping.position; // Obtener la posición actual
+                const checkbox = document.getElementById(`extra${slug}`); // Obtener el checkbox
+
+                if (checkbox.checked) {
+                    // Checkbox activado: sumar valores
+                    if (currentPosition === 'left') {
+                        toppingsLeft += 0.5;
+                    } else if (currentPosition === 'right') {
+                        toppingsRight += 0.5;
+                    } else if (currentPosition === 'whole') {
+                        toppingsLeft += 0.5;
+                        toppingsRight += 0.5;
+                    }
+
+                    // Actualizar el estado "extra" en el array
+                    currentTopping.extra = 1; // Marcar como extra activado
+                } else {
+                    // Checkbox desactivado: restar valores
+                    if (currentPosition === 'left') {
+                        toppingsLeft -= 0.5;
+                    } else if (currentPosition === 'right') {
+                        toppingsRight -= 0.5;
+                    } else if (currentPosition === 'whole') {
+                        toppingsLeft -= 0.5;
+                        toppingsRight -= 0.5;
+                    }
+
+                    // Actualizar el estado "extra" en el array
+                    currentTopping.extra = 0; // Marcar como extra desactivado
+                }
+
+                // Mostrar el estado actualizado en consola
+                //console.log(`Topping actualizado: ${slug}`);
+                //console.log(`Estado extra: ${checkbox.checked ? 'Activado' : 'Desactivado'}`);
+                console.log(arrayToppings);
+                console.log("ToppingsLeft: "+toppingsLeft);
+                console.log("ToppingsRight: "+toppingsRight);
+                verificarToppings();
+            }
+        }
+
+        function verificarToppings() {
+            // Detectar el tamaño seleccionado
+            const selectedSize = document.querySelector('input[name="size"]:checked').value;
+            let mensaje = "";
+            let title = "";
+            // Determinar el límite según el tamaño
+            let toppingLimit = 0;
+            if (selectedSize === 'personal') {
+                toppingLimit = 3;
+                title = "🍕 <strong style='font-size: 16px; line-height: 1.4;'>¡Atención Chef!</strong>";
+                mensaje = "<div style='font-size: 16px; line-height: 1.4;'>" +
+                    "Has seleccionado más de 3 toppings en un lado de la pizza.<br>" +
+                    "Para que tu pizza personal quede perfectamente horneada, te recomendamos elegir hasta 3 toppings por lado.<br>" +
+                    "Si agregas más, la cocción no será la mejor y queremos que disfrutes cada bocado. 😋<br>" +
+                    "<br>" +
+                    "👉 Por favor, ajusta los toppings por lado y sigue creando tu pizza perfecta. 🍕<br>" +
+                    "</div>";
+            } else if (selectedSize === 'large' || selectedSize === 'familiar') {
+                toppingLimit = 4;
+                title = "🍕 <strong style='font-size: 16px; line-height: 1.4;'>¡Cuidado con los toppings, Chef!</strong>";
+                mensaje = "<div style='font-size: 16px; line-height: 1.4;'>" +
+                    "Has seleccionado más de 4 toppings en un lado de la pizza.<br>" +
+                    "Para que tu pizza familiar quede deliciosa y bien cocinada, asegúrate de no agregar más de 4 toppings por lado.<br>" +
+                    "Si eliges más, la masa podría no cocinarse bien y eso afectaría el resultado. 🍽<br>" +
+                    "<br>" +
+                    "👉 Por favor, ajusta los toppings por lado para garantizar una pizza de calidad <strong>FUEGO Y MASA</strong>. 🔥🍕<br>" +
+                    "</div>";
+            }
+
+            // Validar los valores de toppingsLeft y toppingsRight
+            if (toppingsLeft > toppingLimit || toppingsRight > toppingLimit) {
+                // Mostrar el mensaje de alerta con jQuery Confirm
+                $.confirm({
+                    title: title,
+                    content: mensaje,
+                    type: 'red',
+                    buttons: {
+                        aceptar: {
+                            text: 'Entendido',
+                            btnClass: 'btn-red',
+                        },
+                    },
+                });
             }
         }
 
@@ -412,8 +625,8 @@
             const defaultInput = document.getElementById(defaultInputId);
             const defaultImage = document.getElementById(defaultImageId);
 
-            console.log(defaultInput);
-            console.log(defaultImage);
+            /*console.log(defaultInput);
+            console.log(defaultImage);*/
 
             if (defaultInput) {
                 defaultInput.checked = true;
@@ -425,19 +638,19 @@
             // 💡 Resetear las imágenes de los inputs no seleccionados a sus valores inactivos
             const options = document.getElementById(optionsId);
 
-            console.log(options);
+            /*console.log(options);*/
 
             const radios = options.querySelectorAll('input[type="radio"]');
 
-            console.log(options);
+            /*console.log(options);*/
 
             radios.forEach(radio => {
-                console.log(radio);
+                /*console.log(radio);*/
                 const imageId = `img-${radio.id.replace(/([a-z])([A-Z])/g, '$1-$2')}`;
-                console.log(imageId);
+                /*console.log(imageId);*/
 
                 const imageElement = document.getElementById(imageId);
-                console.log(imageElement);
+                /*console.log(imageElement);*/
 
                 if (!radio.checked && imageElement) {
                     imageElement.src = radio.getAttribute('data-image-inactive');
