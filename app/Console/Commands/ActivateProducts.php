@@ -28,10 +28,12 @@ class ActivateProducts extends Command
 
         // Activar los productos correspondientes
         Product::whereIn('id', $activeProductIds)
+            ->where('enable_status', '<>', 2) // Excluir los descontinuados
             ->update(['enable_status' => 1]);
 
         // Desactivar los productos que no corresponden
         Product::whereNotIn('id', $activeProductIds)
+            ->where('enable_status', '<>', 2) // Excluir los descontinuados
             ->update(['enable_status' => 0]);
 
         $this->info('Product activation process completed.');

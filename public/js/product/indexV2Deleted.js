@@ -52,11 +52,10 @@ $(document).ready(function () {
     $formDelete = $('#formDelete');
     $formDelete.on('submit', disableMaterial);
     $modalDelete = $('#modalDelete');
-    $(document).on('click', '[data-cambiar_estado]', openModalDisable);
 
     $(document).on('click', '[data-image]', showImage);
 
-    $(document).on('click', '[data-eliminar]', openModalDelete);
+    $(document).on('click', '[data-reactivar]', openModalReacticar);
 });
 
 var $formDelete;
@@ -64,17 +63,16 @@ var $modalDelete;
 var $modalImage;
 var $permissions;
 
-function openModalDelete() {
-
+function openModalReacticar() {
     let idProduct = $(this).data('product_id');
     let description = $(this).data('description');
     $.confirm({
-        title: 'Eliminación de productos',
-        content: "¿Está seguro de eliminar el producto "+description+"?",
+        title: 'Reactivación de productos',
+        content: "¿Está seguro de reactivar el producto "+description+"?",
         theme: 'modern', // Puedes probar otros temas como 'bootstrap', 'modern', 'dark'
         boxWidth: '350px', // Ajusta el ancho de la ventana
         useBootstrap: false, // Usa estilos independientes de Bootstrap
-        type: 'red',
+        type: 'green',
         buttons: {
             confirmar: {
                 text: 'Confirmar',
@@ -82,7 +80,7 @@ function openModalDelete() {
                 action: function () {
                     // Hacer una llamada AJAX para enviar los datos al backend
                     $.ajax({
-                        url: '/dashboard/destroy/product/'+idProduct,
+                        url: '/dashboard/reactivar/product/'+idProduct,
                         method: 'POST',
                         contentType: 'application/json',
                         data: JSON.stringify(idProduct),
@@ -360,7 +358,7 @@ function getDataProducts($numberPage, $activeColumns) {
     var category = $('#category').val();
     var code = $('#code').val();
 
-    $.get('/dashboard/get/data/products/'+$numberPage, {
+    $.get('/dashboard/get/data/products/deleted/'+$numberPage, {
         full_name:full_name,
         category: category,
         code:code,
@@ -542,40 +540,15 @@ function renderDataTable(data, activeColumns) {
     clone.querySelector("[data-categoria]").innerHTML = data.categoria;
     clone.querySelector("[data-ingredientes]").innerHTML = data.ingredientes;
     clone.querySelector("[data-estado]").innerHTML = data.estado;
-    clone.querySelector("[data-cambiar_estado]").setAttribute("data-cambiar_estado", data.state);
-    clone.querySelector("[data-cambiar_estado]").setAttribute("data-product_id", data.id);
-    clone.querySelector("[data-cambiar_estado]").setAttribute("data-state", data.textEstado);
-    clone.querySelector("[data-cambiar_estado]").setAttribute("data-description", data.nombre);
 
-    clone.querySelector("[data-eliminar]").setAttribute("data-product_id", data.id);
-    clone.querySelector("[data-eliminar]").setAttribute("data-description", data.nombre);
+    clone.querySelector("[data-reactivar]").setAttribute("data-product_id", data.id);
+    clone.querySelector("[data-reactivar]").setAttribute("data-description", data.nombre);
 
     let url_image = document.location.origin + '/images/products/' + data.image;
     clone.querySelector("[data-ver_imagen]").setAttribute("data-src", url_image);
     clone.querySelector("[data-ver_imagen]").setAttribute("data-image", data.id);
 
     clone.querySelector("[data-visibility_price_real]").innerHTML = data.visibility_price_real;
-
-    // Configurar enlaces y botones según los permisos y datos
-    /*if ($.inArray('update_material', $permissions) !== -1) {*/
-        let url = document.location.origin + '/dashboard/editar/producto/' + data.id;
-        clone.querySelector("[data-editar_product]").setAttribute("href", url);
-    /*} else {
-        let element = clone.querySelector("[data-editar_material]");
-        if (element) {
-            element.style.display = 'none';
-        }
-    }*/
-
-    /*if ($.inArray('enable_material', $permissions) !== -1) {*/
-        /*clone.querySelector("[data-deshabilitar]").setAttribute("data-delete", data.id);
-        clone.querySelector("[data-deshabilitar]").setAttribute("data-description", data.nombre);*/
-    /*} else {
-        let element = clone.querySelector("[data-deshabilitar]");
-        if (element) {
-            element.style.display = 'none';
-        }
-    }*/
 
     // Agregar la fila clonada al cuerpo de la tabla
     $("#body-table").append(clone);

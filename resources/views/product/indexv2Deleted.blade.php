@@ -8,7 +8,7 @@
     active
 @endsection
 
-@section('activeListProducts')
+@section('activeListDeletedProducts')
     active
 @endsection
 
@@ -308,9 +308,7 @@
             </td>
             <td data-column="visibility_price_real" data-visibility_price_real>Ver precio Tachado</td>
             <td>
-                <a data-editar_product href="{{--'+document.location.origin+ '/dashboard/editar/material/'+item.id+'--}}" class="btn btn-outline-warning btn-sm" data-toggle="tooltip" data-placement="top" title="Editar"><i class="fa fa-pen"></i> </a>
-                <button data-cambiar_estado="" data-product_id="{{--'+item.id+'--}}" data-state="{{--'+item.id+'--}}" data-description="{{--'+item.full_description+'--}}" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Cambiar de estado"><i class="fas fa-bell-slash"></i> </button>
-                <button data-eliminar="" data-product_id="{{--'+item.id+'--}}" data-description="{{--'+item.full_description+'--}}" class="btn btn-outline-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Eliminar"><i class="fas fa-trash-alt"></i> </button>
+                <button data-reactivar="" data-product_id="" data-description="" class="btn btn-outline-success btn-sm" data-toggle="tooltip" data-placement="top" title="Reactivar productos"><i class="fas fa-recycle"></i> </button>
             </td>
         </tr>
     </template>
@@ -391,6 +389,6 @@
 
         })
     </script>
-    <script src="{{ asset('js/product/indexV2.js') }}"></script>
+    <script src="{{ asset('js/product/indexV2Deleted.js') }}"></script>
 
 @endsection

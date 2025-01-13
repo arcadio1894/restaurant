@@ -508,6 +508,12 @@
                                     <p>Crear productos</p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="{{route('products.list.deleted')}}" class="nav-link @yield('activeListDeletedProducts')">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Productos eliminados</p>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                     <li class="nav-item has-treeview @yield('openTypes')">

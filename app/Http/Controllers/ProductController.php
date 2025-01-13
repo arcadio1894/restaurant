@@ -27,6 +27,7 @@ class ProductController extends Controller
         $category = $request->input('category');
 
         $query = Product::with('category:id,name')
+            ->where('enable_status', '<>', 2)
             ->orderBy('id');
 
         // Aplicar filtros si se proporcionan
@@ -73,8 +74,11 @@ class ProductController extends Controller
             {
                 $estado = '<span class="badge bg-success">ACTIVO</span>';
                 $textEstado = "activo";
+            } elseif ( $product->enable_status == 0 ) {
+                $estado = '<span class="badge bg-warning">INACTIVO</span>';
+                $textEstado = "inactivo";
             } else {
-                $estado = '<span class="badge bg-danger">INACTIVO</span>';
+                $estado = '<span class="badge bg-danger">ELIMINADO</span>';
                 $textEstado = "inactivo";
             }
 
@@ -121,6 +125,115 @@ class ProductController extends Controller
         $arrayCategories = Category::select('id', 'name')->get()->toArray();
 
         return view('product.indexv2', compact( 'arrayCategories'));
+
+    }
+
+    public function getDataProductsDeleted(Request $request, $pageNumber = 1)
+    {
+        $perPage = 10;
+        $full_name = $request->input('full_name');
+        $code = $request->input('code');
+        $category = $request->input('category');
+
+        $query = Product::with('category:id,name')
+            ->where('enable_status', 2)
+            ->orderBy('id');
+
+        // Aplicar filtros si se proporcionan
+        if ($full_name != "") {
+            // Convertir la cadena de búsqueda en un array de palabras clave
+            $keywords = explode(' ', $full_name);
+
+            // Construir la consulta para buscar todas las palabras clave en el campo full_name
+            $query->where(function ($query) use ($keywords) {
+                foreach ($keywords as $keyword) {
+                    $query->where('full_name', 'LIKE', '%' . $keyword . '%');
+                }
+            });
+
+            // Asegurarse de que todas las palabras clave estén presentes en la descripción
+            foreach ($keywords as $keyword) {
+                $query->where('full_name', 'LIKE', '%' . $keyword . '%');
+            }
+        }
+
+        if ($code != "") {
+            $query->where('code', 'LIKE', '%'.$code.'%');
+        }
+
+        if ($category != "") {
+            $query->where('category_id', $category);
+        }
+
+        $totalFilteredRecords = $query->count();
+        $totalPages = ceil($totalFilteredRecords / $perPage);
+
+        $startRecord = ($pageNumber - 1) * $perPage + 1;
+        $endRecord = min($totalFilteredRecords, $pageNumber * $perPage);
+
+        $products = $query->skip(($pageNumber - 1) * $perPage)
+            ->take($perPage)
+            ->get();
+
+        $array = [];
+
+        foreach ( $products as $product )
+        {
+            if ( $product->enable_status == 1 )
+            {
+                $estado = '<span class="badge bg-success">ACTIVO</span>';
+                $textEstado = "activo";
+            } elseif ( $product->enable_status == 0 ) {
+                $estado = '<span class="badge bg-warning">INACTIVO</span>';
+                $textEstado = "inactivo";
+            } else {
+                $estado = '<span class="badge bg-danger">ELIMINADO</span>';
+                $textEstado = "inactivo";
+            }
+
+            if ( $product->visibility_price_real == 1 )
+            {
+                $estado_visibility = '<span class="badge bg-success">VISIBLE</span>';
+            } else {
+                $estado_visibility = '<span class="badge bg-primary">NO VISIBLE</span>';
+            }
+            array_push($array, [
+                "id" => $product->id,
+                "codigo" => $product->code,
+                "descripcion" => $product->description,
+                "nombre" => $product->full_name,
+                "precio" => $product->price_default,
+                "categoria" => ($product->category == null) ? '': $product->category->name,
+                "ingredientes" => $product->ingredients,
+                "state" => $product->enable_status,
+                "estado" => $estado,
+                "textEstado" => $textEstado,
+                "image" => ($product->image == null || $product->image == "" ) ? 'no_image.png':$product->image,
+                "slug" => $product->slug,
+                "visibility_price_real" => $estado_visibility,
+            ]);
+        }
+
+        $pagination = [
+            'currentPage' => (int)$pageNumber,
+            'totalPages' => (int)$totalPages,
+            'startRecord' => $startRecord,
+            'endRecord' => $endRecord,
+            'totalRecords' => $totalFilteredRecords,
+            'totalFilteredRecords' => $totalFilteredRecords
+        ];
+
+        return ['data' => $array, 'pagination' => $pagination];
+    }
+
+    public function indexAdminDeleted()
+    {
+        $user = Auth::user();
+        /*$permissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();*/
+
+        $arrayCategories = Category::select('id', 'name')->get()->toArray();
+
+        return view('product.indexv2Deleted', compact( 'arrayCategories'));
 
     }
 
@@ -574,6 +687,46 @@ class ProductController extends Controller
             'updated_count' => $products->count()
 
         ]);
+    }
+
+    public function destroy($id)
+    {
+        DB::beginTransaction();
+        try {
+            $product = Product::find($id);
+
+            $product->enable_status = 2;
+
+            $product->save();
+
+            DB::commit();
+        } catch ( \Throwable $e ) {
+            DB::rollBack();
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return response()->json(['message' => 'Producto eliminado con éxito.'], 200);
+
+    }
+
+    public function reactivar($id)
+    {
+        DB::beginTransaction();
+        try {
+            $product = Product::find($id);
+
+            $product->enable_status = 1;
+
+            $product->save();
+
+            DB::commit();
+        } catch ( \Throwable $e ) {
+            DB::rollBack();
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return response()->json(['message' => 'Producto reactivado con éxito.'], 200);
+
     }
 
 }

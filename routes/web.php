@@ -109,6 +109,12 @@ Route::middleware('auth')->group(function (){
         Route::get('/listado/productos/', [ProductController::class, 'indexAdmin'])
             ->name('products.list');
         Route::get('/get/data/products/{numberPage}', [ProductController::class, 'getDataProducts']);
+
+        Route::get('/listado/productos/eliminados/', [ProductController::class, 'indexAdminDeleted'])
+            ->name('products.list.deleted');
+        Route::get('/get/data/products/deleted/{numberPage}', [ProductController::class, 'getDataProductsDeleted']);
+
+
         Route::get('/crear/producto/', [ProductController::class, 'create'])
             ->name('product.create');
         Route::post('/save/product/', [ProductController::class, 'store'])
@@ -119,6 +125,11 @@ Route::middleware('auth')->group(function (){
             ->name('product.update');
         Route::post('/delete/product/', [ProductController::class, 'delete'])
             ->name('product.delete');
+
+        Route::post('/destroy/product/{id}', [ProductController::class, 'destroy'])
+            ->name('product.destroy');
+        Route::post('/reactivar/product/{id}', [ProductController::class, 'reactivar'])
+            ->name('product.reactivar');
 
         // Mostrar listado de cupones
         Route::get('/coupons', [CouponController::class, 'index'])
