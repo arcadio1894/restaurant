@@ -20,9 +20,14 @@ class ActivateProducts extends Command
     public function handle()
     {
         $currentDay = Carbon::now()->dayOfWeek;
+        $today = Carbon::now()->toDateString();
 
-        // Obtener productos activos para el día actual
+        // Obtener productos activos para el día actual y dentro del rango de fecha
         $activeProductIds = ProductDay::where('day', $currentDay)
+            ->where(function ($query) use ($today) {
+                $query->whereNull('date_finish') // Verificar sin límite de fecha
+                ->orWhere('date_finish', '>=', $today); // Dentro del rango
+            })
             ->pluck('product_id')
             ->toArray();
 
@@ -31,7 +36,7 @@ class ActivateProducts extends Command
             ->where('enable_status', '<>', 2) // Excluir los descontinuados
             ->update(['enable_status' => 1]);
 
-        // Desactivar los productos que no corresponden
+        // Desactivar los productos que no corresponden o han pasado su rango de fecha
         Product::whereNotIn('id', $activeProductIds)
             ->where('enable_status', '<>', 2) // Excluir los descontinuados
             ->update(['enable_status' => 0]);

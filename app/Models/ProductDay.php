@@ -12,6 +12,7 @@ class ProductDay extends Model
     protected $fillable = [
         'product_id',
         'day',
+        'date_finish', // Fecha hasta la cual es válido
     ];
 
     public function product()
