@@ -349,6 +349,38 @@ class CartController extends Controller
                 $routeToRedirect = route('welcome');
             }
 
+            $method_payment = PaymentMethod::find($validatedData['paymentMethod']);
+
+            // Mapear tipo de pago a los nombres de las cajas
+            $paymentTypeMap = [
+                1 => 'efectivo',
+                2 => 'bancario'
+            ];
+
+            if ( $method_payment->code == 'pos' || $method_payment->code == 'yape_plin' )
+            {
+                // Obtener la caja del tipo de pago
+                $cashRegister = CashRegister::where('type', 'bancario')
+                    ->where('status', 1) // Caja abierta
+                    ->latest()
+                    ->first();
+
+                if (!isset($cashRegister)) {
+                    DB::rollBack();
+                    return response()->json(['message' => 'No hay caja abierta para este tipo de pago.'], 422);
+                }
+            } elseif ( $method_payment->code == 'efectivo' ) {
+                $cashRegister = CashRegister::where('type', 'efectivo')
+                    ->where('status', 1) // Caja abierta
+                    ->latest()
+                    ->first();
+
+                if (!isset($cashRegister)) {
+                    DB::rollBack();
+                    return response()->json(['message' => 'No hay caja abierta para este tipo de pago.'], 422);
+                }
+            }
+
             $shippingAddressId = null;
 
             // Guardar la dirección de envío
@@ -593,13 +625,7 @@ class CartController extends Controller
                 ]);
             }
 
-            $method_payment = PaymentMethod::find($validatedData['paymentMethod']);
 
-            // Mapear tipo de pago a los nombres de las cajas
-            $paymentTypeMap = [
-                1 => 'efectivo',
-                2 => 'bancario'
-            ];
 
             // Selección del método de pago
             switch ($method_payment->code) {
@@ -653,9 +679,9 @@ class CartController extends Controller
                         ->latest()
                         ->first();
 
-                    if (!isset($cashRegister)) {
+                    /*if (!isset($cashRegister)) {
                         return response()->json(['message' => 'No hay caja abierta para este tipo de pago.'], 422);
-                    }
+                    }*/
 
                     // Crear el movimiento de ingreso (venta)
                     $cashMovement = CashMovement::create([
@@ -713,9 +739,9 @@ class CartController extends Controller
                         ->latest()
                         ->first();
 
-                    if (!isset($cashRegister)) {
+                    /*if (!isset($cashRegister)) {
                         return response()->json(['message' => 'No hay caja abierta para este tipo de pago.'], 422);
-                    }
+                    }*/
 
                     // Crear el movimiento de ingreso (venta)
                     CashMovement::create([
@@ -735,18 +761,18 @@ class CartController extends Controller
                     if ($vuelto > 0) {
                         // Mapear el type_vuelto (la caja desde donde se dará el vuelto)
                         // Obtener la caja para el vuelto
-                        $vueltoCashRegister = CashRegister::where('type', $paymentTypeMap[1])
+                        /*$vueltoCashRegister = CashRegister::where('type', $paymentTypeMap[1])
                             ->where('status', 1) // Caja abierta
                             ->latest()
                             ->first();
 
                         if (!isset($vueltoCashRegister)) {
                             return response()->json(['message' => 'No hay caja abierta para dar el vuelto.'], 422);
-                        }
+                        }*/
 
                         // Crear el movimiento de egreso (vuelto)
                         CashMovement::create([
-                            'cash_register_id' => $vueltoCashRegister->id,
+                            'cash_register_id' => $cashRegister->id,
                             'order_id' => $order->id,
                             'type' => 'expense', // Tipo de movimiento: egreso
                             'amount' => $vuelto,
@@ -754,9 +780,9 @@ class CartController extends Controller
                         ]);
 
                         // Actualizar el saldo de la caja del vuelto
-                        $vueltoCashRegister->current_balance -= $vuelto;
-                        $vueltoCashRegister->total_expenses += $vuelto;
-                        $vueltoCashRegister->save();
+                        $cashRegister->current_balance -= $vuelto;
+                        $cashRegister->total_expenses += $vuelto;
+                        $cashRegister->save();
                     }
 
                     DB::commit();
@@ -804,9 +830,9 @@ class CartController extends Controller
                             ->latest()
                             ->first();
 
-                        if (!isset($cashRegister)) {
+                       /* if (!isset($cashRegister)) {
                             return response()->json(['message' => 'No hay caja abierta para este tipo de pago.'], 422);
-                        }
+                        }*/
 
                         // Crear el movimiento de ingreso (venta)
                         $cashMovement = CashMovement::create([
