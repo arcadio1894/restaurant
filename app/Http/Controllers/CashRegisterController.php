@@ -376,7 +376,7 @@ class CashRegisterController extends Controller
         {
             //$query = CashMovement::where('cash_register_id', $cashRegister->id)->orderBy('id', 'desc');
             $query = CashMovement::whereIn('cash_register_id', $cashRegisterIds)
-                ->orderBy('created_at', 'desc'); // Asegúrate de que haya un campo de fecha para ordenar
+                ->orderBy('id', 'desc'); // Asegúrate de que haya un campo de fecha para ordenar
 
             $totalFilteredRecords = $query->count();
             $totalPages = ceil($totalFilteredRecords / $perPage);
