@@ -23,6 +23,12 @@
     <!-- summernote -->
     <link rel="stylesheet" href="{{ asset('admin/plugins/summernote/summernote-bs4.css') }}">
 
+    <link rel="stylesheet" href="{{ asset('admin/plugins/bootstrap-datepicker/css/bootstrap-datepicker.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin/plugins/bootstrap-datepicker/css/bootstrap-datepicker.standalone.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.standalone.css') }}">
+
+
 @endsection
 
 @section('styles')
@@ -183,6 +189,48 @@
                 </div>
 
             </div>
+            <div class="col-md-4">
+                <!-- /.card -->
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Dias activados</h3>
+
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+                                <i class="fas fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="date_validate">Válido hasta</label>
+                            <input
+                                    type="text"
+                                    class="form-control form-control-sm datepicker"
+                                    id="date_validate"
+                                    name="date_validate"
+                                    placeholder="Selecciona una fecha"
+                                    autocomplete="off"
+                            >
+                        </div>
+                        @foreach($days as $day)
+                            <div class="form-group clearfix">
+                                <div class="icheck-primary d-inline">
+                                    <input
+                                            type="checkbox" checked
+                                            name="days[{{ $day['number'] }}]"
+                                            id="checkboxDay{{ $day['number'] }}"
+                                    >
+                                    <label for="checkboxDay{{ $day['number'] }}">
+                                        {{ ucfirst($day['day']) }}
+                                    </label>
+                                </div>
+                            </div>
+                        @endforeach
+
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+            </div>
         </div>
 
         <div class="row">
@@ -274,6 +322,9 @@
     <script src="{{asset('admin/plugins/summernote/summernote-bs4.min.js')}}"></script>
     <script src="{{asset('admin/plugins/summernote/lang/summernote-es-ES.js')}}"></script>
 
+    <script src="{{ asset('admin/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
+    <script src="{{ asset('admin/plugins/bootstrap-datepicker/locales/bootstrap-datepicker.es.min.js') }}"></script>
+
 @endsection
 
 @section('scripts')
@@ -293,7 +344,13 @@
                 allowClear: true,
             });
 
-
+            /*$('#sandbox-container .input-daterange').datepicker({
+                todayBtn: "linked",
+                clearBtn: true,
+                language: "es",
+                multidate: false,
+                autoclose: true
+            });*/
 
             $('.textarea_ingredients').summernote({
                 lang: 'es-ES',

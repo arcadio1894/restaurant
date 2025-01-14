@@ -8,10 +8,12 @@ use App\Http\Requests\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Option;
 use App\Models\Product;
+use App\Models\ProductDay;
 use App\Models\ProductType;
 use App\Models\Selection;
 use App\Models\Topping;
 use App\Models\Type;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -243,7 +245,18 @@ class ProductController extends Controller
         $types = Type::all();
 
         $products = Product::all();
-        return view('product.create', compact('categories', 'types', 'products'));
+
+        $days = [
+            ['day' => 'domingo', 'number' => 0],
+            ['day' => 'lunes', 'number' => 1],
+            ['day' => 'martes', 'number' => 2],
+            ['day' => 'miércoles', 'number' => 3],
+            ['day' => 'jueves', 'number' => 4],
+            ['day' => 'viernes', 'number' => 5],
+            ['day' => 'sábado', 'number' => 6],
+        ];
+
+        return view('product.create', compact('categories', 'types', 'products', 'days'));
     }
 
     public function store(StoreProductRequest $request)
@@ -329,6 +342,20 @@ class ProductController extends Controller
                             'additional_price' => ($selection['additional_price'] == null || $selection['additional_price'] == "") ? null : $selection['additional_price'],
                         ]);
                     }
+                }
+            }
+
+            // **Lógica para guardar los días activos (ProductDay)**
+            $days = $request->input('days', []); // Obtenemos los días seleccionados
+            $dateFinish = $request->input('date_validate'); // Obtenemos la fecha límite si se proporcionó
+
+            foreach ($days as $dayNumber => $isChecked) {
+                if ($isChecked) {
+                    ProductDay::create([
+                        'product_id' => $product->id,
+                        'day' => $dayNumber,
+                        'date_finish' => $dateFinish ? Carbon::createFromFormat('d/m/Y', $dateFinish) : null, // Convertimos el formato
+                    ]);
                 }
             }
 

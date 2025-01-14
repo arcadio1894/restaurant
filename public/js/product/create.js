@@ -33,6 +33,16 @@ $(document).ready(function () {
     $(document).on('click', '[data-delete_option]', deleteOption);
 
     $(document).on('click', '[data-delete_selection]', deleteSelection);
+
+    $('#date_validate').datepicker({
+        format: 'dd/mm/yyyy',
+        autoclose: true,
+        todayHighlight: true,
+        todayBtn: "linked",
+        clearBtn: true,
+        language: "es",
+        multidate: false,
+    });
 });
 
 var $formCreate;
