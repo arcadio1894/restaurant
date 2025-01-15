@@ -221,3 +221,5 @@ Route::post('/dashboard/print', [PrintController::class, 'imprimir']);
 /*Route::post('/print/order/{order_id}', [PrintController::class, 'printOrder']);*/
 Route::get('/imprimir/recibo/{id}', [PrintController::class, 'generarRecibo']);
 Route::get('/imprimir/comanda/{id}', [PrintController::class, 'generarComanda']);
+
+Route::post('/products/initialize-days', [ProductController::class, 'initializeProductDays']);

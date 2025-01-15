@@ -396,7 +396,19 @@ class ProductController extends Controller
         //dd($priceTypes);
         $products = Product::all();
 
-        return view('product.edit', compact('product', 'categories', 'types', 'priceTypes', 'products'));
+        $days = [
+            ['day' => 'domingo', 'number' => 0],
+            ['day' => 'lunes', 'number' => 1],
+            ['day' => 'martes', 'number' => 2],
+            ['day' => 'miércoles', 'number' => 3],
+            ['day' => 'jueves', 'number' => 4],
+            ['day' => 'viernes', 'number' => 5],
+            ['day' => 'sábado', 'number' => 6],
+        ];
+
+        $productDays = ProductDay::where('product_id', $id)->get()->keyBy('day')->toArray();
+
+        return view('product.edit', compact('product', 'categories', 'types', 'priceTypes', 'products', 'days', 'productDays'));
 
     }
 
@@ -551,6 +563,38 @@ class ProductController extends Controller
                     }
                 }
             }
+
+            // Manejo de ProductDays
+            $selectedDays = $request->input('days', []); // Días seleccionados (array)
+            $dateFinish = $request->input('date_validate'); // Fecha de finalización
+            $dateFinish = $dateFinish ? Carbon::createFromFormat('d/m/Y', $dateFinish)->format('Y-m-d') : null;
+
+            // Obtener los días actuales del producto
+            $existingProductDays = ProductDay::where('product_id', $product->id)->get();
+
+            // Procesar días seleccionados
+            foreach ($selectedDays as $dayNumber => $value) {
+                $productDay = $existingProductDays->firstWhere('day', $dayNumber);
+                if ($productDay) {
+                    // Actualizar día existente
+                    $productDay->update(['date_finish' => $dateFinish]);
+                } else {
+                    // Crear nuevo día
+                    ProductDay::create([
+                        'product_id' => $product->id,
+                        'day' => $dayNumber,
+                        'date_finish' => $dateFinish,
+                    ]);
+                }
+            }
+
+            // Eliminar días no seleccionados
+            $daysToKeep = array_keys($selectedDays);
+            $existingProductDays->each(function ($productDay) use ($daysToKeep) {
+                if (!in_array($productDay->day, $daysToKeep)) {
+                    $productDay->delete();
+                }
+            });
 
             DB::commit();
         } catch ( \Throwable $e ) {
@@ -754,6 +798,36 @@ class ProductController extends Controller
 
         return response()->json(['message' => 'Producto reactivado con éxito.'], 200);
 
+    }
+
+    public function initializeProductDays()
+    {
+        DB::beginTransaction();
+        try {
+            // Obtener todos los productos activos
+            $activeProducts = Product::where('enable_status', '<>', 2)->get();
+
+            // Insertar los días de activación para cada producto
+            foreach ($activeProducts as $product) {
+                for ($day = 0; $day <= 6; $day++) { // Días de la semana (0=domingo, 6=sábado)
+                    ProductDay::updateOrCreate(
+                        [
+                            'product_id' => $product->id,
+                            'day_of_week' => $day, // Asumiendo que este campo representa los días
+                        ],
+                        [
+                            'date_finish' => null, // Sin fecha de fin
+                        ]
+                    );
+                }
+            }
+
+            DB::commit();
+            return response()->json(['message' => 'Días de activación inicializados para productos activos.'], 200);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
     }
 
 }
