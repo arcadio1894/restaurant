@@ -813,7 +813,7 @@ class ProductController extends Controller
                     ProductDay::updateOrCreate(
                         [
                             'product_id' => $product->id,
-                            'day_of_week' => $day, // Asumiendo que este campo representa los días
+                            'day' => $day, // Asumiendo que este campo representa los días
                         ],
                         [
                             'date_finish' => null, // Sin fecha de fin

@@ -222,4 +222,4 @@ Route::post('/dashboard/print', [PrintController::class, 'imprimir']);
 Route::get('/imprimir/recibo/{id}', [PrintController::class, 'generarRecibo']);
 Route::get('/imprimir/comanda/{id}', [PrintController::class, 'generarComanda']);
 
-Route::post('/products/initialize-days', [ProductController::class, 'initializeProductDays']);
+Route::get('/products/initialize-days', [ProductController::class, 'initializeProductDays']);
