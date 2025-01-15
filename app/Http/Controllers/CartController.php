@@ -439,7 +439,7 @@ class CartController extends Controller
             // Verificar el cupón
             $couponName = $request->input('coupon_name');
             $coupon = Coupon::where('name', $couponName)->first();
-
+            $phone = preg_replace('/[^\d+]/', '', $validatedData['phone']);
             $discountAmount = 0;
 
             if ($coupon) {
@@ -448,9 +448,20 @@ class CartController extends Controller
                     ->where('coupon_id', $coupon->id)
                     ->first();
 
+                // Verificar si el número de teléfono ya utilizó el cupón
+                $phoneCoupon = UserCoupon::where('phone', $phone)
+                    ->where('coupon_id', $coupon->id)
+                    ->first();
+
                 if ($userCoupon && !$coupon->special) {
                     DB::rollBack();
                     return response()->json(['success' => false, 'message' => 'El cupón ya ha sido utilizado.']);
+                }
+
+                if ((!$coupon->special && $phoneCoupon)) {
+                    DB::rollBack();
+                    return response()->json(['success' => false, 'message' => 'Sus datos ya han sido beneficiados con este cupón.']);
+
                 }
 
                 // Lógica para calcular el descuento
@@ -622,6 +633,7 @@ class CartController extends Controller
                     'coupon_id' => $coupon->id,
                     'discount_amount' => $discountAmount,
                     'order_id' => $order->id,
+                    'phone' => $phone,
                 ]);
             }
 
@@ -668,8 +680,8 @@ class CartController extends Controller
                         'order' => "ORDEN - ".$order->id
                     ];
 
-                    $telegramController = new TelegramController();
-                    $telegramController->sendNotification('process', $data);
+                    /*$telegramController = new TelegramController();
+                    $telegramController->sendNotification('process', $data);*/
 
                     // Agregar movimientos a la caja
                     $paymentType = 2;
@@ -1506,10 +1518,24 @@ class CartController extends Controller
             ->where('coupon_id', $coupon->id)
             ->first();
 
-        if ($userCoupon && !$coupon->special) {
+        // Verificar si el número de teléfono ya utilizó el cupón
+        $phoneCoupon = UserCoupon::where('phone', $request->input('phone'))
+            ->where('coupon_id', $coupon->id)
+            ->first();
+
+        if ((!$coupon->special && $userCoupon)) {
             return response()->json([
                 'success' => false,
                 'message' => 'El cupón ya ha sido utilizado.',
+                'new_total' => number_format($totalWithShipping, 2), // Devolver el total con envío sin descuento
+                'coupon_name' => '' // Limpiar el nombre del cupón
+            ]);
+        }
+
+        if ((!$coupon->special && $phoneCoupon)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sus datos ya han sido beneficiados con el cupón.',
                 'new_total' => number_format($totalWithShipping, 2), // Devolver el total con envío sin descuento
                 'coupon_name' => '' // Limpiar el nombre del cupón
             ]);

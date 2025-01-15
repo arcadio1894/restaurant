@@ -58,7 +58,6 @@ $(document).ready(function() {
 
     // Acción al presionar el botón "Aplicar"
     $('#btn-promo_code').click(function () {
-
         // Mostrar modal para loguearse o registrarse
         // Variable definida desde Blade para saber si el usuario está autenticado
         let isAuthenticated = $('#auth-status').data('authenticated');
@@ -68,6 +67,21 @@ $(document).ready(function() {
             return;
         }
 
+        let phone = $("#phone").val().replace(/\s+/g, '').replace(/[^0-9+]/g, '');
+        if ( phone == "") {
+            $.confirm({
+                title: '',
+                content: 'Por favor ingrese su número telefónico.',
+                type: 'orange',
+                buttons: {
+                    ok: {
+                        text: 'Entendido',
+                        btnClass: 'btn-orange',
+                    }
+                }
+            });
+            return; // Salir de la función si no se ha seleccionado un tamaño
+        }
 
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         $('#info_code').addClass('hidden'); // Ocultar
@@ -80,7 +94,8 @@ $(document).ready(function() {
         $.get('/apply-coupon', {
             code: promoCode,
             cart: JSON.stringify(cart), // Serializar el objeto cart
-            district: district
+            district: district,
+            phone: phone
         }, function (response) {
             if (response.success) {
                 // Si el código es válido, actualizamos los elementos
@@ -219,6 +234,22 @@ $(document).ready(function() {
         const cartId = cart;
         const couponName = $('#coupon_name').val();
 
+        let phone = $("#phone").val().replace(/\s+/g, '').replace(/[^0-9+]/g, '');
+        if ( phone == "") {
+            $.confirm({
+                title: '',
+                content: 'Por favor ingrese su número telefónico.',
+                type: 'orange',
+                buttons: {
+                    ok: {
+                        text: 'Entendido',
+                        btnClass: 'btn-orange',
+                    }
+                }
+            });
+            return; // Salir de la función si no se ha seleccionado un tamaño
+        }
+
         if (!districtId) {
             // Caso cuando se selecciona "Ninguno"
             $('#info_shipping').addClass('hidden'); // Ocultar costo de envío
@@ -235,6 +266,7 @@ $(document).ready(function() {
                     district_id: null,
                     cart: cart,
                     coupon_name: couponName,
+                    phone: phone
                     /*_token: $('meta[name="csrf-token"]').attr('content')*/
                 }),
                 success: function (data) {
@@ -263,6 +295,7 @@ $(document).ready(function() {
                     district_id: districtId,
                     cart: cart,
                     coupon_name: couponName,
+                    phone: phone
                     /*_token: $('meta[name="csrf-token"]').attr('content')*/
                 }),
                 success: function (data) {

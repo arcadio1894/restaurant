@@ -14,6 +14,7 @@ class UserCoupon extends Model
         'coupon_id',
         'order_id',
         'discount_amount',
+        'phone',
     ];
 
     /**
