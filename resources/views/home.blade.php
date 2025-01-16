@@ -51,6 +51,23 @@
 
             overflow: hidden; /* Asegura que el contenido largo no sobresalga */
         }
+
+        .image-container {
+            position: relative;
+            width: 100%; /* Ajusta esto según tu diseño */
+            padding-top: calc(5 / 7 * 100%); /* Mantiene el aspecto 7:5 */
+            overflow: hidden;
+        }
+
+        .image-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Escala la imagen para llenar el contenedor, recortando si es necesario */
+            object-position: center; /* Centra la imagen dentro del contenedor */
+        }
     </style>
 @endsection
 
@@ -200,7 +217,9 @@
                         <div class="col-12 col-sm-6 col-lg-3 mb-2 all category{{ $product->category_id }}">
                             <a href="{{ route('product.show', $product->slug) }}" class="card-link">
                                 <div class="card">
-                                    <img src="{{ asset('images/products/'.$product->image) }}" class="card-img-top" alt="{{ $product->full_name }}">
+                                    <div class="image-container">
+                                        <img src="{{ asset('images/products/'.$product->image) }}" alt="{{ $product->full_name }}">
+                                    </div>
                                     <div class="card-body d-flex flex-column p-3">
                                         <h5 class="card-title text-black fw-bold" style="font-size: 1.2rem; font-weight: bold; text-transform: uppercase;">
                                             {{ $product->full_name }}
