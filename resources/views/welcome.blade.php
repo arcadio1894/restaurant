@@ -193,6 +193,49 @@
                 margin-left: 5px; /* Espacio entre el ícono y el número */
             }
 
+            .card-text, .card-title, .fw-bold {
+                font-size: 14px;
+            }
+            /* Ajuste del tamaño de fuente según el tamaño del dispositivo */
+            .description-text {
+                font-size: 0.8rem; /* Tamaño base */
+            }
+
+            @media (max-width: 768px) {
+                .description-text {
+                    font-size: 0.9rem; /* Reducir tamaño en pantallas pequeñas */
+                }
+            }
+
+            @media (max-width: 576px) {
+                .description-text {
+                    font-size: 0.8rem; /* Más pequeño en pantallas extra pequeñas */
+                }
+            }
+
+            /* Estilo para eliminar el color azul y mantener negro */
+            .card-link {
+                text-decoration: none; /* Elimina el subrayado */
+                color: black; /* Color inicial */
+            }
+
+            .card-link:hover,
+            .card-link:focus,
+            .card-link:active {
+                color: black; /* Mantiene negro en todos los estados */
+            }
+
+            .card {
+                height: 500px; /* Ajusta este valor según lo que necesites */
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between; /* Distribuye el contenido de manera uniforme */
+                overflow: hidden; /* Oculta cualquier contenido extra */
+            }
+            .card-body {
+
+                overflow: hidden; /* Asegura que el contenido largo no sobresalga */
+            }
         </style>
     </head>
     <body>
@@ -546,7 +589,37 @@
                 <div class="filters-content">
                     <div class="row grid">
                         @foreach($products as $product)
-                            <div class="col-sm-6 col-lg-4 all category{{ $product->category_id }}">
+                            <div class="col-6 col-sm-6 col-lg-3 mb-2 all category{{ $product->category_id }}">
+                                <a href="{{ route('product.show', $product->slug) }}" class="card-link">
+                                    <div class="card">
+                                        <img src="{{ asset('images/products/'.$product->image) }}" class="card-img-top" alt="{{ $product->full_name }}">
+                                        <div class="card-body d-flex flex-column p-3">
+                                            <h5 class="card-title text-black fw-bold" style="font-size: 1.2rem; font-weight: bold; text-transform: uppercase;">
+                                                {{ $product->full_name }}
+                                            </h5>
+                                            <p class="card-text flex-grow-1 description-text">
+                                                {{ \Illuminate\Support\Str::limit($product->description, 80, '...') }}
+                                            </p>
+                                            <div class="mt-3">
+                                                <div class="row align-items-center">
+                                                    <div class="col-12 col-sm-5 col-lg-5 mb-2">
+                                                        <span style="font-size: 0.9rem;">Desde</span><br>
+                                                        <span style="font-size: 1.2rem; color: red; font-weight: bold;">
+                                                            S/ {{ $product->price_default }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="col-12 col-sm-7 col-lg-7">
+                                                        <button class="btn btn-danger w-100 btn-lg" style="padding: 15px 0; font-size: 1rem;">
+                                                            Agregar
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            {{--<div class="col-sm-6 col-lg-4 all category{{ $product->category_id }}">
                                 <div class="box">
                                     <div>
                                         <div class="img-box">
@@ -561,7 +634,7 @@
                                             </p>
                                             <div class="options">
                                                 <h6>Desde S/. {{ $product->price_default }}</h6>
-                                                {{--<a href="{{ route('product.show', ['id' => $product->id]) }}"
+                                                --}}{{--<a href="{{ route('product.show', ['id' => $product->id]) }}"
                                                    data-auth-check-url="{{ route('auth.check') }}"
                                                    onclick="event.preventDefault(); checkAuthentication({{ $product->id }}, this);">
                                                     <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 456.029 456.029" style="enable-background:new 0 0 456.029 456.029;" xml:space="preserve">
@@ -581,7 +654,7 @@
                                                             </g>
                                                         </g>
                                     </svg>
-                                                </a>--}}
+                                                </a>--}}{{--
                                                 <a href="{{ route('product.show', $product->slug) }}">
                                                     <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 456.029 456.029" style="enable-background:new 0 0 456.029 456.029;" xml:space="preserve">
                                         <g>
@@ -605,7 +678,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div>--}}
                         @endforeach
                     </div>
                 </div>
