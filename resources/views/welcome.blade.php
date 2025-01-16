@@ -634,7 +634,7 @@
                                                 {{ \Illuminate\Support\Str::limit($product->full_name, 24, '...') }}
                                             </h5>
                                             <p class="card-text flex-grow-1 description-text">
-                                                {{ \Illuminate\Support\Str::limit($product->description, 80, '...') }}
+                                                {{ \Illuminate\Support\Str::limit($product->description, 60, '...') }}
                                             </p>
                                             <div class="mt-3">
                                                 <div class="row align-items-center">
