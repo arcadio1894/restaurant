@@ -239,7 +239,7 @@
                                     </div>
                                     <div class="card-body d-flex flex-column p-3">
                                         <h5 class="card-title text-black fw-bold" style="font-size: 1.0rem; font-weight: bold; text-transform: uppercase;">
-                                            {{ \Illuminate\Support\Str::limit($product->full_name, 22, '...') }}
+                                            {{ \Illuminate\Support\Str::limit($product->full_name, 24, '...') }}
                                         </h5>
                                         <p class="card-text flex-grow-0 description-text">
                                             {{ \Illuminate\Support\Str::limit($product->description, 80, '...') }}
