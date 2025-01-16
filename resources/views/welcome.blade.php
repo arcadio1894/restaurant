@@ -589,7 +589,7 @@
                 <div class="filters-content">
                     <div class="row grid">
                         @foreach($products as $product)
-                            <div class="col-6 col-sm-6 col-lg-3 mb-2 all category{{ $product->category_id }}">
+                            <div class="col-12 col-sm-6 col-lg-3 mb-2 all category{{ $product->category_id }}">
                                 <a href="{{ route('product.show', $product->slug) }}" class="card-link">
                                     <div class="card">
                                         <img src="{{ asset('images/products/'.$product->image) }}" class="card-img-top" alt="{{ $product->full_name }}">
