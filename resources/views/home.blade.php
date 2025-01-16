@@ -238,8 +238,8 @@
                                         <img src="{{ asset('images/products/'.$product->image) }}" alt="{{ $product->full_name }}">
                                     </div>
                                     <div class="card-body d-flex flex-column p-3">
-                                        <h5 class="card-title text-black fw-bold" style="font-size: 0.9rem; font-weight: bold; text-transform: uppercase;">
-                                            {{ \Illuminate\Support\Str::limit($product->full_name, 24, '...') }}
+                                        <h5 class="card-title text-black fw-bold" style="font-size: 1rem; font-weight: bold; text-transform: uppercase;">
+                                            {{ \Illuminate\Support\Str::limit($product->full_name, 22, '...') }}
                                         </h5>
                                         <p class="card-text flex-grow-1 description-text">
                                             {{ \Illuminate\Support\Str::limit($product->description, 60, '...') }}
