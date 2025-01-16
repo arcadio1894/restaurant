@@ -16,7 +16,13 @@ class WelcomeController extends Controller
             ->where('visible', 1)
             ->where('enable_status', 1)
             ->get();
-        $products = Product::where('enable_status', 1)->get(); // Solo productos habilitados
+
+        // Obtener los productos habilitados que pertenecen a las categorías seleccionadas
+        $categoryIds = $categories->pluck('id'); // Obtener los IDs de las categorías visibles
+
+        $products = Product::whereIn('category_id', $categoryIds) // Filtrar productos por las categorías seleccionadas
+        ->where('enable_status', 1) // Solo productos habilitados
+        ->get();
 
         $slidersSmalls = Slider::where('size', 's')->orderBy('order', 'asc')->get();
         $slidersLarges = Slider::where('size', 'l')->orderBy('order', 'asc')->get();
