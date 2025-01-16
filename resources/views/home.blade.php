@@ -28,6 +28,13 @@
             }
         }
 
+        /* Cambiar a 2:1 en pantallas pequeñas */
+        @media (max-width: 576px) {
+            .image-container {
+                padding-top: calc(1 / 2 * 100%) !important; /* Cambia el ratio a 2:1 */
+            }
+        }
+
         /* Estilo para eliminar el color azul y mantener negro */
         .card-link {
             text-decoration: none; /* Elimina el subrayado */
@@ -40,21 +47,31 @@
             color: black; /* Mantiene negro en todos los estados */
         }
 
+        /* Altura predeterminada (para móviles) */
         .card {
-            height: 500px; /* Ajusta este valor según lo que necesites */
+            height: 415px; /* Altura para dispositivos pequeños */
             display: flex;
             flex-direction: column;
             justify-content: space-between; /* Distribuye el contenido de manera uniforme */
             overflow: hidden; /* Oculta cualquier contenido extra */
         }
+
+        /* Altura ajustada para pantallas grandes */
+        @media (min-width: 768px) { /* O ajusta el breakpoint según tu diseño */
+            .card {
+                height: 390px; /* Altura reducida para dispositivos grandes */
+            }
+        }
+
         .card-body {
 
             overflow: hidden; /* Asegura que el contenido largo no sobresalga */
         }
 
+        /* Aspect ratio 7:5 para pantallas grandes */
         .image-container {
             position: relative;
-            width: 100%; /* Ajusta esto según tu diseño */
+            width: 100%;
             padding-top: calc(5 / 7 * 100%); /* Mantiene el aspecto 7:5 */
             overflow: hidden;
         }
@@ -65,8 +82,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Escala la imagen para llenar el contenedor, recortando si es necesario */
-            object-position: center; /* Centra la imagen dentro del contenedor */
+            object-fit: cover; /* Escala la imagen sin distorsión */
+            object-position: center;
         }
     </style>
 @endsection
@@ -221,10 +238,10 @@
                                         <img src="{{ asset('images/products/'.$product->image) }}" alt="{{ $product->full_name }}">
                                     </div>
                                     <div class="card-body d-flex flex-column p-3">
-                                        <h5 class="card-title text-black fw-bold" style="font-size: 1.2rem; font-weight: bold; text-transform: uppercase;">
+                                        <h5 class="card-title text-black fw-bold" style="font-size: 1.0rem; font-weight: bold; text-transform: uppercase;">
                                             {{ $product->full_name }}
                                         </h5>
-                                        <p class="card-text flex-grow-1 description-text">
+                                        <p class="card-text flex-grow-0 description-text">
                                             {{ \Illuminate\Support\Str::limit($product->description, 80, '...') }}
                                         </p>
                                         <div class="mt-3">
