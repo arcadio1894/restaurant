@@ -193,6 +193,7 @@ $(document).ready(function() {
     // Al hacer clic en el botón de enviar
     $('#btn-continue').on('click', function(event) {
         event.preventDefault();
+        $('#btn-continue').text("Procesando pago...");
         $('#btn-submit').attr("disabled", true);
         $('#btn-continue').attr("disabled", true);
         $('#btn-cancel').attr("disabled", true);
@@ -206,6 +207,7 @@ $(document).ready(function() {
                     $('#business-message').text(response.message);
                     $('#business-status').fadeIn();
                     $('#btn-submit').attr("disabled", true); // Deshabilitar el botón
+                    $('#btn-continue').text("Continuar").attr("disabled", false); // Restaurar el botón
                     return; // Detener el flujo del código
                 } else {
                     procesarFormulario(); // Llamar a la función para validar y enviar el formulario
@@ -216,6 +218,7 @@ $(document).ready(function() {
             error: function () {
                 console.error('No se pudo verificar el horario de atención.');
                 $('#btn-submit').attr("disabled", false); // Permitir envío si ocurre un error inesperado
+                $('#btn-continue').text("Continuar").attr("disabled", false);
             }
         });
 
@@ -328,7 +331,10 @@ $(document).ready(function() {
         var email = $("#email").val();
         $('#showPhone').html(phone);
         $('#showEmail').html(email);
-        $('#verifyModal').modal('show');
+        $('#verifyModal').modal({
+            backdrop: 'static', // Desactiva el clic fuera del modal
+            keyboard: false     // Desactiva el cierre con la tecla Esc
+        });
         $('#btn-submit').attr("disabled", true);
 
         $('#btn-continue').attr("disabled", false);
@@ -574,6 +580,32 @@ function procesarFormulario() {
     if (form[0].checkValidity() === false) {
         event.stopPropagation();
         form.addClass('was-validated');
+
+        // Restaurar los botones a su estado original
+        $('#btn-continue').text("Continuar").attr("disabled", false);
+        $('#btn-cancel').attr("disabled", false);
+        $('#btn-submit').attr("disabled", false);
+
+        $('#verifyModal').modal('hide');
+
+        // Mostrar mensajes de error (opcional, si usas Toast o alert)
+        toastr.error('Por favor, corrige los errores en el formulario.', 'Error', {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "2000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        });
     } else {
         // Verificar el método de pago seleccionado y validar campos adicionales
         let selectedMethod = $("input[name='paymentMethod']:checked").attr('id');
@@ -608,6 +640,12 @@ function procesarFormulario() {
                         "showMethod": "fadeIn",
                         "hideMethod": "fadeOut"
                     });
+                // Restaurar los botones a su estado original
+                $('#btn-continue').text("Continuar").attr("disabled", false);
+                $('#btn-cancel').attr("disabled", false);
+                $('#btn-submit').attr("disabled", false);
+
+                $('#verifyModal').modal('hide');
             }
         } else if (selectedMethod === 'method_yape_plin') {
             // Validar si el código de operación está presente
@@ -634,6 +672,12 @@ function procesarFormulario() {
                         "showMethod": "fadeIn",
                         "hideMethod": "fadeOut"
                     });
+                // Restaurar los botones a su estado original
+                $('#btn-continue').text("Continuar").attr("disabled", false);
+                $('#btn-cancel').attr("disabled", false);
+                $('#btn-submit').attr("disabled", false);
+
+                $('#verifyModal').modal('hide');
             }
         } else if (selectedMethod === 'method_mercado_pago') {
 

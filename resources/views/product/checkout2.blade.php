@@ -326,12 +326,11 @@
         </div>
     </div>
 
-    <div class="modal fade" id="verifyModal" tabindex="-1" aria-labelledby="verifyModalLabel" aria-hidden="true">
+    <div class="modal fade" id="verifyModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="verifyModalLabel">¡Atención! 📢</h5>
-                    <button type="button" class="close closeModalVerify" ><span aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
                     <p>Antes de finalizar tu compra, asegúrate de que los datos en los campos de celular y correo electrónico estén correctos.</p>
