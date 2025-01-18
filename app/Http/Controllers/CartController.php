@@ -1712,33 +1712,40 @@ class CartController extends Controller
         $maxSubtotal = 0;
 
         foreach ($cart as $item) {
-            $basePrice = 0;
+            $subtotal = 0;
 
-            // Obtener el precio base del producto o tipo de producto
-            if (isset($item['product_type_id']) && $item['product_type_id'] != null) {
-                $productType = ProductType::find($item['product_type_id']);
-                if ($productType) {
-                    $basePrice = $productType->price;
-                }
+            if (isset($item['custom']) && $item['custom'] === true) {
+                // Si el producto es personalizado, tomar directamente el total
+                $subtotal = $item['total'];
             } else {
-                $product = Product::find($item['product_id']);
-                if ($product) {
-                    $basePrice = $product->price_default;
-                }
-            }
+                $basePrice = 0;
 
-            // Calcular el total de las opciones
-            $optionsTotal = 0;
-            if (isset($item['options'])) {
-                foreach ($item['options'] as $optionsGroup) {
-                    foreach ($optionsGroup as $option) {
-                        $optionsTotal += $option['additional_price'];
+                // Obtener el precio base del producto o tipo de producto
+                if (isset($item['product_type_id']) && $item['product_type_id'] != null) {
+                    $productType = ProductType::find($item['product_type_id']);
+                    if ($productType) {
+                        $basePrice = $productType->price;
+                    }
+                } else {
+                    $product = Product::find($item['product_id']);
+                    if ($product) {
+                        $basePrice = $product->price_default;
                     }
                 }
-            }
 
-            // Calcular el subtotal unitario incluyendo opciones
-            $subtotal = $basePrice + $optionsTotal;
+                // Calcular el total de las opciones
+                $optionsTotal = 0;
+                if (isset($item['options'])) {
+                    foreach ($item['options'] as $optionsGroup) {
+                        foreach ($optionsGroup as $option) {
+                            $optionsTotal += $option['additional_price'];
+                        }
+                    }
+                }
+
+                // Calcular el subtotal unitario incluyendo opciones
+                $subtotal = $basePrice + $optionsTotal;
+            }
 
             // Verificar si este es el mayor subtotal elegible
             $product = Product::find($item['product_id']);
@@ -1754,7 +1761,7 @@ class CartController extends Controller
             }
         }
 
-        return $maxDetail; // Devuelve el producto con el mayor subtotal (sin combos)
+        return $maxDetail;  // Devuelve el producto con el mayor subtotal (sin combos)
     }
 
     public function calculateShippingOriginal(Request $request)
