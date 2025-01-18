@@ -256,7 +256,7 @@
             top: -5px; /* Mueve más arriba para que quede al borde */
             right: -5px; /* Mueve más a la derecha para alinearse al borde */
             font-size: 20px;
-            color: #ff0000;
+            color: #e69c00;
             display: none; /* Solo se muestra cuando está seleccionado */
         }
 
@@ -280,7 +280,7 @@
 
         /* Cuando el radio está seleccionado */
         .pizza-options .radio-button.active {
-            border: 2px solid #ff0000 !important; /* Forzar la aplicación del borde rojo */
+            border: 2px solid #e69c00 !important; /* Forzar la aplicación del borde rojo */
         }
 
         .radio-button.active .check-icon {
@@ -337,6 +337,113 @@
         /* Giro hacia arriba cuando está expandido */
         .card-header[aria-expanded="true"] .toggle-icon {
             transform: rotate(180deg);
+        }
+
+        /* checkbox adicionales */
+        /* Grupo de checkboxes */
+        .custom-checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Ocultar el checkbox original */
+        .custom-checkbox-input {
+            position: absolute; /* Posición fuera del flujo */
+            opacity: 0; /* Totalmente invisible */
+            width: 0;
+            height: 0;
+        }
+
+        /* Contenedor como label */
+        .custom-checkbox-container {
+            display: flex;
+            align-items: center;
+            border: 2px solid #ddd; /* Borde inicial */
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            background-color: #fff; /* Fondo inicial */
+            transition: border-color 0.3s ease, background-color 0.3s ease; /* Transiciones suaves */
+        }
+
+        /* Hover: Cambiar color al pasar el mouse */
+        .custom-checkbox-container:hover {
+            border-color: #e69c00;
+            background-color: #fff8e5; /* Fondo amarillo claro */
+        }
+
+        /* Estilo cuando está seleccionado */
+        .custom-checkbox-container.selected {
+            border-color: #e69c00;
+            background-color: #fff8e5; /* Fondo amarillo claro */
+        }
+
+        /* Cuadro del checkbox */
+        .checkbox-box {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-radius: 3px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+        }
+
+        /* Check visual dentro del cuadro */
+        .checkbox-box::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background-color: transparent; /* Inicialmente vacío */
+            border-radius: 2px;
+            display: none; /* Oculto inicialmente */
+        }
+
+        /* Checkbox activado: cuadro del checkbox */
+        .custom-checkbox-input:checked + .checkbox-box {
+            border-color: #e69c00;
+            background-color: #e69c00;
+        }
+
+        .custom-checkbox-input:checked + .checkbox-box::after {
+            display: block;
+            background-color: #fff; /* Check blanco dentro del cuadro */
+        }
+
+        /* Contenido dentro del label */
+        .custom-checkbox-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%; /* Extender al ancho total */
+        }
+
+        /* Imagen */
+        .custom-checkbox-content img {
+            width: 48px;
+            height: 48px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        /* Detalles del topping */
+        .custom-checkbox-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topping-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .topping-price {
+            font-size: 12px;
+            color: #555;
         }
     </style>
 @endsection
@@ -527,15 +634,41 @@
                                 </div>
                                 <div id="collapseThree" class="collapse" aria-labelledby="headingThree">
                                     <div class="card-body">
-                                        Contenido de la sección 3.
+                                        <div class="custom-checkbox-group">
+                                            <!-- Opción 1 -->
+                                            <label class="custom-checkbox-container" for="topping1">
+                                                <input type="checkbox" id="topping1" class="custom-checkbox-input">
+                                                <span class="checkbox-box"></span>
+                                                <div class="custom-checkbox-content">
+                                                    <img src="https://via.placeholder.com/48" alt="Pimientos Verdes">
+                                                    <div class="custom-checkbox-details">
+                                                        <span class="topping-name">Pimientos Verdes</span>
+                                                        <span class="topping-price">+S/. 6.00</span>
+                                                    </div>
+                                                </div>
+                                            </label>
+
+                                            <!-- Opción 2 -->
+                                            <label class="custom-checkbox-container" for="topping2">
+                                                <input type="checkbox" id="topping2" class="custom-checkbox-input">
+                                                <span class="checkbox-box"></span>
+                                                <div class="custom-checkbox-content">
+                                                    <img src="https://via.placeholder.com/48" alt="Cebolla Roja">
+                                                    <div class="custom-checkbox-details">
+                                                        <span class="topping-name">Cebolla Roja</span>
+                                                        <span class="topping-price">+S/. 5.00</span>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="accordion" id="dynamicAccordion">
+                        {{--<div class="accordion" id="dynamicAccordion">
 
-                            {{-- Tamaño --}}
+                            --}}{{-- Tamaño --}}{{--
                             @if (count($productTypes) > 0)
 
                                     <div class="accordion-item">
@@ -546,8 +679,8 @@
                                         </h2>
                                         <div id="collapseSize" class="accordion-collapse collapse" aria-labelledby="headingSize" data-bs-parent="#dynamicAccordion">
                                             <div class="accordion-body">
-                                                {{-- Aquí puedes renderizar los tamaños --}}
-                                                {{--<div class="pizza-options">
+                                                --}}{{-- Aquí puedes renderizar los tamaños --}}{{--
+                                                --}}{{--<div class="pizza-options">
                                                 @foreach($productTypes as $productType)
                                                     <div class="radio-button" data-value="mediana">
                                                         <input type="radio" name="pizza-size" value="{{ $productType->id }}" data-price="{{ $productType->price }}" {{ $productType->default ? 'checked' : '' }}>
@@ -559,14 +692,14 @@
                                                         </div>
                                                     </div>
                                                 @endforeach
-                                                </div>--}}
+                                                </div>--}}{{--
                                             </div>
                                         </div>
                                     </div>
 
                             @endif
 
-                            {{-- Opciones --}}
+                            --}}{{-- Opciones --}}{{--
                             @if(isset($product->options) && count($product->options) > 0)
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="headingOptions">
@@ -576,7 +709,7 @@
                                     </h2>
                                     <div id="collapseOptions" class="accordion-collapse collapse" aria-labelledby="headingOptions" data-bs-parent="#dynamicAccordion">
                                         <div class="accordion-body">
-                                            {{-- Aquí puedes renderizar las opciones --}}
+                                            --}}{{-- Aquí puedes renderizar las opciones --}}{{--
                                             @foreach($product->options as $option)
                                                 <p>{{ $option }}</p>
                                             @endforeach
@@ -587,7 +720,7 @@
 
 
 
-                            {{-- Adicionales --}}
+                            --}}{{-- Adicionales --}}{{--
                             @if(isset($adicionales) && count($adicionales) > 0)
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="headingAdicionales">
@@ -597,7 +730,7 @@
                                     </h2>
                                     <div id="collapseAdicionales" class="accordion-collapse collapse" aria-labelledby="headingAdicionales" data-bs-parent="#dynamicAccordion">
                                         <div class="accordion-body">
-                                            {{-- Aquí puedes renderizar los adicionales --}}
+                                            --}}{{-- Aquí puedes renderizar los adicionales --}}{{--
                                             @foreach($adicionales as $adicional)
                                                 <p>{{ $adicional }}</p>
                                             @endforeach
@@ -606,7 +739,7 @@
                                 </div>
                             @endif
 
-                        </div>
+                        </div>--}}
 
                         {{--<div class="mb-3">
                             <span class="h5">S/. <span data-base-price="{{ isset($defaultProductType->price) ? $defaultProductType->price : $product->price_default }}" id="product-price">{{ isset($defaultProductType->price) ? $defaultProductType->price : $product->price_default }}</span></span>
@@ -614,8 +747,8 @@
                             <small class="ml-5 text-danger {{ ($product->visibility_price_real == 0) ? 'd-none' : '' }}" style="text-decoration: line-through;"><span data-real-price="" id="product-price-real"></span></small>
                         </div>--}}
 
-                        <div class="row">
-                            {{-- Logica para mostrar las opciones --}}
+                        {{--<div class="row">
+                            --}}{{-- Logica para mostrar las opciones --}}{{--
                             @foreach ($options as $option)
                                 <div class="col-md-12 mb-4">
                                     <strong>{{ $option->description }}</strong>
@@ -626,7 +759,7 @@
                                          data-quantity="{{ $option->quantity }}"
                                          data-type="{{ $option->type }}">
 
-                                        {{-- Según el tipo de la opción, generar dinámicamente los inputs --}}
+                                        --}}{{-- Según el tipo de la opción, generar dinámicamente los inputs --}}{{--
                                         @if ($option->type == 'radio')
                                             @foreach ($option->selections as $selection)
                                                 <div class="form-check mb-2 custom-radio-checkbox">
@@ -679,7 +812,7 @@
                                     </div>
                                 </div>
                             @endforeach
-                        </div>
+                        </div>--}}
 
                         <hr />
 
@@ -857,6 +990,17 @@
 
             $(".collapse").on("hide.bs.collapse", function () {
                 $(this).prev(".card-header").attr("aria-expanded", "false").find(".toggle-icon").removeClass("rotate");
+            });
+
+            // Evento cuando se hace clic en un checkbox
+            $(".custom-checkbox-input").on("change", function () {
+                const container = $(this).closest(".custom-checkbox-container");
+
+                if ($(this).is(":checked")) {
+                    container.addClass("selected"); // Añade la clase cuando está seleccionado
+                } else {
+                    container.removeClass("selected"); // Remueve la clase cuando no está seleccionado
+                }
             });
         });
 
