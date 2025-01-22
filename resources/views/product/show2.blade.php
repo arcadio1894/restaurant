@@ -47,7 +47,7 @@
         }
 
         .custom-radio-checkbox .form-check-label {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #333;
         }
 
