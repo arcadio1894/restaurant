@@ -47,7 +47,7 @@
         }
 
         .custom-radio-checkbox .form-check-label {
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: #333;
         }
 
@@ -310,9 +310,8 @@
             text-decoration: underline; /* Subrayado al pasar el mouse */
         }
 
-        .collapse.show {
-            background-color: #ffffff; /* Fondo del contenido expandido */
-
+        .collapse.custom-collapse.show {
+            background-color: #ffffff; /* Fondo del contenido expandido específico */
         }
 
         /* ACCORDEON */
@@ -493,7 +492,7 @@
 
         /* Scroll */
         .scrollable-container {
-            max-height: 450px; /* Ajusta según tus necesidades */
+            max-height: 600px; /* Ajusta según tus necesidades */
             overflow-y: auto;
             scrollbar-width: thin; /* Para navegadores modernos */
         }
@@ -618,7 +617,7 @@
                                         <i class="fas fa-chevron-down toggle-icon"></i>
                                     </h5>
                                 </div>
-                                <div id="collapseOne" class="collapse show" aria-labelledby="headingOne">
+                                <div id="collapseOne" class="collapse custom-collapse show" aria-labelledby="headingOne">
                                     <div class="card-body">
                                         <div class="pizza-options">
                                             @foreach($productTypes as $productType)
@@ -647,7 +646,7 @@
                                         <i class="fas fa-chevron-down toggle-icon"></i>
                                     </h5>
                                 </div>
-                                <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo">
+                                <div id="collapseTwo" class="collapse custom-collapse show" aria-labelledby="headingTwo">
                                     <div class="card-body scrollable-container">
                                         @foreach ($options as $option)
                                             <div class="col-md-12 mb-4">
@@ -726,7 +725,7 @@
                                         <i class="fas fa-chevron-down toggle-icon"></i>
                                     </h5>
                                 </div>
-                                <div id="collapseThree" class="collapse show" aria-labelledby="headingThree">
+                                <div id="collapseThree" class="collapse custom-collapse show" aria-labelledby="headingThree">
                                     <div class="card-body scrollable-container">
                                         <div class="custom-checkbox-group">
                                             <!-- Opción 1 -->
