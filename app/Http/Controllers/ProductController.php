@@ -680,7 +680,8 @@ class ProductController extends Controller
 
         //dd($chunkedAdicionales);
 
-        return view('product.show', compact('product', 'productTypes', 'defaultProductType', 'options', 'adicionales'));
+        //return view('product.show', compact('product', 'productTypes', 'defaultProductType', 'options', 'adicionales'));
+        return view('product.show2', compact('product', 'productTypes', 'defaultProductType', 'options', 'adicionales'));
     }
 
     public function customPizza()
