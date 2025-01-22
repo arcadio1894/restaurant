@@ -437,6 +437,12 @@ class ProductController extends Controller
                 }
             } else {
                 $path = public_path('/images/products/');
+                if (!file_exists($path)) {
+                    return response()->json(['message' => 'La carpeta de destino no existe.'], 422);
+                }
+                if (!is_writable($path)) {
+                    return response()->json(['message' => 'No hay permisos de escritura en la carpeta de destino.'], 422);
+                }
                 $extension = $request->file('image')->getClientOriginalExtension();
                 $filename = $product->id . '.' . $extension;
                 $request->file('image')->move($path, $filename);
