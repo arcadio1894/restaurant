@@ -3,9 +3,9 @@
 @section('menu-active', 'active')
 
 @section('text-header')
-    <h2 class="pt-5">
+    {{--<h2 class="pt-5">
         {{ $product->full_name }}
-    </h2>
+    </h2>--}}
 
 @endsection
 
@@ -368,15 +368,54 @@
         }
 
         /* Hover: Cambiar color al pasar el mouse */
-        .custom-checkbox-container:hover {
+        /*.custom-checkbox-container:hover {
             border-color: #e69c00;
-            background-color: #fff8e5; /* Fondo amarillo claro */
-        }
+            background-color: #fff8e5; !* Fondo amarillo claro *!
+        }*/
 
         /* Estilo cuando está seleccionado */
         .custom-checkbox-container.selected {
-            border-color: #e69c00;
+            /*border-color: #e69c00;*/
+            border: 2px solid #e69c00;
             background-color: #fff8e5; /* Fondo amarillo claro */
+        }
+
+        /* Quitar el estilo de foco para checkboxes */
+        .custom-checkbox-input:focus,
+        .custom-checkbox-container:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        /* Para navegadores basados en WebKit */
+        .custom-checkbox-input:focus {
+            outline: none !important;
+            box-shadow: none !important;
+            border: none !important;
+        }
+
+        /* Estilos para deshabilitar el borde amarillo */
+        .custom-checkbox-input {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Para navegadores móviles */
+        @media (max-width: 768px) {
+            .custom-checkbox-input {
+                outline: none !important;
+                box-shadow: none !important;
+            }
+
+            .custom-checkbox-input:focus {
+                outline: none !important;
+                box-shadow: none !important;
+            }
+        }
+
+        .no-focus:focus {
+            outline: none !important;
+            box-shadow: none !important;
         }
 
         /* Cuadro del checkbox */
@@ -445,27 +484,82 @@
             font-size: 12px;
             color: #555;
         }
+
+        /* Remover el estilo de enfoque para los checkboxes */
+        .custom-checkbox-input:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        /* Scroll */
+        .scrollable-container {
+            max-height: 450px; /* Ajusta según tus necesidades */
+            overflow-y: auto;
+            scrollbar-width: thin; /* Para navegadores modernos */
+        }
+
+        /* Ver Mas */
+        .hidden-elements {
+            display: none; /* Inicialmente oculto */
+        }
+
+        .hidden-elements.visible {
+            display: flex; /* O block, según tu diseño */
+        }
+
+        /* Boton de Agregar carrito */
+        /* Esconder el botón original en dispositivos móviles */
+        @media (max-width: 992px) {
+            .d-lg-flex {
+                display: none !important;
+            }
+        }
+
+        /* Div fijo para móviles */
+        .mobile-fixed-cart {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1050;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            padding: 10px 15px;
+            border-top: 1px solid #ddd;
+        }
+
+        .mobile-fixed-cart .btn {
+            width: 100%;
+            margin: 0;
+        }
+
+        .text-custom {
+            padding: 0px 0px 4px;
+            margin: 0px;
+            font-weight: bold;
+            font-size: 40px;
+            text-decoration: none;
+            line-height: 40px;
+            color: rgb(35, 31, 32);
+        }
     </style>
 @endsection
 
 @section('content')
+    <div id="clickHere"></div>
     <section class="py-5">
         <div class="container">
             <div class="row gx-5">
                 <aside class="col-lg-5 offset-xl-1">
-                    <div class="d-flex flex-row my-3">
-                        <div class="text-warning mb-1 me-2">
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fas fa-star-half"></i>
-                            <span class="ms-1">
-                                    4.5
-                                </span>
+                    <div class="d-flex flex-row">
+                        <div class="mb-1 me-2 text-uppercase text-custom">
+                            <h2>
+                                {{ $product->full_name }}
+                            </h2>
+
                         </div>
                         {{--<span class="text-muted"><i class="fas fa-shopping-basket fa-sm mx-1 pl-2"></i>154 orders</span>--}}
-                        <span class="text-success ms-2 pl-2"> In stock</span>
+                        {{--<span class="text-success ms-2 pl-2"> In stock</span>--}}
                         <small class="ml-5 text-danger {{ ($product->visibility_price_real == 0) ? 'd-none' : '' }}" style="text-decoration: line-through;"><span data-real-price="" id="product-price-real"></span></small>
 
                     </div>
@@ -477,7 +571,7 @@
                             <img style="max-width: 100%; max-height: 100vh; margin: auto;" class="rounded-4 fit" src="{{ asset('images/products/'.$product->image) }}" />
                         </a>
                     </div>
-                    <div class="d-flex justify-content-center mb-3">
+                    <div class="d-flex justify-content-center mb-3 d-lg-flex d-none">
                         <button type="button" class="btn btn-danger btn-block py-3"
                                 id="add-to-cart-btn"
                                 data-product-category="{{ $product->category_id }}"
@@ -494,26 +588,25 @@
                     </div>
                     <!-- thumbs-wrap.// -->
                     <!-- gallery-wrap .end// -->
-
+                    <!-- Div fijo para móviles -->
+                    <div class="mobile-fixed-cart d-lg-none">
+                        <button type="button" class="btn btn-danger btn-block py-3"
+                                id="add-to-cart-btn-mobile"
+                                data-product-category="{{ $product->category_id }}"
+                                data-product-id_v2="{{ $product->id }}"
+                                data-product-id="{{ $product->slug }}"
+                                data-auth-check-url="{{ route('auth.check') }}"
+                                data-add-cart-url="{{ route('cart.manage') }}">
+                            Agregar al carrito
+                            <span class="h5">S/.
+                                <span data-base-price="{{ isset($defaultProductType->price) ? $defaultProductType->price : $product->price_default }}" id="product-price-mobile">{{ isset($defaultProductType->price) ? $defaultProductType->price : $product->price_default }}
+                                </span>
+                            </span>
+                        </button>
+                    </div>
                 </aside>
                 <main class="col-lg-5">
                     <div class="ps-lg-3">
-
-                        {{--<div class="pizza-options">
-                            @if (count($productTypes) > 0)
-                                @foreach($productTypes as $productType)
-                                    <div class="radio-button" data-value="{{ $productType->id }}">
-                                        <input type="radio" name="pizza-size" value="{{ $productType->id }}" data-price="{{ $productType->price }}" {{ $productType->default ? 'checked' : '' }}>
-                                        <span class="check-icon"><i class="fas fa-check-circle"></i></span>
-                                        <div class="content">
-                                            <span class="size">{{ $productType->type->name }} </span>
-                                            <span class="slices">{{ ($productType->type->size == null) ? "":"(".$productType->type->size.")" }}</span>
-                                            <span class="price">S/ {{ $productType->price }}</span>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            @endif
-                        </div>--}}
 
                         <div id="accordionExample">
                             <!-- Tamaños -->
@@ -548,14 +641,14 @@
                             <!-- Opciones -->
                             @if(isset($product->options) && count($product->options) > 0)
                             <div class="card">
-                                <div class="card-header toggle-header" id="headingTwo" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                <div class="card-header toggle-header" id="headingTwo" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
                                     <h5 class="mb-0 d-flex justify-content-between align-items-center">
                                         <span>Opciones para seleccionar</span>
                                         <i class="fas fa-chevron-down toggle-icon"></i>
                                     </h5>
                                 </div>
-                                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo">
-                                    <div class="card-body">
+                                <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo">
+                                    <div class="card-body scrollable-container">
                                         @foreach ($options as $option)
                                             <div class="col-md-12 mb-4">
                                                 <strong>{{ $option->description }}</strong>
@@ -624,200 +717,48 @@
                             </div>
                             @endif
 
-                            <!-- Sección 3 -->
+                            <!-- Adicionales -->
+                            @if (count($adicionales) > 0)
                             <div class="card">
-                                <div class="card-header toggle-header" id="headingThree" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                <div class="card-header toggle-header" id="headingThree" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
                                     <h5 class="mb-0 d-flex justify-content-between align-items-center">
-                                        <span>Sección 3</span>
+                                        <span>Adicionales </span>
                                         <i class="fas fa-chevron-down toggle-icon"></i>
                                     </h5>
                                 </div>
-                                <div id="collapseThree" class="collapse" aria-labelledby="headingThree">
-                                    <div class="card-body">
+                                <div id="collapseThree" class="collapse show" aria-labelledby="headingThree">
+                                    <div class="card-body scrollable-container">
                                         <div class="custom-checkbox-group">
                                             <!-- Opción 1 -->
-                                            <label class="custom-checkbox-container" for="topping1">
-                                                <input type="checkbox" id="topping1" class="custom-checkbox-input">
+                                            @foreach ($adicionales as $adicional)
+                                            <label class="custom-checkbox-container {{ $loop->index >= 4 ? 'hidden-elements' : '' }}" for="topping{{$adicional->id}}">
+                                                <input type="checkbox" data-product_id = "{{$adicional->id}}" data-price="{{ $adicional->price_default }}" data-product_name="{{ $adicional->full_name }}" id="topping{{$adicional->id}}" class="custom-checkbox-input">
                                                 <span class="checkbox-box"></span>
                                                 <div class="custom-checkbox-content">
-                                                    <img src="https://via.placeholder.com/48" alt="Pimientos Verdes">
+                                                    <img src="{{ asset('images/products/'.$adicional->image) }}" alt="{{ $adicional->full_name }}">
                                                     <div class="custom-checkbox-details">
-                                                        <span class="topping-name">Pimientos Verdes</span>
-                                                        <span class="topping-price">+S/. 6.00</span>
+                                                        <span class="topping-name">{{ $adicional->full_name }}</span>
+                                                        <span class="topping-price">+S/. {{ $adicional->price_default }}</span>
                                                     </div>
                                                 </div>
                                             </label>
-
-                                            <!-- Opción 2 -->
-                                            <label class="custom-checkbox-container" for="topping2">
-                                                <input type="checkbox" id="topping2" class="custom-checkbox-input">
-                                                <span class="checkbox-box"></span>
-                                                <div class="custom-checkbox-content">
-                                                    <img src="https://via.placeholder.com/48" alt="Cebolla Roja">
-                                                    <div class="custom-checkbox-details">
-                                                        <span class="topping-name">Cebolla Roja</span>
-                                                        <span class="topping-price">+S/. 5.00</span>
-                                                    </div>
-                                                </div>
-                                            </label>
+                                            @endforeach
+                                            @if(count($adicionales) > 4)
+                                                <button id="showMoreBtn" class="btn btn-link">Ver más</button>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            @endif
+
+
                         </div>
-
-                        {{--<div class="accordion" id="dynamicAccordion">
-
-                            --}}{{-- Tamaño --}}{{--
-                            @if (count($productTypes) > 0)
-
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header" id="headingSize">
-                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSize" aria-expanded="false" aria-controls="collapseSize">
-                                                Tamaño
-                                            </button>
-                                        </h2>
-                                        <div id="collapseSize" class="accordion-collapse collapse" aria-labelledby="headingSize" data-bs-parent="#dynamicAccordion">
-                                            <div class="accordion-body">
-                                                --}}{{-- Aquí puedes renderizar los tamaños --}}{{--
-                                                --}}{{--<div class="pizza-options">
-                                                @foreach($productTypes as $productType)
-                                                    <div class="radio-button" data-value="mediana">
-                                                        <input type="radio" name="pizza-size" value="{{ $productType->id }}" data-price="{{ $productType->price }}" {{ $productType->default ? 'checked' : '' }}>
-                                                        <span class="check-icon"><i class="fas fa-check-circle"></i></span>
-                                                        <div class="content">
-                                                            <span class="size">{{ $productType->type->name }} </span>
-                                                            <span class="slices">{{ ($productType->type->size == null) ? "":"(".$productType->type->size.")" }}</span>
-                                                            <span class="price">{{ $productType->price }}</span>
-                                                        </div>
-                                                    </div>
-                                                @endforeach
-                                                </div>--}}{{--
-                                            </div>
-                                        </div>
-                                    </div>
-
-                            @endif
-
-                            --}}{{-- Opciones --}}{{--
-                            @if(isset($product->options) && count($product->options) > 0)
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header" id="headingOptions">
-                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOptions" aria-expanded="false" aria-controls="collapseOptions">
-                                            Opciones
-                                        </button>
-                                    </h2>
-                                    <div id="collapseOptions" class="accordion-collapse collapse" aria-labelledby="headingOptions" data-bs-parent="#dynamicAccordion">
-                                        <div class="accordion-body">
-                                            --}}{{-- Aquí puedes renderizar las opciones --}}{{--
-                                            @foreach($product->options as $option)
-                                                <p>{{ $option }}</p>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
-
-
-
-                            --}}{{-- Adicionales --}}{{--
-                            @if(isset($adicionales) && count($adicionales) > 0)
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header" id="headingAdicionales">
-                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdicionales" aria-expanded="false" aria-controls="collapseAdicionales">
-                                            Adicionales
-                                        </button>
-                                    </h2>
-                                    <div id="collapseAdicionales" class="accordion-collapse collapse" aria-labelledby="headingAdicionales" data-bs-parent="#dynamicAccordion">
-                                        <div class="accordion-body">
-                                            --}}{{-- Aquí puedes renderizar los adicionales --}}{{--
-                                            @foreach($adicionales as $adicional)
-                                                <p>{{ $adicional }}</p>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
-
-                        </div>--}}
-
-                        {{--<div class="mb-3">
-                            <span class="h5">S/. <span data-base-price="{{ isset($defaultProductType->price) ? $defaultProductType->price : $product->price_default }}" id="product-price">{{ isset($defaultProductType->price) ? $defaultProductType->price : $product->price_default }}</span></span>
-                            <span class="text-muted">/ por unidad</span>
-                            <small class="ml-5 text-danger {{ ($product->visibility_price_real == 0) ? 'd-none' : '' }}" style="text-decoration: line-through;"><span data-real-price="" id="product-price-real"></span></small>
-                        </div>--}}
-
-                        {{--<div class="row">
-                            --}}{{-- Logica para mostrar las opciones --}}{{--
-                            @foreach ($options as $option)
-                                <div class="col-md-12 mb-4">
-                                    <strong>{{ $option->description }}</strong>
-                                    <small>Cantidad máxima: {{ $option->quantity }}</small>
-                                    <br><br>
-                                    <div class="option-container"
-                                         data-option-id="{{ $option->id }}"
-                                         data-quantity="{{ $option->quantity }}"
-                                         data-type="{{ $option->type }}">
-
-                                        --}}{{-- Según el tipo de la opción, generar dinámicamente los inputs --}}{{--
-                                        @if ($option->type == 'radio')
-                                            @foreach ($option->selections as $selection)
-                                                <div class="form-check mb-2 custom-radio-checkbox">
-                                                    <input class="form-check-input option-input"
-                                                           type="radio"
-                                                           name="option_{{ $option->id }}"
-                                                           value="{{ $selection->product_id }}"
-                                                           id="radio_{{ $option->id }}_{{ $loop->index }}" />
-                                                    <label class="form-check-label" for="radio_{{ $option->id }}_{{ $loop->index }}">
-                                                        {{ $selection->product->full_name }}
-                                                    </label>
-                                                </div>
-                                            @endforeach
-                                        @elseif ($option->type == 'checkbox')
-                                            @foreach ($option->selections as $selection)
-                                                @if ($selection->product->enable_status == 1)
-                                                <div class="form-check mb-2 custom-radio-checkbox">
-                                                    <input class="form-check-input option-input"
-                                                           type="checkbox"
-                                                           data-option_id="{{$option->id}}"
-                                                           data-selection_id="{{$selection->id}}"
-                                                           data-selection_product_price="{{ isset($selection->product_price) ? $selection->product_price : 0 }}"
-                                                           data-selection_product_name="{{$selection->product->full_name}}"
-                                                           data-selection_price="{{$selection->additional_price}}"
-                                                           data-selection_product_id="{{$selection->product_id}}"
-                                                           name="option_{{ $option->id }}[]"
-                                                           value="{{ $selection->product_id }}"
-                                                           id="checkbox_{{ $option->id }}_{{ $loop->index }}" />
-                                                    <label class="form-check-label" for="checkbox_{{ $option->id }}_{{ $loop->index }}">
-                                                        {{ $selection->product->full_name }}
-                                                        @if ($selection->additional_price > 0)
-                                                            <span class="text-muted">( + S/. {{ number_format($selection->additional_price, 2) }} )</span>
-                                                        @endif
-                                                    </label>
-                                                </div>
-                                                @endif
-                                            @endforeach
-                                        @elseif ($option->type == 'select')
-                                            <div class="mb-2">
-                                                <select class="form-select option-input" name="option_{{ $option->id }}">
-                                                    <option value="">Seleccione una opción</option>
-                                                    @foreach ($option->selections as $selection)
-                                                        <option value="{{ $selection->product_id }}">
-                                                            {{ $selection->product->full_name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        @endif
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>--}}
 
                         <hr />
 
                         <div class="row mb-2">
-                            @if (count($productTypes) > 0)
+                            {{--@if (count($productTypes) > 0)
                             <div class="col-md-4 col-6">
                                 <select id="pizza-type-select" class="form-select border border-secondary" style="height: 35px;">
                                     @foreach($productTypes as $productType)
@@ -829,7 +770,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            @endif
+                            @endif--}}
                             <!-- col.// -->
                             {{--<div class="col-md-4 col-6 mb-3">
                                 <a href="#"
@@ -847,7 +788,7 @@
                     </div>
                 </main>
             </div>
-            <div class="row">
+            {{--<div class="row">
                 <div class="col-md-12">
                     <h2 class="text-center">Productos <b>Adicionales</b></h2>
                     <div class="d-none d-sm-block">
@@ -950,7 +891,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>--}}
         </div>
     </section>
     <!-- content -->
@@ -958,9 +899,19 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('js/product/showV2.js') }}?v={{ time() }}"></script>
+
     <script>
+        let $selectedAdditions = [];
         $(document).ready(function () {
+            if (/Mobi|Android/i.test(navigator.userAgent)) {
+                $(".custom-checkbox-input").addClass("no-focus");
+            }
+
+            $(".custom-checkbox-input").on("focus", function (e) {
+                e.preventDefault(); // Previene el comportamiento de foco
+                $("#clickHere").blur(); // Quita el foco del checkbox
+            });
+
             // Aplica la clase 'active' al contenedor del radio button ya seleccionado
             $(".radio-button input[type='radio']:checked").each(function () {
                 $(this).closest(".radio-button").addClass("active");
@@ -974,7 +925,11 @@
 
                 // Marca el radio button actual y su contenedor
                 $(this).addClass("active");
-                $(this).find("input[type='radio']").prop("checked", true);
+                const radioInput = $(this).find("input[type='radio']");
+                radioInput.prop("checked", true);
+
+                // Dispara manualmente el evento 'change' del radio
+                radioInput.trigger("change");
             });
 
             // Manejar el cambio de icono
@@ -992,17 +947,67 @@
                 $(this).prev(".card-header").attr("aria-expanded", "false").find(".toggle-icon").removeClass("rotate");
             });
 
+
+
             // Evento cuando se hace clic en un checkbox
             $(".custom-checkbox-input").on("change", function () {
                 const container = $(this).closest(".custom-checkbox-container");
+                const productId = $(this).data("product_id");
+                const productName = $(this).data("product_name");
+                const productPrice = parseFloat($(this).data("price")); // Asegurarse de que sea número
 
                 if ($(this).is(":checked")) {
+                    // Añadir el adicional al array
+                    $selectedAdditions.push({
+                        id: productId,
+                        name: productName,
+                        price: productPrice,
+                    });
+
                     container.addClass("selected"); // Añade la clase cuando está seleccionado
                 } else {
+                    // Remover el adicional del array
+                    $selectedAdditions = $selectedAdditions.filter(item => item.id !== productId);
+                    $(this).addClass("no-focus");
                     container.removeClass("selected"); // Remueve la clase cuando no está seleccionado
                 }
+
+                // Simula un clic o cambio de foco
+                $(this).blur(); // Intenta quitar el foco
+                setTimeout(() => {
+                    $("#clickHere").trigger("click"); // Simula un clic en el body
+                }, 50);
+
+                // Actualizar los precios dinámicamente
+                updatePrices();
             });
+
+            // Evento del Ver Mas
+            $('#showMoreBtn').on('click', function() {
+                const hiddenElements = $('.hidden-elements');
+
+                hiddenElements.toggleClass('visible'); // Alterna la clase visible
+
+                // Cambiar el texto del botón
+                $(this).text($(this).text() === 'Ver más' ? 'Ver menos' : 'Ver más');
+            });
+
+
         });
 
+        // Función para actualizar los precios en el DOM
+        function updatePrices() {
+            // Obtener el precio base de los spans
+            let basePrice = parseFloat($("#product-price").attr("data-base-price")) || 0;
+
+            // Calcular el precio total sumando los adicionales
+            let additionsTotal = $selectedAdditions.reduce((total, item) => total + item.price, 0);
+            let totalPrice = basePrice + additionsTotal;
+
+            // Actualizar los elementos del precio
+            $("#product-price, #product-price-mobile").text(totalPrice.toFixed(2));
+        }
+
     </script>
+    <script src="{{ asset('js/product/showV3.js') }}?v={{ time() }}"></script>
 @endsection

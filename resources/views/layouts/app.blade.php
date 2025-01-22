@@ -97,23 +97,24 @@
             position: relative;
         }
 
+        /* Ajustes para el botón de WhatsApp */
         .whatsapp-btn {
             position: fixed;
-            bottom: 20px;
+            bottom: 90px; /* Asegura que esté por encima del botón fijo */
             right: 20px;
-            z-index: 9999;
-            width: 120px; /* Ancho del botón */
-            height: 50px; /* Altura ajustada */
+            z-index: 10000; /* Mayor prioridad para estar encima de otros elementos */
+            width: 120px;
+            height: 50px;
             background-color: #25D366;
             display: flex;
-            align-items: center;  /* Alineación vertical centrada */
+            align-items: center;
             justify-content: center;
             border-radius: 10px;
             padding: 0 10px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
             animation: breathe 2s ease-in-out infinite;
-            flex-direction: row; /* Los elementos están en fila */
-            gap: 5px; /* Espacio ajustado entre el texto y el ícono */
+            flex-direction: row;
+            gap: 5px;
         }
 
         /* Estilos para el contenedor de texto */
