@@ -234,7 +234,8 @@ class CartController extends Controller
             ->where('status', 'pending')
             ->first();*/
         /*return view('product.cart', compact('cart'));*/
-        return view('product.cart2');
+        //return view('product.cart2');
+        return view('product.cart3');
     }
 
     public function updateQuantity(Request $request)
