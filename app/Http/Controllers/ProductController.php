@@ -432,31 +432,32 @@ class ProductController extends Controller
             // TODO: Tratamiento de un archivo de forma tradicional
             if ($request->file('image')) {
                 $path = public_path('/images/products/');
-                $tmpPath = $request->file('image')->getPathname(); // Ruta del archivo temporal
+                $tmpPath = $request->file('image')->getPathname();
                 $extension = $request->file('image')->getClientOriginalExtension();
                 $filename = $product->id . '.' . $extension;
 
-                // Verificar si el archivo temporal existe
+                // Verifica si el archivo temporal existe
                 if (!file_exists($tmpPath)) {
                     return response()->json(['error' => 'El archivo temporal no existe: ' . $tmpPath], 500);
                 }
 
-                // Verificar si la carpeta destino existe
+                // Verifica si la carpeta destino existe
                 if (!file_exists($path)) {
                     return response()->json(['error' => 'La carpeta de destino no existe: ' . $path], 500);
                 }
 
-                // Verificar si la carpeta es escribible
+                // Verifica si la carpeta tiene permisos de escritura
                 if (!is_writable($path)) {
                     return response()->json(['error' => 'No hay permisos de escritura en la carpeta de destino: ' . $path], 500);
                 }
 
-                // Intentar mover el archivo
+                // Intenta mover el archivo
                 try {
                     $request->file('image')->move($path, $filename);
                     $product->image = $filename;
                     $product->save();
                 } catch (\Exception $e) {
+                    // Muestra el mensaje completo del error
                     return response()->json(['error' => 'Error al mover el archivo: ' . $e->getMessage()], 500);
                 }
             }
