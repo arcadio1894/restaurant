@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Intervention\Image\Facades\Image;
 
 class ProductController extends Controller
 {
@@ -284,18 +285,40 @@ class ProductController extends Controller
             $product->code = $code;
             $product->save();
 
-            // TODO: Tratamiento de un archivo de forma tradicional
-            if (!$request->file('image')) {
-                $product->image = 'no_image.png';
-                $product->save();
+            // Procesar la imagen
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $destinationPath = public_path('/images/products/'); // Carpeta destino
+
+                // Asegúrate de que la carpeta exista
+                if (!file_exists($destinationPath)) {
+                    mkdir($destinationPath, 0755, true);
+                }
+
+                // Generar el nombre del archivo
+                $extension = $file->getClientOriginalExtension();
+                $filename = time() . '_' . uniqid() . '.' . $extension;
+
+                try {
+                    // Procesar la imagen con Intervention
+                    $image = Image::make($file->getRealPath());
+
+                    // Guardar la imagen en la carpeta destino
+                    $image->save($destinationPath . $filename);
+
+                    // Asignar el nombre de la imagen al producto
+                    $product->image = $filename;
+
+                } catch (\Exception $e) {
+                    return response()->json(['error' => 'Error al procesar la imagen: ' . $e->getMessage()], 500);
+                }
             } else {
-                $path = public_path().'/images/products/';
-                $extension = $request->file('image')->getClientOriginalExtension();
-                $filename = $product->id . '.' . $extension;
-                $request->file('image')->move($path, $filename);
-                $product->image = $filename;
-                $product->save();
+                // Si no se sube una imagen, asignar la predeterminada
+                $product->image = 'no_image.png';
             }
+
+            // Guardar el producto en la base de datos
+            $product->save();
 
             //$mat = $material;
             // TODO: Guardar las promociones
@@ -429,25 +452,41 @@ class ProductController extends Controller
             $product->visibility_price_real = $request->get('visibility_price_real') === 'on' ? 1 : 0;
             $product->save();
 
-            // TODO: Tratamiento de un archivo de forma tradicional
-            if (!$request->file('image')) {
-                if ($product->image == 'no_image.png' || $product->image == null) {
-                    $product->image = 'no_image.png';
+            // Verificar si hay un archivo cargado
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+
+                // Define la carpeta de destino
+                $destinationPath = public_path('/images/products/');
+
+                // Asegúrate de que la carpeta existe
+                if (!file_exists($destinationPath)) {
+                    mkdir($destinationPath, 0755, true);
+                }
+
+                // Genera el nombre del archivo con extensión
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+                try {
+                    // Verifica si ya existe una imagen con el mismo nombre
+                    $existingFile = $destinationPath . $filename;
+                    if (file_exists($existingFile)) {
+                        unlink($existingFile); // Elimina la imagen existente
+                    }
+
+                    // Procesar la imagen con Intervention
+                    $image = Image::make($file->getRealPath());
+
+                    // Guardar la imagen en la carpeta
+                    $image->save($destinationPath . $filename);
+
+                    // Actualizar el registro del producto
+                    $product->image = $filename;
                     $product->save();
+
+                } catch (\Exception $e) {
+                    return response()->json(['error' => 'Error al procesar la imagen: ' . $e->getMessage()], 500);
                 }
-            } else {
-                $path = public_path('/images/products/');
-                if (!file_exists($path)) {
-                    return response()->json(['message' => 'La carpeta de destino no existe.'], 422);
-                }
-                if (!is_writable($path)) {
-                    return response()->json(['message' => 'No hay permisos de escritura en la carpeta de destino.'], 422);
-                }
-                $extension = $request->file('image')->getClientOriginalExtension();
-                $filename = $product->id . '.' . $extension;
-                $request->file('image')->move($path, $filename);
-                $product->image = $filename;
-                $product->save();
             }
 
             // TODO: Guardar las product types
