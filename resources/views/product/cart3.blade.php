@@ -393,50 +393,6 @@
                 </div>
             </div>
         </div>
-        {{--<div class="row gy-3 mb-4">
-            <div class="col-md-5">
-                <div class="me-lg-5">
-                    <div class="d-flex">
-                        <img data-image src="--}}{{--{{ asset('images/products/'.$detail->product->image) }}--}}{{--" class="border rounded me-3" style="width: 96px; height: 96px;" />
-                        <div class="">
-                            <a href="#" class="nav-link" data-product_name>--}}{{--{{ $detail->product->full_name }}--}}{{--</a>
-                            <p class="text-muted ml-3 mb-0" data-detail_productType>
-                            </p>
-                            <div class="text-muted ml-1 small">
-                                <ul class="mb-0 ps-3" data-body_options>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-5">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="input-group mb-3" style="width: 140px;">
-                            <button data-minus data-detail_id="--}}{{--{{ $detail->id }}--}}{{--" class="btn btn-white border border-secondary" type="button" data-mdb-ripple-color="dark">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                            <input data-quantity data-detail_id="--}}{{--{{ $detail->id }}--}}{{--" type="text" class="form-control text-center border border-secondary" placeholder="14" aria-label="Example text with button addon" aria-describedby="button-addon1" value="--}}{{--{{ $detail->quantity }}--}}{{--" readonly/>
-                            <button data-plus data-detail_id="--}}{{--{{ $detail->id }}--}}{{--" class="btn btn-white border border-secondary" type="button" data-mdb-ripple-color="dark">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <text class="h6" data-detail_subtotal>--}}{{--S/ {{ $detail->subtotal }}--}}{{--</text> <br />
-                        <small class="text-muted text-nowrap" data-detail_price> --}}{{--S/ {{ $detail->product->price_default }} / por item--}}{{-- </small>
-
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="float-md-end">
-                    --}}{{--<a href="#!" data-material_id="--}}{{----}}{{--{{ $detail->product->id }}--}}{{----}}{{--" class="btn btn-light border icon-hover-primary"><i class="fas fa-heart fa-lg text-secondary"></i></a>--}}{{--
-                    <button type="button" data-delete_item data-detail_id="--}}{{--{{ $detail->id }}--}}{{--" class="btn btn-light border text-danger icon-hover-danger"> <i class="fas fa-trash fa-lg text-secondary"></i></button>
-                </div>
-            </div>
-        </div>--}}
     </template>
 
     <template id="template-option">

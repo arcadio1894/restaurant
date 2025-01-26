@@ -193,7 +193,8 @@ $(document).ready(function () {
                         quantity: 1,
                         user_id: userId, // Añadir el user_id
                         custom: false,
-                        total: totalTotal
+                        total: totalTotal,
+                        cart_index: generateUUID()
                     });
                 }
 
@@ -218,7 +219,8 @@ $(document).ready(function () {
                             user_id: userId,
                             options: {}, // Adicionales no tienen opciones
                             custom: false, // Marcado como adicional
-                            total: addition.price
+                            total: addition.price,
+                            cart_index: generateUUID()
                         });
                     }
                 });
@@ -305,7 +307,8 @@ $(document).ready(function () {
                         quantity: 1,
                         user_id: userId, // Añadir el user_id
                         custom: false,
-                        total: 0
+                        total: 0,
+                        cart_index: generateUUID()
                     });
                 }
 
@@ -421,6 +424,14 @@ $(document).ready(function () {
                 console.error("Error al verificar autenticación:", error);
                 $("#quantityCart").html(`(0)`);
             }
+        });
+    }
+
+    function generateUUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            const r = Math.random() * 16 | 0;
+            const v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
         });
     }
 });
