@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Slider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Intervention\Image\Facades\Image;
 
 class SliderController extends Controller
 {
@@ -57,14 +58,27 @@ class SliderController extends Controller
     private function handleImageUpload(Request $request, $slider)
     {
         if ($request->hasFile('image')) {
-            $path = public_path().'/images/slider/';
+            // Ruta de almacenamiento
+            $path = public_path('images/slider/');
+            if (!file_exists($path)) {
+                mkdir($path, 0755, true); // Crear el directorio si no existe
+            }
+
+            // Obtener la extensión original
             $extension = $request->file('image')->getClientOriginalExtension();
+
             // Determinar el sufijo según el tamaño
             $sizeSuffix = $request->get('size') === 'on' ? '_s' : '_l';
 
             // Generar el nombre del archivo
             $filename = 'slide' . $slider->id . $sizeSuffix . '.' . $extension;
-            $request->file('image')->move( $path, $filename);
+
+            // Procesar la imagen con Intervention (sin cambios)
+            $image = Image::make($request->file('image')->getRealPath());
+
+            // Guardar la imagen en la ruta especificada
+            $image->save($path . $filename);
+
             return $filename;
         }
 
@@ -117,7 +131,11 @@ class SliderController extends Controller
 
     private function handleImageUpdate(Request $request, $slider)
     {
-        $path = public_path().'/images/slider/';
+        $path = public_path('images/slider/');
+        if (!file_exists($path)) {
+            mkdir($path, 0755, true); // Crear el directorio si no existe
+        }
+
         $sizeSuffix = $request->get('size') === 'on' ? '_s' : '_l';
 
         // Eliminar la imagen anterior si existe y no es la imagen predeterminada
@@ -128,12 +146,21 @@ class SliderController extends Controller
             }
         }
 
-        // Guardar la nueva imagen
-        $extension = $request->file('image')->getClientOriginalExtension();
-        $filename = 'slide' . $slider->id . $sizeSuffix . '.' . $extension;
-        $request->file('image')->move($path, $filename);
+        // Procesar y guardar la nueva imagen
+        if ($request->hasFile('image')) {
+            $extension = $request->file('image')->getClientOriginalExtension();
+            $filename = 'slide' . $slider->id . $sizeSuffix . '.' . $extension;
 
-        return $filename;
+            // Procesar la imagen con Intervention (sin cambios)
+            $image = Image::make($request->file('image')->getRealPath());
+
+            // Guardar la imagen en la ruta especificada
+            $image->save($path . $filename);
+
+            return $filename;
+        }
+
+        return 'no_image.png';
     }
 
     public function destroy(Request $request)
