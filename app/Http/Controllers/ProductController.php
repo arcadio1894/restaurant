@@ -33,8 +33,9 @@ class ProductController extends Controller
 
         $query = Product::with('category:id,name')
             ->where('enable_status', '<>', 2)
-            ->orderByRaw('FIELD(category_id, ' . implode(',', $order) . ')')
-            ->orderBy('id');
+            ->orderByRaw('FIELD(category_id, ' . implode(',', $order) . ') DESC') // Categorías en orden específico
+            ->orderBy('category_id') // Ordenar las categorías no listadas
+            ->orderBy('id'); // Ordenar por ID como criterio secundario
 
         // Aplicar filtros si se proporcionan
         if ($full_name != "") {
