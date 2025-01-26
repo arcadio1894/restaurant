@@ -31,6 +31,7 @@ class ProductController extends Controller
 
         $query = Product::with('category:id,name')
             ->where('enable_status', '<>', 2)
+            ->orderBy('category_id')
             ->orderBy('id');
 
         // Aplicar filtros si se proporcionan
