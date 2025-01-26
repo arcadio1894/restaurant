@@ -29,9 +29,11 @@ class ProductController extends Controller
         $code = $request->input('code');
         $category = $request->input('category');
 
+        $order = [1, 2, 5, 3, 7, 6]; // Orden deseado de las categorías
+
         $query = Product::with('category:id,name')
             ->where('enable_status', '<>', 2)
-            ->orderBy('category_id')
+            ->orderByRaw('FIELD(category_id, ' . implode(',', $order) . ')')
             ->orderBy('id');
 
         // Aplicar filtros si se proporcionan
