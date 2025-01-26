@@ -35,9 +35,13 @@ class HomeController extends Controller
         // Obtener los productos habilitados que pertenecen a las categorías seleccionadas
         $categoryIds = $categories->pluck('id'); // Obtener los IDs de las categorías visibles
 
-        $products = Product::whereIn('category_id', $categoryIds) // Filtrar productos por las categorías seleccionadas
-        ->where('enable_status', 1) // Solo productos habilitados
-        ->get();
+        $order = [1, 2, 5, 3, 7, 6]; // Orden deseado de las categorías
+
+        $products = Product::with('category:id,name')
+            ->where('enable_status', 1)
+            ->orderByRaw('FIELD(category_id, ' . implode(',', $order) . ') DESC') // Categorías en orden específico
+            ->orderBy('category_id') // Ordenar las categorías no listadas
+            ->orderBy('id')->get(); // Ordenar por ID como criterio secundario
 
         $slidersSmalls = Slider::where('size', 's')->orderBy('order', 'asc')->get();
         $slidersLarges = Slider::where('size', 'l')->orderBy('order', 'asc')->get();
