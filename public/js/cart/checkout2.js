@@ -756,9 +756,18 @@ function submitFormAjax(extraData = {}) {
     let observations = localStorage.getItem('observations');
     if (cart) {
         try {
+            // Parsear el carrito
             cart = JSON.parse(cart); // Convertir el JSON en objeto
-            observations = JSON.parse(observations);
-            dataObj.cart = cart; // Agregar el carrito al objeto de datos
+
+            // Validar y parsear las observaciones (si existen)
+            if (observations && observations.trim() !== "") {
+                observations = JSON.parse(observations);
+            } else {
+                observations = null; // Si no hay observaciones, establecer como null
+            }
+
+            // Agregar los datos al objeto de datos
+            dataObj.cart = cart;
             dataObj.observations = observations;
         } catch (error) {
             console.error("Error al parsear el carrito desde localStorage:", error);
