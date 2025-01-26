@@ -39,7 +39,7 @@ class HomeController extends Controller
 
         $products = Product::with('category:id,name')
             ->where('enable_status', 1)
-            ->orderByRaw('FIELD(category_id, ' . implode(',', $order) . ') DESC') // Categorías en orden específico
+            ->orderByRaw('FIELD(category_id, ' . implode(',', $order) . ')') // Categorías en orden específico
             ->orderBy('category_id') // Ordenar las categorías no listadas
             ->orderBy('id')->get(); // Ordenar por ID como criterio secundario
 
