@@ -3,7 +3,85 @@ $(document).ready(function() {
 
     loadCart();
 
-    // Evento para aumentar la cantidad
+    $(document).on("click", ".icono-cantidad" ,function () {
+        console.log("Entre");
+        let iconTrash = $(this).parent().find("i.fa-trash-alt");
+        let iconMinus = $(this).parent().find("i.fa-minus");
+
+        let cantidadElemento = $(this).parent().find("span.cantidad-numero");
+
+        let cantidad = parseInt(cantidadElemento.text());
+
+        let button = $(this);
+
+        if ($(this).find("i.fa-trash-alt").is(":visible")) {
+            // Acciones para eliminar el producto (solo si la papelera está visible)
+            console.log("Eliminar producto");
+
+            // Mostrar el cuadro de confirmación con jQuery Confirm
+            $.confirm({
+                title: 'Eliminar producto',
+                content: '¿Desea eliminar este producto del carrito?',
+                buttons: {
+                    Eliminar: function() {
+                        const detailIndex = button.data('detail_id');
+
+                        // Obtener el carrito desde el localStorage
+                        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+                        // Verificar si el índice existe en el carrito
+                        if (detailIndex !== undefined && cart[detailIndex]) {
+                            // Eliminar producto del carrito
+                            cart.splice(detailIndex, 1);
+
+                            // Actualizar el carrito en el localStorage
+                            localStorage.setItem('cart', JSON.stringify(cart));
+
+                            // Recargar la vista del carrito (sin recargar todo el carrito)
+                            updateCartViewAfterDelete(cart); // Usamos la nueva función
+
+                            // Eliminar el producto visualmente
+                            button.closest(".producto").remove();
+
+                            // Mostrar mensaje de éxito
+                            toastr.success("Producto eliminado del carrito", 'Éxito', {
+                                "closeButton": true,
+                                "positionClass": "toast-top-right",
+                                "timeOut": "2000"
+                            });
+                        } else {
+                            console.error("Índice del detalle no válido.");
+                        }
+                    },
+                    Cancelar: function() {
+                        // No hacer nada, solo cerrar el cuadro de confirmación
+                    }
+                }
+            });
+        } else if ($(this).find("i.fa-minus").is(":visible")) {
+            // Restar cantidad (solo si el menos está visible)
+            if (cantidad > 1) {
+                cantidad -= 1;
+                cantidadElemento.text(cantidad);
+                updateQuantity($(this), -1);
+            }
+        } else if ($(this).find("i.fa-plus").length > 0) {
+            // Sumar cantidad
+            cantidad += 1;
+            cantidadElemento.text(cantidad);
+            updateQuantity($(this), 1);
+        }
+
+        // Mostrar/ocultar íconos según la cantidad
+        if (cantidad === 1) {
+            iconTrash.show();
+            iconMinus.hide();
+        } else {
+            iconTrash.hide();
+            iconMinus.show();
+        }
+    });
+    /*// Evento para aumentar la cantidad
     $(document).on('click', '[data-plus]', function() {
         updateQuantity($(this), 1);
     });
@@ -15,9 +93,27 @@ $(document).ready(function() {
 
     $(document).on('click', '[data-delete_item]',function() {
         deleteItem($(this));
-    });
+    });*/
 
-    $(document).on('click', '#btn-observations',saveObservations);
+    //$(document).on('click', '#btn-observations',saveObservations);
+    // Evento para los botones
+    $(document).on('click', '#go-to-checkout, #go-to-checkout-btn-mobile', function (e) {
+        e.preventDefault(); // Prevenir el comportamiento predeterminado
+
+        // Obtener las observaciones
+        const observations = $('#observations').val();
+
+        // Guardar las observaciones en el localStorage
+        localStorage.setItem('observations', observations);
+
+        // Redirigir al enlace en data-href
+        const href = $(this).data('href');
+        if (href) {
+            window.location.href = href;
+        } else {
+            console.error("El atributo data-href no está definido en el botón.");
+        }
+    });
 
     // Eliminar producto del carrito
     $(document).on('click', '.remove-item', function () {
@@ -71,7 +167,7 @@ async function loadCart() {
     showLoading(); // Mostrar carga al comenzar
 
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    let observations = JSON.parse(localStorage.getItem('observations')) || [];
+    let observations = localStorage.getItem('observations') || '';
 
     // Limpiar los contenedores actuales
     $('#body-items').empty();
@@ -83,6 +179,7 @@ async function loadCart() {
         const clone = activateTemplate('#template-cart_empty');
         $("#body-items").append(clone);
         hideLoading();
+        $(".mobile-fixed-cart").hide();
         return;
     }
 
@@ -98,7 +195,7 @@ async function loadCart() {
             let url_image = document.location.origin + '/images/icons/default_custom_image.png'; // Usa una imagen genérica para productos custom
             clone.querySelector("[data-image]").setAttribute('src', url_image);
             clone.querySelector("[data-product_name]").innerHTML = "Producto Personalizado";
-            clone.querySelector("[data-quantity]").value = item.quantity;
+            clone.querySelector("[data-quantity]").innerHTML = item.quantity;
             clone.querySelector("[data-detail_subtotal]").innerHTML = `S/. ${productTotal.toFixed(2)}`;
             clone.querySelector("[data-detail_price]").innerHTML = `S/. ${productTotal.toFixed(2)} / por item`;
             clone.querySelector("[data-minus]").setAttribute('data-detail_id', index);
@@ -106,6 +203,22 @@ async function loadCart() {
             clone.querySelector("[data-plus]").setAttribute('data-detail_id', index);
             clone.querySelector("[data-delete_item]").setAttribute('data-detail_id', index);
             clone.querySelector("[data-detail_productType]").innerHTML = "Tipo: "+item.product_type_name;
+
+            const iconTrash = clone.querySelector("#icon-trash");
+            const iconMinus = clone.querySelector("#icon-minus");
+
+            // Mostrar el icono correcto basado en la cantidad
+            if (item.quantity > 1) {
+                iconTrash.style.display = "none"; // Ocultar el icono de eliminar
+                iconMinus.style.display = "inline-block"; // Mostrar el icono de restar cantidad
+            } else {
+                iconTrash.style.display = "inline-block"; // Mostrar el icono de eliminar
+                iconMinus.style.display = "none"; // Ocultar el icono de restar cantidad
+            }
+
+
+            const detailsLink = clone.querySelector(".producto-detalles-link");
+            const detailsPopup = clone.querySelector(".detalles-popup");
 
             // Procesar toppings
             if (item.toppings && item.toppings.length > 0) {
@@ -123,6 +236,10 @@ async function loadCart() {
                     cloneOption.querySelector("[data-option]").innerHTML = `${topping.topping_name} (${selected} - ${position} - ${extra})`;
                     clone.querySelector("[data-body_options]").append(cloneOption);
                 });
+            } else {
+                // Ocultar enlace y popup si no hay toppings
+                detailsLink.style.display = "none";
+                detailsPopup.style.display = "none";
             }
 
             // Incrementar el total general
@@ -141,13 +258,28 @@ async function loadCart() {
             let url_image = document.location.origin + '/images/products/' + product.image_url;
             clone.querySelector("[data-image]").setAttribute('src', url_image);
             clone.querySelector("[data-product_name]").innerHTML = product.name;
-            clone.querySelector("[data-quantity]").value = item.quantity;
+            clone.querySelector("[data-quantity]").innerHTML = item.quantity;
             clone.querySelector("[data-detail_price]").innerHTML = `S/. ${product.price.toFixed(2)} / por item`;
             clone.querySelector("[data-minus]").setAttribute('data-detail_id', index);
             clone.querySelector("[data-quantity]").setAttribute('data-detail_id', index);
             clone.querySelector("[data-plus]").setAttribute('data-detail_id', index);
             clone.querySelector("[data-delete_item]").setAttribute('data-detail_id', index);
             clone.querySelector("[data-detail_productType]").innerHTML = product.product_type;
+
+            const iconTrash = clone.querySelector("#icon-trash");
+            const iconMinus = clone.querySelector("#icon-minus");
+
+            // Mostrar el icono correcto basado en la cantidad
+            if (item.quantity > 1) {
+                iconTrash.style.display = "none"; // Ocultar el icono de eliminar
+                iconMinus.style.display = "inline-block"; // Mostrar el icono de restar cantidad
+            } else {
+                iconTrash.style.display = "inline-block"; // Mostrar el icono de eliminar
+                iconMinus.style.display = "none"; // Ocultar el icono de restar cantidad
+            }
+
+            const detailsLink = clone.querySelector(".producto-detalles-link");
+            const detailsPopup = clone.querySelector(".detalles-popup");
 
             // Si tiene opciones
             if (item.options && Object.keys(item.options).length > 0) {
@@ -172,6 +304,8 @@ async function loadCart() {
             } else {
                 // Si no tiene opciones, mostrar el precio base
                 clone.querySelector("[data-detail_price]").innerHTML = `S/. ${product.price.toFixed(2)} / por item`;
+                detailsLink.style.display = "none";
+                detailsPopup.style.display = "none";
             }
 
             // Actualizar subtotal del producto
@@ -250,13 +384,36 @@ async function loadCart() {
 
     // Renderizamos las observaciones
     const cloneObservations = activateTemplate('#template-observations');
+
     if (observations) {
-        cloneObservations.querySelector("[data-cart_observations]").innerHTML = observations;
+        // Asignar el valor al textarea
+        const textarea = cloneObservations.querySelector("[data-cart_observations]");
+        if (textarea) {
+            textarea.value = observations;
+
+            // Actualizar el contador inmediatamente
+            const currentLength = observations.length;
+            const charCount = cloneObservations.querySelector("#charCount");
+            if (charCount) {
+                charCount.textContent = `${currentLength}/100`;
+
+                // Cambiar el color si ya está cerca del límite
+                if (currentLength >= 90) {
+                    charCount.classList.add("text-danger");
+                } else {
+                    charCount.classList.remove("text-danger");
+                }
+            }
+        }
     }
+
+    // Agregar el contenido al DOM
     $('#body-observations').append(cloneObservations);
 
     // Ocultar indicador de carga una vez todo esté cargado
     hideLoading();
+
+    $("#product-price-mobile").text(total.toFixed(2))
 }
 /*async function loadCart() {
     showLoading();  // Mostrar carga al comenzar
@@ -373,7 +530,7 @@ function updateQuantity(button, change) {
         localStorage.setItem('cart', JSON.stringify(cart));
 
         // Recargar la vista del carrito
-        toastr.success("Detalle actualizado con éxito", 'Éxito',
+        /*toastr.success("Detalle actualizado con éxito", 'Éxito',
             {
                 "closeButton": true,
                 "debug": false,
@@ -383,21 +540,116 @@ function updateQuantity(button, change) {
                 "preventDuplicates": false,
                 "onclick": null,
                 "showDuration": "300",
-                "hideDuration": "1000",
+                "hideDuration": "500",
                 "timeOut": "2000",
                 "extendedTimeOut": "1000",
                 "showEasing": "swing",
                 "hideEasing": "linear",
                 "showMethod": "fadeIn",
                 "hideMethod": "fadeOut"
-            });
-        setTimeout( function () {
+            });*/
+        //loadCart();
+        /*setTimeout( function () {
             loadCart();
-        }, 2000 )
+        }, 500 )*/
+
+        // Actualizar la vista sin recargar todo
+        updateCartView(button, cart, detailIndex);
 
     } else {
         console.error("Índice del detalle no válido.");
     }
+}
+
+function updateCartView(button, cart, detailIndex) {
+    // Variables para los cálculos
+    let total = 0;
+    const TAX_RATE = 0.18; // Cambia según tu configuración
+
+    // Recorrer el carrito para calcular totales
+    cart.forEach((item) => {
+        total += item.total * item.quantity;
+    });
+
+    // Calcular los valores del resumen del carrito
+    const taxesCart = total - total / (1 + TAX_RATE);
+    const subtotalCart = total - taxesCart;
+
+    // Actualizar los valores del resumen en el carrito
+    $("[data-subtotal_cart]").text(`S/. ${subtotalCart.toFixed(2)}`);
+    $("[data-taxes_cart]").text(`S/. ${taxesCart.toFixed(2)}`);
+    $("[data-total_cart]").text(`S/. ${total.toFixed(2)}`);
+
+    // Actualizar el precio del botón móvil
+    $("#product-price-mobile").text(total.toFixed(2));
+
+    // Actualizar el subtotal del producto específico
+    const $productRow = button.closest(".producto");
+    if ($productRow.length) {
+        const item = cart[detailIndex];
+        const productSubtotal = item.total * item.quantity;
+
+        $productRow.find("[data-detail_subtotal]").text(`S/. ${productSubtotal.toFixed(2)}`);
+
+        // Mostrar/ocultar iconos según la cantidad
+        if (item.quantity > 1) {
+            $productRow.find("#icon-trash").hide();
+            $productRow.find("#icon-minus").show();
+        } else {
+            $productRow.find("#icon-trash").show();
+            $productRow.find("#icon-minus").hide();
+        }
+    }
+}
+
+function updateCartViewAfterDelete(cart) {
+    // Si el carrito está vacío, mostramos el mensaje del template
+    if (cart.length === 0) {
+        loadCart();
+
+        return; // Termina la ejecución de la función
+    }
+
+    // Variables para los cálculos
+    let total = 0;
+    const TAX_RATE = 0.18; // Cambia según tu configuración
+
+    // Recorrer el carrito para calcular totales
+    cart.forEach((item) => {
+        if (item) {  // Asegúrate de que el producto no sea undefined
+            total += item.total * item.quantity;
+        }
+    });
+
+    // Calcular los valores del resumen del carrito
+    const taxesCart = total - total / (1 + TAX_RATE);
+    const subtotalCart = total - taxesCart;
+
+    // Actualizar los valores del resumen en el carrito
+    $("[data-subtotal_cart]").text(`S/. ${subtotalCart.toFixed(2)}`);
+    $("[data-taxes_cart]").text(`S/. ${taxesCart.toFixed(2)}`);
+    $("[data-total_cart]").text(`S/. ${total.toFixed(2)}`);
+
+    // Actualizar el precio del botón móvil
+    $("#product-price-mobile").text(total.toFixed(2));
+
+    // Actualizar el subtotal del producto específico
+    cart.forEach((item, index) => {
+        const $productRow = $(`[data-detail_id="${index}"]`);
+        if ($productRow.length && item) {
+            const productSubtotal = item.total * item.quantity;
+            $productRow.find("[data-detail_subtotal]").text(`S/. ${productSubtotal.toFixed(2)}`);
+
+            // Mostrar/ocultar iconos según la cantidad
+            if (item.quantity > 1) {
+                $productRow.find("#icon-trash").hide();
+                $productRow.find("#icon-minus").show();
+            } else {
+                $productRow.find("#icon-trash").show();
+                $productRow.find("#icon-minus").hide();
+            }
+        }
+    });
 }
 
 /*function loadCart() {

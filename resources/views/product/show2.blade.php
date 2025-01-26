@@ -1005,6 +1005,8 @@
 
             // Actualizar los elementos del precio
             $("#product-price, #product-price-mobile").text(totalPrice.toFixed(2));
+
+            //$priceTotal = totalPrice;
         }
 
     </script>

@@ -65,7 +65,7 @@
         .precio-original {
             font-size: 14px;
             color: #999;
-            text-decoration: line-through;
+            /*text-decoration: line-through;*/
         }
 
         .cantidad {
@@ -190,6 +190,32 @@
             font-size: 14px;
             margin-bottom: 5px;
         }
+
+        /* Boton de Agregar carrito */
+        /* Esconder el botón original en dispositivos móviles */
+        @media (max-width: 992px) {
+            .d-lg-flex {
+                display: none !important;
+            }
+        }
+
+        /* Div fijo para móviles */
+        .mobile-fixed-cart {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1050;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            padding: 10px 15px;
+            border-top: 1px solid #ddd;
+        }
+
+        .mobile-fixed-cart .btn {
+            width: 100%;
+            margin: 0;
+        }
     </style>
 @endsection
 
@@ -202,7 +228,7 @@
                 <div class="col-lg-9">
                     <div class="card border shadow-0">
                         <div class="m-2" id="body-items">
-                            <div class="producto">
+                            {{--<div class="producto">
                                 <img src="{{ asset('images/products/1.png') }}" alt="Imagen del producto">
                                 <div class="producto-info">
                                     <p class="producto-nombre">Margarita del campo</p>
@@ -234,7 +260,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div>--}}
                             <div id="loading-indicator" style="display: none;">
                                 <p>Cargando...</p>
                             </div>
@@ -257,6 +283,15 @@
 
         </div>
     </section>
+
+    <div class="mobile-fixed-cart d-lg-none">
+        <button data-href="{{ route('cart.checkout') }}" class="btn btn-danger btn-block py-3" id="go-to-checkout-btn-mobile">
+            Ir a Pagar
+            <span class="h5">S/.
+                <span id="product-price-mobile"></span>
+            </span>
+        </button>
+    </div>
 
     <template id="template-cart_empty">
         <div class="text-center py-5">
@@ -287,7 +322,7 @@
                 </div>
 
                 <div class="mt-3">
-                    <a href="{{ route('cart.checkout') }}" class="btn btn-success w-100 shadow-0 mb-2"> Ir a Pagar </a>
+                    <button data-href="{{ route('cart.checkout') }}" class="btn btn-success w-100 shadow-0 mb-2 d-lg-flex d-none text-center" id="go-to-checkout"> Ir a Pagar </button>
                     @auth()
                         <a href="{{ route('home') }}" class="btn btn-light w-100 border mt-2"> Seguir comprando </a>
                     @else
@@ -301,38 +336,74 @@
     <template id="template-observations">
         <div class="card border shadow-0 mt-3 pt-3 pb-3">
             <div class="col-sm-12">
-                <label for="observations" class="col-form-label">Ingrese alguna información de sus pedido</label>
-                <button type="button" id="btn-observations" class="btn btn-outline-success btn-sm float-right"><i class="far fa-save"></i> Guardar</button>
-            </div>
-            <div class="col-sm-12">
-                <textarea name="observations" data-cart_observations id="observations" rows="3" class="form-control"></textarea>
+                <div id="accordion">
+                    <div class="card">
+                        <div class="card-header py-2 d-flex justify-content-between align-items-center" id="headingOne" style="border-bottom: none;">
+                            <button class="btn btn-link d-flex align-items-center p-0 w-100 justify-content-between text-dark" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="text-decoration: none; color: inherit;">
+                                <span>Notas Adicionales</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+
+                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                            <div class="card-body py-2">
+                                <textarea name="observations" data-cart_observations id="observations" rows="3" class="form-control" maxlength="100"></textarea>
+                                <div class="d-flex justify-content-end mt-2">
+                                    <small id="charCount" class="text-muted">0/100</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </template>
 
     <template id="template-cart_detail">
-        <div class="row gy-3 mb-4">
+        <div class="producto">
+            <img data-image src="" alt="Imagen del producto">
+            <div class="producto-info">
+                <p class="producto-nombre" data-product_name>Margarita del campo</p>
+                <p class="producto-detalle" data-detail_productType>Familiar (35 cm)</p>
+                <a href="#" class="producto-detalles-link">Detalles</a>
+                <div class="detalles-popup">
+                    <div class="burbuja">
+                        <ul data-body_options>
+                            {{--<li>Ingredientes: Tomate, queso, albahaca</li>
+                            <li>Tamaño: 35 cm</li>
+                            <li>Porciones: 8</li>--}}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="producto-precio">
+                <p class="precio-actual" data-detail_subtotal>S/22.42</p>
+                <p class="precio-original" data-detail_price>S/29.90</p>
+                <div class="cantidad">
+                    <div class="cantidad-control">
+                        <button class="icono-cantidad" data-minus data-detail_id="">
+                            <i class="far fa-trash-alt" id="icon-trash" data-delete_item data-detail_id=""></i>
+                            <i class="fas fa-minus" id="icon-minus" style="display: none;"></i>
+                        </button>
+                        <span class="cantidad-numero" data-quantity data-detail_id="">1</span>
+                        <button class="icono-cantidad" data-plus data-detail_id="">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{--<div class="row gy-3 mb-4">
             <div class="col-md-5">
                 <div class="me-lg-5">
                     <div class="d-flex">
-                        <img data-image src="{{--{{ asset('images/products/'.$detail->product->image) }}--}}" class="border rounded me-3" style="width: 96px; height: 96px;" />
+                        <img data-image src="--}}{{--{{ asset('images/products/'.$detail->product->image) }}--}}{{--" class="border rounded me-3" style="width: 96px; height: 96px;" />
                         <div class="">
-                            <a href="#" class="nav-link" data-product_name>{{--{{ $detail->product->full_name }}--}}</a>
+                            <a href="#" class="nav-link" data-product_name>--}}{{--{{ $detail->product->full_name }}--}}{{--</a>
                             <p class="text-muted ml-3 mb-0" data-detail_productType>
-                                {{--Tipo: {{ $detail->productType->type->name }}
-                                @if($detail->productType->type && $detail->productType->type->size)
-                                    ( {{ $detail->productType->type->size }} )
-                                @endif--}}
                             </p>
                             <div class="text-muted ml-1 small">
                                 <ul class="mb-0 ps-3" data-body_options>
-                                    {{--@foreach($detail->options as $option)
-                                        <li>{{ $option->option->name }}
-                                            @if($option->product)
-                                                {{ $option->product->full_name }}
-                                            @endif
-                                        </li>
-                                    @endforeach--}}
                                 </ul>
                             </div>
                         </div>
@@ -343,72 +414,40 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="input-group mb-3" style="width: 140px;">
-                            <button data-minus data-detail_id="{{--{{ $detail->id }}--}}" class="btn btn-white border border-secondary" type="button" data-mdb-ripple-color="dark">
+                            <button data-minus data-detail_id="--}}{{--{{ $detail->id }}--}}{{--" class="btn btn-white border border-secondary" type="button" data-mdb-ripple-color="dark">
                                 <i class="fas fa-minus"></i>
                             </button>
-                            <input data-quantity data-detail_id="{{--{{ $detail->id }}--}}" type="text" class="form-control text-center border border-secondary" placeholder="14" aria-label="Example text with button addon" aria-describedby="button-addon1" value="{{--{{ $detail->quantity }}--}}" readonly/>
-                            <button data-plus data-detail_id="{{--{{ $detail->id }}--}}" class="btn btn-white border border-secondary" type="button" data-mdb-ripple-color="dark">
+                            <input data-quantity data-detail_id="--}}{{--{{ $detail->id }}--}}{{--" type="text" class="form-control text-center border border-secondary" placeholder="14" aria-label="Example text with button addon" aria-describedby="button-addon1" value="--}}{{--{{ $detail->quantity }}--}}{{--" readonly/>
+                            <button data-plus data-detail_id="--}}{{--{{ $detail->id }}--}}{{--" class="btn btn-white border border-secondary" type="button" data-mdb-ripple-color="dark">
                                 <i class="fas fa-plus"></i>
                             </button>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <text class="h6" data-detail_subtotal>{{--S/ {{ $detail->subtotal }}--}}</text> <br />
-                        <small class="text-muted text-nowrap" data-detail_price> {{--S/ {{ $detail->product->price_default }} / por item--}} </small>
+                        <text class="h6" data-detail_subtotal>--}}{{--S/ {{ $detail->subtotal }}--}}{{--</text> <br />
+                        <small class="text-muted text-nowrap" data-detail_price> --}}{{--S/ {{ $detail->product->price_default }} / por item--}}{{-- </small>
 
                     </div>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="float-md-end">
-                    {{--<a href="#!" data-material_id="--}}{{--{{ $detail->product->id }}--}}{{--" class="btn btn-light border icon-hover-primary"><i class="fas fa-heart fa-lg text-secondary"></i></a>--}}
-                    <button type="button" data-delete_item data-detail_id="{{--{{ $detail->id }}--}}" class="btn btn-light border text-danger icon-hover-danger"> <i class="fas fa-trash fa-lg text-secondary"></i></button>
+                    --}}{{--<a href="#!" data-material_id="--}}{{----}}{{--{{ $detail->product->id }}--}}{{----}}{{--" class="btn btn-light border icon-hover-primary"><i class="fas fa-heart fa-lg text-secondary"></i></a>--}}{{--
+                    <button type="button" data-delete_item data-detail_id="--}}{{--{{ $detail->id }}--}}{{--" class="btn btn-light border text-danger icon-hover-danger"> <i class="fas fa-trash fa-lg text-secondary"></i></button>
                 </div>
             </div>
-        </div>
+        </div>--}}
     </template>
 
     <template id="template-option">
-        <li data-option>
-            {{--{{ $option->option->name }}
-            @if($option->product)
-                {{ $option->product->full_name }}
-            @endif--}}
-        </li>
+        <li data-option>Ingredientes: Tomate, queso, albahaca</li>
+        {{--<li data-option>
+
+        </li>--}}
     </template>
 @endsection
 
-{{--@section('content')
-    <div class="container">
-        <h1 class="mb-4">Carrito de Compras</h1>
-
-        <!-- Contenedor para los productos del carrito -->
-        <div id="cart-container">
-            <!-- Los productos se generarán dinámicamente -->
-        </div>
-
-        <!-- Template del producto del carrito -->
-        <template id="template-item">
-            <div class="cart-item d-flex align-items-center mb-3 border-bottom pb-3">
-                <img src="" alt="Producto" class="cart-item-image me-3" style="width: 80px; height: 80px; object-fit: cover;">
-                <div class="cart-item-info">
-                    <h5 class="cart-item-name"></h5>
-                    <p class="cart-item-options text-muted"></p>
-                    <p><strong>Precio:</strong> $<span class="cart-item-price"></span></p>
-                    <p><strong>Cantidad:</strong> <span class="cart-item-quantity"></span></p>
-                </div>
-                <button class="btn btn-danger btn-sm ms-auto remove-item" data-product-id="">Eliminar</button>
-            </div>
-        </template>
-
-        <div class="d-flex justify-content-between mt-4">
-            <h3>Total: $<span id="cart-total">0.00</span></h3>
-            <a href="{{ route('cart.checkout') }}" class="btn btn-success btn-lg">Ir al Checkout</a>
-        </div>
-    </div>
-@endsection--}}
-
 @section('scripts')
-    {{--<script src="{{ asset('js/cart/cart2.js') }}"></script>--}}
+    <script src="{{ asset('js/cart/cart3.js') }}"></script>
     <script src="{{ asset('js/cart/cartNew.js') }}"></script>
 @endsection

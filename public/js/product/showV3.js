@@ -140,6 +140,21 @@ $(document).ready(function () {
         }
 
         console.log("Opciones seleccionadas:", options);
+        let totalOptionsPrice = 0;
+        // Recorrer las opciones en el objeto `options`
+        for (const optionId in options) {
+            if (options.hasOwnProperty(optionId)) {
+                // Sumar los precios adicionales de cada opción seleccionada
+                const selectedOptions = options[optionId];
+                totalOptionsPrice += selectedOptions.reduce((sum, item) => sum + item.additional_price, 0);
+            }
+        }
+        console.log("Total opciones: "+totalOptionsPrice);
+
+        let priceTotal = parseFloat($("#product-price, #product-price-mobile").data('base-price'), 2);
+        console.log("Precio Total 1: "+priceTotal);
+
+        let totalTotal = priceTotal + totalOptionsPrice;
 
         // Verificar autenticación
         $.ajax({
@@ -178,7 +193,7 @@ $(document).ready(function () {
                         quantity: 1,
                         user_id: userId, // Añadir el user_id
                         custom: false,
-                        total: 0
+                        total: totalTotal
                     });
                 }
 
@@ -222,7 +237,7 @@ $(document).ready(function () {
                     extendedTimeOut: "1000",
                 });
 
-                window.location.reload();
+                //window.location.reload();
 
             },
             error: function (error) {
@@ -360,6 +375,7 @@ $(document).ready(function () {
         //console.log("totalPrice " +totalRealPrice);
         // Actualizar el precio mostrado
         $("#product-price").text(totalPrice.toFixed(2));
+        $priceTotal = totalPrice;
         $("#product-price-real").text("Precio normal: S/. "+totalRealPrice.toFixed(2)); // Actualizar el precio real
         //console.log(totalRealPrice.toFixed(2));
     });
@@ -381,6 +397,24 @@ $(document).ready(function () {
                 // Actualizar el contenido del span
                 $("#quantityCart").html(`(${totalItems})`);
                 $("#quantityCart2").html(`(${totalItems})`);
+
+                // Variables para el parpadeo
+                let blinkCount = 0;
+                let blinkInterval = setInterval(function() {
+                    if (blinkCount < 5) { // Repetir 5 veces (azul, rojo, azul, rojo, azul)
+                        if (blinkCount % 2 === 0) {
+                            $("#cartButton").css("background-color", "red");
+                        } else {
+                            $("#cartButton").css("background-color", "#007bff"); // Azul
+                        }
+                        blinkCount++;
+                    } else {
+                        clearInterval(blinkInterval); // Detener el intervalo después de 5 cambios
+                        // Asegurarse de que el color final sea azul
+                        $("#cartButton").css("background-color", "#007bff");
+                    }
+                }, 300); // Cambiar cada 300ms (puedes ajustar el tiempo según prefieras)
+
 
             },
             error: function (error) {

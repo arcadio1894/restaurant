@@ -1,9 +1,13 @@
 $(document).ready(function () {
-    const cantidadElemento = $(".cantidad-numero");
+    /*const cantidadElemento = $(".cantidad-numero");
     const iconTrash = $("#icon-trash");
-    const iconMinus = $("#icon-minus");
+    const iconMinus = $("#icon-minus");*/
 
-    $(".icono-cantidad").on("click", function () {
+    /*$(document).on("click", ".icono-cantidad" ,function () {
+        let iconTrash = $(this).find("i.fa-trash-alt");
+        let iconMinus = $(this).find("i.fa-minus");
+
+        let cantidadElemento = $(this).next();
         let cantidad = parseInt(cantidadElemento.text());
 
         if ($(this).find("i.fa-trash-alt").is(":visible")) {
@@ -29,9 +33,10 @@ $(document).ready(function () {
             iconTrash.hide();
             iconMinus.show();
         }
-    });
+    });*/
 
-    $(".producto-detalles-link").on("click", function (e) {
+    $(document).on("click", '.producto-detalles-link',function (e) {
+        console.log("Ingrese");
         e.preventDefault(); // Prevenir el comportamiento predeterminado del enlace
         const popup = $(this).siblings(".detalles-popup");
         popup.toggle(); // Mostrar/ocultar el popup al hacer clic
@@ -41,6 +46,19 @@ $(document).ready(function () {
     $(document).on("click", function (e) {
         if (!$(e.target).closest(".producto-info").length) {
             $(".detalles-popup").hide();
+        }
+    });
+
+    $(document).on('input', '#observations', function () {
+        const currentLength = $(this).val().length; // Usamos $(this) para el textarea actual
+        const $charCount = $('#charCount'); // Aseguramos que se seleccione correctamente
+
+        $charCount.text(`${currentLength}/100`);
+
+        if (currentLength >= 90) {
+            $charCount.addClass('text-danger');
+        } else {
+            $charCount.removeClass('text-danger');
         }
     });
 });
