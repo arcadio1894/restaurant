@@ -754,6 +754,7 @@ function submitFormAjax(extraData = {}) {
     // Recuperar el carrito desde localStorage
     let cart = localStorage.getItem('cart'); // Asume que está guardado con la clave 'cart'
     let observations = localStorage.getItem('observations');
+
     if (cart) {
         try {
             // Parsear el carrito
@@ -761,7 +762,12 @@ function submitFormAjax(extraData = {}) {
 
             // Validar y parsear las observaciones (si existen)
             if (observations && observations.trim() !== "") {
-                observations = JSON.parse(observations);
+                try {
+                    observations = JSON.parse(observations); // Intentar parsear como JSON
+                } catch (error) {
+                    // Si no es un JSON válido, asumir que es una cadena de texto simple
+                    console.warn("Las observaciones no son un JSON válido, se tratarán como texto simple.");
+                }
             } else {
                 observations = null; // Si no hay observaciones, establecer como null
             }
