@@ -681,8 +681,8 @@ class CartController extends Controller
                         'order' => "ORDEN - ".$order->id
                     ];
 
-                    /*$telegramController = new TelegramController();
-                    $telegramController->sendNotification('process', $data);*/
+                    $telegramController = new TelegramController();
+                    $telegramController->sendNotification('process', $data);
 
                     // Agregar movimientos a la caja
                     $paymentType = 2;
