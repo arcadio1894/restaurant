@@ -63,7 +63,7 @@
         }
 
         .precio-original {
-            font-size: 14px;
+            font-size: 12px;
             color: #999;
             /*text-decoration: line-through;*/
         }
@@ -165,7 +165,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             padding: 10px;
-            max-width: 200px;
+            width: 250px;
             z-index: 10;
         }
 
@@ -187,7 +187,7 @@
         }
 
         .burbuja ul li {
-            font-size: 14px;
+            font-size: 0.8rem;
             margin-bottom: 5px;
         }
 

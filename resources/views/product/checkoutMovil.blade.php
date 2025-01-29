@@ -161,6 +161,14 @@
         .carousel-control-next {
             animation: breathe-slider 2s ease-in-out infinite; /* Reduce el tiempo para que sea más rápida */
         }
+
+        .text-subtotal {
+            font-size: 12px;
+        }
+
+        .text-full_name {
+            font-size: 13px;
+        }
     </style>
 @endsection
 
@@ -512,10 +520,10 @@
             <div>
                 <img data-image src="{{--{{ asset('images/products/'.$detail->product->image) }}--}}" alt="{{--{{ $detail->product->full_name }}--}}" class="img-thumbnail mr-2" style="width: 50px; height: 50px; object-fit: cover;">
             </div>
-            <div data-full_name>
+            <div data-full_name class="text-full_name">
                 {{--{{ $detail->product->full_name }} x{{ $detail->quantity }}--}}
             </div>
-            <span class="text-muted" data-subtotal>{{--S/ {{ number_format($detail->subtotal, 2, '.', '') }}--}}</span>
+            <span class="text-subtotal" data-subtotal>{{--S/ {{ number_format($detail->subtotal, 2, '.', '') }}--}}</span>
         </li>
     </template>
 
