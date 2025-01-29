@@ -168,6 +168,7 @@
 
         .text-full_name {
             font-size: 13px;
+            width: 180px;
         }
     </style>
 @endsection
