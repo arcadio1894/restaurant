@@ -1001,12 +1001,28 @@
 
             // Calcular el precio total sumando los adicionales
             let additionsTotal = $selectedAdditions.reduce((total, item) => total + item.price, 0);
-            let totalPrice = basePrice + additionsTotal;
+
+            let optionsTotal = getTotalOptionsSelected();
+            console.log("precio base "+basePrice);
+            console.log("opciones "+optionsTotal);
+            console.log("Adicionales "+additionsTotal);
+            let totalPrice = basePrice + additionsTotal + optionsTotal;
 
             // Actualizar los elementos del precio
             $("#product-price, #product-price-mobile").text(totalPrice.toFixed(2));
 
             //$priceTotal = totalPrice;
+        }
+
+        function getTotalOptionsSelected() {
+            let total = 0;
+
+            $(".option-input:checked").each(function () {
+                let price = parseFloat($(this).data("selection_price")) || 0;
+                total += price;
+            });
+
+            return total;
         }
 
     </script>

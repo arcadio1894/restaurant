@@ -374,11 +374,13 @@ $(document).ready(function () {
             totalRealPrice += parseFloat($(this).data("selection_product_price")) || 0; // Sumar precio real adicional
 
         });
+
+        updatePrices();
         //console.log("totalPrice " +totalPrice);
         //console.log("totalPrice " +totalRealPrice);
         // Actualizar el precio mostrado
-        $("#product-price").text(totalPrice.toFixed(2));
-        $priceTotal = totalPrice;
+        //$("#product-price, #product-price-mobile").text(totalPrice.toFixed(2));
+        //$priceTotal = totalPrice;
         $("#product-price-real").text("Precio normal: S/. "+totalRealPrice.toFixed(2)); // Actualizar el precio real
         //console.log(totalRealPrice.toFixed(2));
     });
