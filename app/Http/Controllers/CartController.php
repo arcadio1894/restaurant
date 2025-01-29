@@ -273,7 +273,7 @@ class CartController extends Controller
             ->where('status', 'pending')
             ->first();*/
 
-        $payment_methods = PaymentMethod::active()->get();
+        $payment_methods = PaymentMethod::active()->orderBy('id', 'desc')->get();
 
         /* if (!$cart || $cart->details->isEmpty()) {
             return redirect()->route('home');
@@ -291,7 +291,7 @@ class CartController extends Controller
         $districts = ShippingDistrict::all();
 
         /*return view('product.checkout', compact('cart', 'payment_methods', 'defaultAddress', 'districts'));*/
-        return view('product.checkout2', compact( 'payment_methods', 'defaultAddress', 'districts'));
+        return view('product.checkoutMovil', compact( 'payment_methods', 'defaultAddress', 'districts'));
     }
 
     public function checkout2()

@@ -120,6 +120,47 @@
             width: 100%;
             margin: 0;
         }
+
+        @media (max-width: 768px) { /* Ocultar en pantallas pequeñas */
+            #btn-submit {
+                display: none;
+            }
+            #li_total_amount {
+                display: none !important;
+            }
+        }
+
+        #verifyModal .modal-dialog {
+            top: 5%; /* Ajusta según sea necesario */
+            transform: translateY(-10%);
+        }
+
+        #verifyModal .modal-header {
+            padding: 10px 10px; /* Reduce el padding interno */
+            margin-bottom: 0; /* Evita margen extra */
+        }
+        #verifyModal .modal-title {
+            font-size: 1rem; /* Reduce el tamaño del título si es necesario */
+            margin: 0; /* Evita espacio extra */
+        }
+        #verifyModal .modal-body {
+            font-size: 0.9rem; /* Reduce ligeramente el tamaño del texto */
+        }
+
+        #verifyModal .modal-footer {
+            font-size: 0.9rem; /* Reduce el tamaño del texto de los botones si es necesario */
+        }
+
+        @keyframes breathe-slider {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); } /* Aumenta más la escala */
+            100% { transform: scale(1); }
+        }
+
+        .carousel-control-prev,
+        .carousel-control-next {
+            animation: breathe-slider 2s ease-in-out infinite; /* Reduce el tiempo para que sea más rápida */
+        }
     </style>
 @endsection
 
@@ -129,7 +170,13 @@
         <div class="row mt-4 mb-4 ">
             <div class="col-md-6 order-md-2">
                 <h4 class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="text-muted">Tu pedido</span>
+
+                    <h5 class="mb-3">
+                        <span class="d-flex align-items-center">
+                            <img src="{{ asset('/images/checkout/cart.png') }}" alt="Cupon" style="width: 30px; height: 30px; margin-right: 10px;">
+                            <strong>Tu pedido</strong>
+                        </span>
+                    </h5>
                     {{--<span class="badge badge-secondary badge-pill">{{ count($cart->details) }}</span>--}}
                 </h4>
                 <ul class="list-group mb-3">
@@ -139,17 +186,7 @@
                             <p>Cargando...</p>
                         </div>
                     </div>
-                    {{--@foreach( $cart->details as $detail )
-                    <li class="list-group-item d-flex justify-content-between lh-condensed">
-                        <div>
-                            <img src="{{ asset('images/products/'.$detail->product->image) }}" alt="{{ $detail->product->full_name }}" class="img-thumbnail mr-2" style="width: 50px; height: 50px; object-fit: cover;">
-                        </div>
-                        <div>
-                            {{ $detail->product->full_name }} x{{ $detail->quantity }}
-                        </div>
-                        <span class="text-muted">S/ {{ number_format($detail->subtotal, 2, '.', '') }}</span>
-                    </li>
-                    @endforeach--}}
+
                     <li id="info_code" class="list-group-item d-flex justify-content-between bg-light hidden" style="display: none;">
                         <div class="text-success">
                             <h6 class="my-0">Código de promoción</h6>
@@ -163,23 +200,60 @@
                         </div>
                         <span class="text-danger" id="amount_shipping">+$5</span>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between">
+                    <li id="li_total_amount" class="list-group-item d-flex justify-content-between">
                         <span>Total </span>
-                        <strong id="total_amount">{{--S/ {{ number_format($cart->total_cart, 2, '.', '') }}--}}</strong>
+                        <strong id="total_amount"></strong>
                     </li>
                 </ul>
 
-                <div class="input-group">
+                <!-- Acordeón -->
+                <div class="accordion" id="accordionPromo">
+                    <!-- Sección del acordeón -->
+                    <div class="card">
+                        <div class="card-header p-2" id="headingOne">
+                            <p class="mb-0 d-flex justify-content-between">
+                                <!-- Título del acordeón -->
+                                <span class="d-flex align-items-center">
+                                    <img src="{{ asset('/images/checkout/cupon.png') }}" alt="Cupon" style="width: 30px; height: 30px; margin-right: 10px;">
+                                    ¿Tienes un cupon?
+                                </span>
+                                <!-- Link de agregar -->
+                                <a href="#" class="btn btn-link p-0" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                    Agregar
+                                </a>
+                            </p>
+                        </div>
+
+                        <!-- Contenido del acordeón -->
+                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionPromo">
+                            <div class="card-body">
+                                <!-- Formulario para código de promoción -->
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="promo_code" placeholder="Código de Promoción">
+                                    <div class="input-group-append">
+                                        <button type="button" id="btn-promo_code" class="btn btn-success">Aplicar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{--<div class="input-group">
                     <input type="text" class="form-control" id="promo_code" placeholder="Código de Promocíon">
                     <div class="input-group-append">
                         <button type="button" id="btn-promo_code" class="btn btn-secondary">Aplicar</button>
                     </div>
-                </div>
-                <a href="{{ route('home') }}" class="btn btn-light w-100 border mt-2"> Volver al menú </a>
+                </div>--}}
+                {{--<a href="{{ route('home') }}" class="btn btn-light w-100 border mt-2"> Volver al menú </a>--}}
             </div>
-            <div class="col-md-6 order-md-1">
-
-                <h4 class="mb-3">Dirección de envío</h4>
+            <div class="col-md-6 order-md-1 mt-3">
+                <h5 class="mb-3">
+                    <span class="d-flex align-items-center">
+                        <img src="{{ asset('/images/checkout/pizza-deliver.png') }}" alt="Cupon" style="width: 30px; height: 30px; margin-right: 10px;">
+                        <strong>Datos de envío</strong>
+                    </span>
+                </h5>
                 <form class="needs-validation" novalidate id="checkoutForm">
                     @csrf
                     <input type="hidden" name="cart_id" value="{{--{{ $cart->id }}--}}">
@@ -269,31 +343,32 @@
 
                     <hr class="mb-4">
 
-                    <h4 class="mb-3">Método de pago</h4>
+                    <h5 class="mb-3">
+                        <span class="d-flex align-items-center">
+                            <img src="{{ asset('/images/checkout/payment-method.png') }}" alt="Cupon" style="width: 30px; height: 30px; margin-right: 10px;">
+                            <strong>Elige tu método de pago</strong>
+                        </span>
+                    </h5>
+                    {{--<div class="d-block my-3">
+                        @foreach( $payment_methods as $method )
+                            <div class="custom-control custom-radio">
+                                <input id="method_{{$method->code}}" name="paymentMethod" type="radio" value="{{$method->id}}" class="custom-control-input payment-method" required data-code="{{ $method->code }}">
+                                <label class="custom-control-label" for="method_{{$method->code}}">{{$method->name}}</label>
+                            </div>
+                        @endforeach
+                    </div>--}}
 
                     <div id="payment-slider" class="carousel slide w-100 mx-auto" data-ride="carousel" data-interval="false">
                         <div class="carousel-inner">
-                            <!-- Elemento 1: Efectivo -->
-                            <div class="carousel-item">
-                                <div id="efectivo" class="h-100 w-100 d-flex flex-column justify-content-center align-items-center">
-                                    <img src="{{ asset('/images/checkout/pago-efectivo2.png') }}" alt="Efectivo" style="width: 100%; height: auto; border-radius: 20px;">
-                                    <input type="radio" name="payment_method" value="efectivo" id="radio-efectivo" class="d-none">
+                            @foreach($payment_methods as $index => $method)
+                            <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                <div id="{{$method->code}}" class="h-100 w-100 d-flex flex-column justify-content-center align-items-center">
+                                    <img src="{{ asset('/images/checkout/'.$method->image) }}" alt="{{$method->name}}" style="width: 100%; height: auto; border-radius: 20px;">
+                                    <input type="radio" name="paymentMethod" value="{{$method->id}}" id="method_{{$method->code}}" class="d-none" data-code="{{ $method->code }}">
                                 </div>
                             </div>
-                            <!-- Elemento 2: Yape/Plin -->
-                            <div class="carousel-item">
-                                <div id="yape_plin" class="h-100 w-100 d-flex flex-column justify-content-center align-items-center">
-                                    <img src="{{ asset('/images/checkout/pago-yape.png') }}" alt="Yape/Plin" style="width: 100%; height: auto; border-radius: 20px;">
-                                    <input type="radio" name="payment_method" value="yape_plin" id="radio-yape_plin" class="d-none">
-                                </div>
-                            </div>
-                            <!-- Elemento 3: POS -->
-                            <div class="carousel-item active">
-                                <div id="pos" class="h-100 w-100 d-flex flex-column justify-content-center align-items-center">
-                                    <img src="{{ asset('/images/checkout/pago-pos.png') }}" alt="POS" style="width: 100%; height: auto; border-radius: 20px;">
-                                    <input type="radio" name="payment_method" value="pos" id="radio-pos" class="d-none">
-                                </div>
-                            </div>
+                            @endforeach
+
                         </div>
 
                         <!-- Controles -->
@@ -307,58 +382,8 @@
                         </a>
                     </div>
 
-
-                    <div class="d-block my-3">
-                        @foreach( $payment_methods as $method )
-                            <div class="custom-control custom-radio">
-                                <input id="method_{{$method->code}}" name="paymentMethod" type="radio" value="{{$method->id}}" class="custom-control-input payment-method" required data-code="{{ $method->code }}">
-                                <label class="custom-control-label" for="method_{{$method->code}}">{{$method->name}}</label>
-                            </div>
-                        @endforeach
-
-                        <div id="payment-slider" class="carousel slide w-100 mx-auto" data-ride="carousel" data-interval="false">
-                            <div class="carousel-inner">
-                                @foreach( $payment_methods as $method )
-                                <!-- Elemento 1: Efectivo -->
-                                <div class="carousel-item">
-                                    <div id="efectivo" class="h-100 w-100 d-flex flex-column justify-content-center align-items-center">
-                                        <img src="{{ asset('/images/checkout/pago-efectivo2.png') }}" alt="Efectivo" style="width: 100%; height: auto; border-radius: 20px;">
-                                        <input type="radio" name="payment_method" value="efectivo" id="radio-efectivo" class="d-none">
-                                    </div>
-                                </div>
-                                @endforeach
-                                {{--<!-- Elemento 2: Yape/Plin -->
-                                <div class="carousel-item">
-                                    <div id="yape_plin" class="h-100 w-100 d-flex flex-column justify-content-center align-items-center">
-                                        <img src="{{ asset('/images/checkout/pago-yape.png') }}" alt="Yape/Plin" style="width: 100%; height: auto; border-radius: 20px;">
-                                        <input type="radio" name="payment_method" value="yape_plin" id="radio-yape_plin" class="d-none">
-                                    </div>
-                                </div>
-                                <!-- Elemento 3: POS -->
-                                <div class="carousel-item active">
-                                    <div id="pos" class="h-100 w-100 d-flex flex-column justify-content-center align-items-center">
-                                        <img src="{{ asset('/images/checkout/pago-pos.png') }}" alt="POS" style="width: 100%; height: auto; border-radius: 20px;">
-                                        <input type="radio" name="payment_method" value="pos" id="radio-pos" class="d-none">
-                                    </div>
-                                </div>--}}
-                            </div>
-
-                            <!-- Controles -->
-                            <a class="carousel-control-prev" href="#payment-slider" role="button" data-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="sr-only">Anterior</span>
-                            </a>
-                            <a class="carousel-control-next" href="#payment-slider" role="button" data-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="sr-only">Siguiente</span>
-                            </a>
-                        </div>
-
-
-                    </div>
-
-                    <!-- Sección para método de pago en efectivo -->
-                    <div id="pos-section" style="display: none; margin-top: 15px;">
+                    <!-- Sección para método de pago en POS -->
+                    <div id="pos-section" style="display: none; margin-top: 15px; text-align: center">
                         <label for="cashAmount">Nuestro repartidor está llevando el POS para que puedas pagar con cualquier tarjeta de Débito o Crédito</label>
                     </div>
 
@@ -370,14 +395,22 @@
 
                     <!-- Sección para método de pago Yape/Plin -->
                     <div id="yape-section" style="display: none; margin-top: 15px;">
-                        <p>Escanee el código QR para pagar con Yape o Plin:</p>
+
+                        <p style="font-size: 0.9rem">Paga con Yape o Plin usando nuestro número: <br><strong><span id="yape-phone" class="font-weight-bold mr-2 ">987 654 321</span></strong>
+                            <!-- Botón para copiar al portapapeles -->
+                            <button type="button" id="copy-phone" class="btn btn-link p-0" title="Copiar número">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </p>
+
+                        <p>O escanea el código QR para pagar:</p>
                         <div class="text-center">
-                            <img src="{{ asset('images/checkout/qr_yape.jpg') }}" alt="QR para Yape/Plin" style="width: 200px;">
+                            <img src="{{ asset('images/checkout/qr_yape.webp') }}" alt="QR para Yape/Plin" style="width: 100%; height: auto; border-radius: 20px">
                         </div>
-                        <br>
+
                         <label for="operationCode">Código de operación
                             <!-- Botón de información -->
-                            <button type="button" id="info-button" class="btn btn-link p-0 info-button" title="¿Donde encuentro el número de operación?">
+                            <button type="button" id="info-button" class="btn btn-link p-0 info-button" title="¿Dónde encuentro el número de operación?">
                                 <i class="fas fa-info-circle"></i>
                             </button>
                         </label>
@@ -466,10 +499,10 @@
     </div>
 
     <div class="mobile-fixed-cart d-lg-none">
-        <button data-href="{{ route('cart.checkout') }}" class="btn btn-danger btn-block py-3" id="go-to-checkout-btn-mobile">
+        <button class="btn btn-danger btn-block py-3" id="btn-submit-mobile">
             COMPRAR
-            <span class="h5">S/.
-                <span id="product-price-mobile"></span>
+            <span class="h5">
+                <span id="total-price-mobile"></span>
             </span>
         </button>
     </div>
@@ -513,11 +546,9 @@
                     <h5 class="modal-title" id="verifyModalLabel">¡Atención! 📢</h5>
                 </div>
                 <div class="modal-body">
-                    <p>Antes de finalizar tu compra, asegúrate de que los datos en los campos de celular y correo electrónico estén correctos.</p>
-                    <p>📱: <span id="showPhone"></span></p>
-                    <p>✉: <span id="showEmail"></span></p>
-                    <p>✅ Estos son los medios que utilizaremos para informarte sobre el estado de tu pedido y coordinar la entrega. 🚗🍕</p>
-                    <p>🔄 Verifica tus datos ahora para una experiencia sin inconvenientes.</p>
+                    <p>Antes de finalizar tu compra, asegúrate de que los datos en los campos de celular <strong><span id="showPhone"></span></strong> y correo electrónico <strong><span id="showEmail"></span></strong> estén correctos.</p>
+
+                    <p class="mb-0">✅ Estos son los medios que utilizaremos para informarte sobre el estado de tu pedido y coordinar la entrega. 🚗</p>
                 </div>
                 <div class="modal-footer">
                     <button id="btn-continue" class="btn btn-primary">Continuar</button>

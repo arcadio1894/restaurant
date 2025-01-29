@@ -45,13 +45,91 @@ $(document).ready(function() {
 
     loadCheckout();
 
-    // Mantener el estado inicial en POS
-    $('#payment-slider').on('slide.bs.carousel', function (e) {
+    // 1️⃣ Desmarcar todos los radios primero
+    $('input[name="paymentMethod"]').prop('checked', false);
+
+    // 2️⃣ Marcar POS como seleccionado por defecto y forzar el evento change
+    $('#method_yape_plin').prop('checked', true).trigger('change');
+
+    // 3️⃣ Mostrar la sección del POS al inicio
+    $('#yape-section').show();
+
+    // 4️⃣ Verificar que POS está seleccionado correctamente en la consola
+    console.log("Carga inicial: Método POS seleccionado ->", $('#method_yape_plin').prop('checked'));
+
+    // 5️⃣ Detectar cambios de slide y actualizar el método seleccionado
+    $('#payment-slider').on('slid.bs.carousel', function (e) {
         const activeItem = $(e.relatedTarget).find('input[type="radio"]');
-        activeItem.prop('checked', true); // Cambia el radio del método seleccionado
-        console.log(`Método seleccionado: ${activeItem.val()}`);
+
+        if (activeItem.length) {
+            $('input[name="paymentMethod"]').prop('checked', false); // Desmarcar todos
+            activeItem.prop('checked', true).trigger('change'); // Marcar el correcto y disparar evento
+        }
+
+        let selectedMethod = activeItem.data('code');
+
+        // Ocultar todas las secciones
+        $('#pos-section, #cash-section, #yape-section').hide();
+
+        // Mostrar la sección correspondiente
+        if (selectedMethod === 'efectivo') {
+            $('#cash-section').show();
+            $('#cashAmount').val("");
+        } else if (selectedMethod === 'yape_plin') {
+            $('#yape-section').show();
+            $('#operationCode').val("");
+        } else if (selectedMethod === 'pos') {
+            $('#pos-section').show();
+        }
+
+        console.log(`Método seleccionado: ${selectedMethod}, Checked: ${activeItem.prop('checked')}`);
     });
 
+    $('#copy-phone').on('click', function () {
+        let phoneNumber = $('#yape-phone').text().trim();
+
+        // Verificar si navigator.clipboard está disponible
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(phoneNumber).then(function () {
+                $.confirm({
+                    title: 'Copiado!',
+                    content: 'El número: <strong>' + phoneNumber + '</strong> fue copiado.',
+                    type: 'green',
+                    typeAnimated: true,
+                    buttons: {
+                        ok: {
+                            text: 'OK',
+                            btnClass: 'btn-green',
+                            action: function () {}
+                        }
+                    }
+                });
+            }).catch(function (err) {
+                console.error('Error al copiar el número: ', err);
+            });
+        } else {
+            // Método alternativo usando un input temporal
+            let tempInput = $('<input>');
+            $('body').append(tempInput);
+            tempInput.val(phoneNumber).select();
+            document.execCommand('copy');
+            tempInput.remove();
+
+            $.confirm({
+                title: 'Copiado!',
+                content: 'El número: <strong>' + phoneNumber + '</strong> fue copiado.',
+                type: 'green',
+                typeAnimated: true,
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-green',
+                        action: function () {}
+                    }
+                }
+            });
+        }
+    });
 
 
     // Ocultamos inicialmente el li del código de promoción
@@ -113,6 +191,8 @@ $(document).ready(function() {
                 $('#amount_code').text(response.discount_display); // Monto de descuento
                 $('#total_amount').text(`S/ ${response.new_total}`); // Nuevo total con envío y descuento
                 $('#coupon_name').val(response.code_name); // Nombre del código
+
+                $('#total-price-mobile').text(`S/ ${response.new_total}`);
                 toastr.success(response.message, 'Éxito',
                     {
                         "closeButton": true,
@@ -136,6 +216,9 @@ $(document).ready(function() {
                 $('#info_code').addClass('hidden');
                 $('#total_amount').text(`S/ ${response.new_total}`); // Devolver el total con envío sin descuento
                 $('#coupon_name').val(""); // Limpiar el nombre del cupón
+
+                $('#total-price-mobile').text(`S/ ${response.new_total}`);
+
                 toastr.error(response.message, 'Error',
                     {
                         "closeButton": true,
@@ -177,7 +260,7 @@ $(document).ready(function() {
         });
     });
 
-    $('.payment-method').on('change', function() {
+    /*$('.payment-method').on('change', function() {
         let selectedMethod = $(this).data('code');
 
         // Ocultar ambas secciones al cambiar la selección
@@ -190,15 +273,16 @@ $(document).ready(function() {
         } else if (selectedMethod === 'yape_plin') {
             $('#yape-section').show();
             $('#operationCode').val("");
-        }  /*else if (selectedMethod === 'mercado_pago') {
+        }  /!*else if (selectedMethod === 'mercado_pago') {
             $('#mercado_pago-section').show();
             $('#cardExpirationMonth').val("");
             $('#cardExpirationYear').val("");
             $('#securityCode').val("");
             $('#cardholderName').val("");
             $('#cardholderEmail').val("");
-        }*/
-    });
+        }*!/
+    });*/
+
     // Al hacer clic en el botón de enviar
     $('#btn-continue').on('click', function(event) {
         event.preventDefault();
@@ -287,6 +371,8 @@ $(document).ready(function() {
                         $('#amount_shipping').text(`+ S/ ${defaultShippingCost.toFixed(2)}`);
                         // Actualizar el total
                         $('#total_amount').text(`S/ ${data.new_total.toFixed(2)}`);
+
+                        $('#total-price-mobile').text(`S/ ${data.new_total.toFixed(2)}`);
                     }
                 },
                 error: function (xhr) {
@@ -315,6 +401,8 @@ $(document).ready(function() {
                         $('#info_shipping').removeClass('hidden');
                         $('#amount_shipping').text(`+ S/ ${data.shipping_cost.toFixed(2)}`);
                         $('#total_amount').text(`S/ ${data.new_total.toFixed(2)}`);
+
+                        $('#total-price-mobile').text(`S/ ${data.new_total.toFixed(2)}`);
                     } else {
                         toastr.error(data.message, 'Error');
                     }
@@ -335,7 +423,7 @@ $(document).ready(function() {
         $('#btn-cancel').attr("disabled", false);
     });
 
-    $('#btn-submit').click(function () {
+    $('#btn-submit, #btn-submit-mobile').click(function () {
         var phone = $("#phone").val();
         var email = $("#email").val();
         $('#showPhone').html(phone);
@@ -442,32 +530,6 @@ async function loadCheckout() {
         clone.querySelector("[data-subtotal]").innerHTML = `S/. ${subtotal.toFixed(2)}`;
 
         return clone;
-        /*const product = await fetchProduct(item.product_id, item.product_type_id);
-        if (!product) return null; // Si no conseguimos el producto, lo omitimos
-
-        const clone = activateTemplate('#template-detail');
-        let subtotal = product.price * item.quantity;
-
-        // Incluir el precio de las opciones seleccionadas
-        if (item.options && Object.keys(item.options).length > 0) {
-            const options = Object.values(item.options).flat();
-
-            const optionTotal = options.reduce((sum, option) => {
-                return sum + option.additional_price;
-            }, 0);
-
-            subtotal += optionTotal * item.quantity; // Sumamos el precio total de las opciones
-        }
-
-        total += subtotal; // Actualizamos el total general
-
-        // Rellenar los datos del producto en el clon
-        const urlImage = document.location.origin + '/images/products/' + product.image_url;
-        clone.querySelector("[data-image]").setAttribute('src', urlImage);
-        clone.querySelector("[data-full_name]").innerHTML = `${product.name} x${item.quantity}`;
-        clone.querySelector("[data-subtotal]").innerHTML = `S/. ${subtotal.toFixed(2)}`;
-
-        return clone;*/
     });
 
     // Esperamos a que todas las promesas de los productos se resuelvan
@@ -485,6 +547,8 @@ async function loadCheckout() {
     $("#subtotal_amount").html(`S/. ${subtotalCart.toFixed(2)}`);
     $("#taxes_amount").html(`S/. ${taxesCart.toFixed(2)}`);
     $("#total_amount").html(`S/. ${total.toFixed(2)}`);
+
+    $("#total-price-mobile").html(`S/. ${total.toFixed(2)}`);
 
     hideLoading(); // Ocultar indicador de carga
 }
