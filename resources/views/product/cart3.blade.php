@@ -73,14 +73,21 @@
             align-items: center;
             justify-content: center;
             margin-top: 10px;
+            max-width: 120px; /* Limita el ancho total */
+            margin: 0 auto; /* Centrar si es necesario */
         }
 
         .cantidad button {
             background: none;
             border: none;
-            font-size: 20px;
+            font-size: 16px; /* Reducimos el tamaño */
             cursor: pointer;
             color: #555;
+            width: 30px; /* Tamaño fijo para evitar separación */
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .cantidad button:hover {
@@ -88,10 +95,10 @@
         }
 
         .cantidad span {
-            font-size: 16px;
-            margin: 0 10px;
+            font-size: 14px; /* Reducimos el tamaño de fuente */
+            margin: 0 5px; /* Menos espacio entre botones */
             display: inline-block;
-            width: 20px;
+            width: 25px; /* Limitamos el ancho */
             text-align: center;
         }
 
