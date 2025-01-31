@@ -57,12 +57,69 @@ $(document).ready(function () {
     $(document).on('click', '[data-image]', showImage);
 
     $(document).on('click', '[data-eliminar]', openModalDelete);
+
+    $(document).on('click', '[data-desactivar]', desactivarProducto);
 });
 
 var $formDelete;
 var $modalDelete;
 var $modalImage;
 var $permissions;
+
+function desactivarProducto() {
+    let idProduct = $(this).data('product_id');
+    let description = $(this).data('description');
+    let time = $(this).data('time');
+
+    $.confirm({
+        title: 'Desactivación de productos',
+        content: "¿Está seguro de desactivar el producto "+description+"? <br> Por " + time ,
+        theme: 'modern', // Puedes probar otros temas como 'bootstrap', 'modern', 'dark'
+        boxWidth: '350px', // Ajusta el ancho de la ventana
+        useBootstrap: false, // Usa estilos independientes de Bootstrap
+        type: 'red',
+        buttons: {
+            confirmar: {
+                text: 'Confirmar',
+                btnClass: 'btn-green',
+                action: function () {
+                    // Hacer una llamada AJAX para enviar los datos al backend
+                    $.ajax({
+                        url: '/dashboard/desactivar/producto/'+idProduct,
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            id_product: idProduct,
+                            time: time
+                        }),
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Incluye el token CSRF en los encabezados
+                        },
+                        success: function (response) {
+                            $.alert({
+                                title: 'Éxito',
+                                content: response.message,
+                                onClose: function () {
+                                    location.reload(); // Redirigir a la ruta del carrito
+                                }
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            $.alert('Hubo un problema al eliminar el producto.');
+                        }
+                    });
+                }
+            },
+            volver: {
+                text: 'Volver',
+                btnClass: 'btn-red',
+                action: function () {
+                    // Cerrar el modal
+                }
+            }
+        }
+    });
+}
 
 function openModalDelete() {
 
@@ -546,6 +603,11 @@ function renderDataTable(data, activeColumns) {
     clone.querySelector("[data-cambiar_estado]").setAttribute("data-product_id", data.id);
     clone.querySelector("[data-cambiar_estado]").setAttribute("data-state", data.textEstado);
     clone.querySelector("[data-cambiar_estado]").setAttribute("data-description", data.nombre);
+
+    clone.querySelectorAll("[data-desactivar]").forEach(btn => {
+        btn.setAttribute("data-product_id", data.id);
+        btn.setAttribute("data-description", data.nombre);
+    });
 
     clone.querySelector("[data-eliminar]").setAttribute("data-product_id", data.id);
     clone.querySelector("[data-eliminar]").setAttribute("data-description", data.nombre);

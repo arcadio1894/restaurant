@@ -128,6 +128,9 @@ Route::middleware('auth')->group(function (){
 
         Route::post('/destroy/product/{id}', [ProductController::class, 'destroy'])
             ->name('product.destroy');
+        Route::post('/desactivar/producto/{id}', [ProductController::class, 'desactivar'])
+            ->name('product.desactivar');
+
         Route::post('/reactivar/product/{id}', [ProductController::class, 'reactivar'])
             ->name('product.reactivar');
 

@@ -662,8 +662,10 @@ class ProductController extends Controller
         if ($currentState == 1)
         {
             $product->enable_status = 0;
+            $product->date_reactivate = null;
         } else {
             $product->enable_status = 1;
+            $product->date_reactivate = null;
         }
 
         $product->save();
@@ -844,6 +846,44 @@ class ProductController extends Controller
 
         return response()->json(['message' => 'Producto reactivado con éxito.'], 200);
 
+    }
+
+    public function desactivar( Request $request, $id)
+    {
+        $product_id = $request->get('id_product');
+        $time = trim($request->get('time')); // Elimina espacios en blanco
+
+        DB::beginTransaction();
+        try {
+            $product = Product::find($product_id);
+
+            // Logica para hallar la fecha de reactivacion del producto y colocar en el campo
+            if (!$product) {
+                return response()->json(['message' => 'Producto no encontrado.'], 404);
+            }
+
+            // Calcular la fecha de reactivación
+            $fechaActual = Carbon::now();
+
+            if ($time === 'siempre') {
+                $fechaReactivacion = $fechaActual->addDays(100); // Sumar 100 días
+            } else {
+                $horas = intval($time); // Convertir a número entero
+                $fechaReactivacion = $fechaActual->addHours($horas); // Sumar horas
+            }
+
+            // Guardar la fecha de reactivación en el producto
+            $product->enable_status = 0;
+            $product->date_reactivate = $fechaReactivacion;
+            $product->save();
+
+            DB::commit();
+
+            return response()->json(['message' => 'Producto desactivado con éxito.'], 200);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
     }
 
     public function initializeProductDays()

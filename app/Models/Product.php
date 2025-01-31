@@ -19,7 +19,8 @@ class Product extends Model
         'enable_status',
         'ingredients',
         'slug',
-        'visibility_price_real'
+        'visibility_price_real',
+        'date_reactivate'
     ];
 
     public function options()
