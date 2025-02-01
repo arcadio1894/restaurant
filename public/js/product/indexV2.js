@@ -50,7 +50,7 @@ $(document).ready(function () {
     $modalImage = $('#modalImage');
 
     $formDelete = $('#formDelete');
-    $formDelete.on('submit', disableMaterial);
+    //$formDelete.on('submit', disableMaterial);
     $modalDelete = $('#modalDelete');
     $(document).on('click', '[data-cambiar_estado]', openModalDisable);
 
@@ -69,54 +69,110 @@ var $permissions;
 function desactivarProducto() {
     let idProduct = $(this).data('product_id');
     let description = $(this).data('description');
-    let time = $(this).data('time');
 
     $.confirm({
         title: 'Desactivación de productos',
-        content: "¿Está seguro de desactivar el producto "+description+"? <br> Por " + time ,
-        theme: 'modern', // Puedes probar otros temas como 'bootstrap', 'modern', 'dark'
-        boxWidth: '350px', // Ajusta el ancho de la ventana
-        useBootstrap: false, // Usa estilos independientes de Bootstrap
+        content: "¿Por cuánto tiempo desea desactivar el producto <strong>" + description + "</strong>?",
+        theme: 'modern',
+        boxWidth: '400px',
+        useBootstrap: false,
         type: 'red',
         buttons: {
-            confirmar: {
-                text: 'Confirmar',
-                btnClass: 'btn-green',
+            '1hora': {
+                text: '1 Hora',
+                btnClass: 'btn-blue',
                 action: function () {
-                    // Hacer una llamada AJAX para enviar los datos al backend
-                    $.ajax({
-                        url: '/dashboard/desactivar/producto/'+idProduct,
-                        method: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({
-                            id_product: idProduct,
-                            time: time
-                        }),
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Incluye el token CSRF en los encabezados
-                        },
-                        success: function (response) {
-                            $.alert({
-                                title: 'Éxito',
-                                content: response.message,
-                                onClose: function () {
-                                    location.reload(); // Redirigir a la ruta del carrito
-                                }
-                            });
-                        },
-                        error: function (xhr, status, error) {
-                            $.alert('Hubo un problema al eliminar el producto.');
-                        }
-                    });
+                    confirmarDesactivacion(idProduct, description, 1);
                 }
             },
-            volver: {
-                text: 'Volver',
+            '2horas': {
+                text: '2 Horas',
+                btnClass: 'btn-blue',
+                action: function () {
+                    confirmarDesactivacion(idProduct, description, 2);
+                }
+            },
+            '12horas': {
+                text: '12 Horas',
+                btnClass: 'btn-blue',
+                action: function () {
+                    confirmarDesactivacion(idProduct, description, 12);
+                }
+            },
+            '24horas': {
+                text: '24 Horas',
+                btnClass: 'btn-blue',
+                action: function () {
+                    confirmarDesactivacion(idProduct, description, 24);
+                }
+            },
+            'siempre': {
+                text: 'SIEMPRE',
+                btnClass: 'btn-dark',
+                action: function () {
+                    confirmarDesactivacion(idProduct, description, 'siempre');
+                }
+            },
+            cancelar: {
+                text: 'Cancelar',
                 btnClass: 'btn-red',
                 action: function () {
-                    // Cerrar el modal
+                    // No hacer nada, solo cerrar el modal
                 }
             }
+        }
+    });
+}
+
+// Función para confirmar la desactivación antes de enviar la solicitud AJAX
+function confirmarDesactivacion(idProduct, description, time) {
+    $.confirm({
+        title: 'Confirmación',
+        content: "¿Está seguro de desactivar el producto <strong>" + description + "</strong> por " + (time === 'siempre' ? 'siempre' : time + ' horas') + "?",
+        type: 'orange',
+        buttons: {
+            confirmar: {
+                text: 'Sí, desactivar',
+                btnClass: 'btn-green',
+                action: function () {
+                    enviarDesactivacion(idProduct, time);
+                }
+            },
+            cancelar: {
+                text: 'Cancelar',
+                btnClass: 'btn-red',
+                action: function () {
+                    // No hacer nada, solo cerrar el modal
+                }
+            }
+        }
+    });
+}
+
+// Función para enviar la solicitud AJAX
+function enviarDesactivacion(idProduct, time) {
+    $.ajax({
+        url: '/dashboard/desactivar/producto/' + idProduct,
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            id_product: idProduct,
+            time: time
+        }),
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function (response) {
+            $.alert({
+                title: 'Éxito',
+                content: response.message,
+                onClose: function () {
+                    location.reload();
+                }
+            });
+        },
+        error: function (xhr, status, error) {
+            $.alert('Hubo un problema al desactivar el producto.');
         }
     });
 }
@@ -185,18 +241,68 @@ function openModalDisable() {
     var description = $(this).data('description');
     var state = $(this).data('state');
 
-    var title = "";
-    if ( state == 'activo' )
-    {
-        title = "Confirmar cambio de estado a INACTIVO";
-    } else {
-        title = "Confirmar cambio de estado a ACTIVO";
-    }
-    $modalDelete.find('[id=product_id]').val(product_id);
-    $modalDelete.find('[id=modal_title]').html(title);
-    $modalDelete.find('[id=descriptionDelete]').html(description);
+    var title = (state === 'activo')
+        ? "Cambio de estado a <strong>INACTIVO</strong>"
+        : "Cambio de estado a <strong>ACTIVO</strong>";
 
-    $modalDelete.modal('show');
+    $.confirm({
+        title: title,
+        content: "¿Está seguro de cambiar el estado del producto <strong>" + description + "</strong>?",
+        type: 'orange',
+        buttons: {
+            confirmar: {
+                text: 'Sí, cambiar',
+                btnClass: 'btn-green',
+                action: function () {
+                    cambiarEstadoProducto(product_id);
+                }
+            },
+            cancelar: {
+                text: 'Cancelar',
+                btnClass: 'btn-red',
+                action: function () {
+                    // Solo cierra el modal
+                }
+            }
+        }
+    });
+}
+
+// Función AJAX para cambiar el estado del producto
+function cambiarEstadoProducto(product_id) {
+    var deleteUrl = $formDelete.data('url'); // Asegúrate de que esta variable tiene la URL correcta
+
+    $.ajax({
+        url: deleteUrl,
+        method: 'POST',
+        data: JSON.stringify({
+            product_id: product_id,
+        }),
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Importante para Laravel
+        },
+        contentType: "application/json", // Especificamos que estamos enviando JSON
+        success: function (data) {
+            toastr.success(data.message, 'Éxito', {
+                "closeButton": true,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "2000"
+            });
+
+            setTimeout(function () {
+                location.reload();
+            }, 2000);
+        },
+        error: function (data) {
+            if (data.responseJSON.message && !data.responseJSON.errors) {
+                toastr.error(data.responseJSON.message, 'Error');
+            }
+            for (var property in data.responseJSON.errors) {
+                toastr.error(data.responseJSON.errors[property], 'Error');
+            }
+        }
+    });
 }
 
 function disableMaterial() {
@@ -276,28 +382,6 @@ function disableMaterial() {
                         "hideMethod": "fadeOut"
                     });
             }
-            /*for ( var property in data.responseJSON.errors ) {
-                toastr.error(data.responseJSON.errors[property], 'Error',
-                    {
-                        "closeButton": true,
-                        "debug": false,
-                        "newestOnTop": false,
-                        "progressBar": true,
-                        "positionClass": "toast-top-right",
-                        "preventDuplicates": false,
-                        "onclick": null,
-                        "showDuration": "300",
-                        "hideDuration": "1000",
-                        "timeOut": "4000",
-                        "extendedTimeOut": "1000",
-                        "showEasing": "swing",
-                        "hideEasing": "linear",
-                        "showMethod": "fadeIn",
-                        "hideMethod": "fadeOut"
-                    });
-            }*/
-
-
         },
     });
 }
