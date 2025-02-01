@@ -664,11 +664,21 @@
                                                             <div class="form-check mb-2 custom-radio-checkbox">
                                                                 <input class="form-check-input option-input"
                                                                        type="radio"
+                                                                       data-option_id="{{$option->id}}"
+                                                                       data-selection_id="{{$selection->id}}"
+                                                                       data-selection_product_price="{{ isset($selection->product_price) ? $selection->product_price : 0 }}"
+                                                                       data-selection_product_name="{{$selection->product->full_name}}"
+                                                                       data-selection_price="{{$selection->additional_price}}"
+                                                                       data-selection_product_id="{{$selection->product_id}}"
                                                                        name="option_{{ $option->id }}"
                                                                        value="{{ $selection->product_id }}"
-                                                                       id="radio_{{ $option->id }}_{{ $loop->index }}" />
+                                                                       id="radio_{{ $option->id }}_{{ $loop->index }}"
+                                                                       @if(count($option->selections) === 1) checked @endif />
                                                                 <label class="form-check-label" for="radio_{{ $option->id }}_{{ $loop->index }}">
                                                                     {{ $selection->product->full_name }}
+                                                                    @if ($selection->additional_price > 0)
+                                                                        <span class="text-muted">( + S/. {{ number_format($selection->additional_price, 2) }} )</span>
+                                                                    @endif
                                                                 </label>
                                                             </div>
                                                         @endforeach

@@ -20,6 +20,8 @@ $(document).ready(function () {
         adjustCarousel();
     });
 
+    updatePrices();
+
     // Escuchar el evento de cambio en los radios de tamaño de pizza
     $(document).on('change', 'input[name="pizza-size"]', function () {
         console.log("cambio");
@@ -110,9 +112,18 @@ $(document).ready(function () {
                 }
 
                 options[optionId] = selected;
-            } /*else if (optionType === 'radio') {
+            } else if (optionType === 'radio') {
                 // Obtener radio seleccionado
-                const selected = $container.find('.form-check-input:checked').val();
+                //const selected = $container.find('.form-check-input:checked').val();
+                const selected = $container.find('.form-check-input:checked').map(function () {
+                    return {
+                        option_id: optionId,
+                        selection_id: $(this).data('selection_id'),
+                        product_id: $(this).val(),
+                        selection_name: $(this).data('selection_product_name'), // Capturamos el texto del label como nombre
+                        additional_price: parseFloat($(this).data('selection_price')) || 0
+                    };
+                }).get();
 
                 if (!selected) {
                     showError(`Debes seleccionar una opción para: ${optionDescription}.`);
@@ -121,7 +132,7 @@ $(document).ready(function () {
                 }
 
                 options[optionId] = selected;
-            } else if (optionType === 'select') {
+            } /*else if (optionType === 'select') {
                 // Manejar select
                 const selected = $container.find('.form-select').val();
 
@@ -333,7 +344,8 @@ $(document).ready(function () {
     });
 
     // Manejar cambios en checkboxes
-    $(".option-container").on("change", ".form-check-input[type='checkbox']", function () {
+    $(".option-container").on("change", ".form-check-input[type='checkbox'], .form-check-input[type='radio']", function () {
+        console.log("Entre");
         const $container = $(this).closest(".option-container"); // Encontrar el contenedor de la opción
         const maxQuantity = parseInt($container.data("quantity"), 10);  // Obtener la cantidad máxima permitida
         const checkedCount = $container.find(".form-check-input:checked").length;  // Contar checkboxes seleccionados
@@ -370,6 +382,7 @@ $(document).ready(function () {
         totalRealPrice = parseFloat($("#product-price-real").data("real-base-price")) || 0; // Reiniciar precio real total
         //console.log(totalRealPrice);
         $(".form-check-input:checked").each(function () {
+            console.log($(this));
             totalPrice += parseFloat($(this).data("selection_price")) || 0; // Sumar precio adicional
             totalRealPrice += parseFloat($(this).data("selection_product_price")) || 0; // Sumar precio real adicional
 
