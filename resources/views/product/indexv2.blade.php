@@ -309,7 +309,7 @@
             <td data-column="visibility_price_real" data-visibility_price_real>Ver precio Tachado</td>
             <td>
                 <a data-editar_product href="{{--'+document.location.origin+ '/dashboard/editar/material/'+item.id+'--}}" class="btn btn-outline-warning btn-sm" data-toggle="tooltip" data-placement="top" title="Editar"><i class="fa fa-pen"></i> </a>
-                <button data-cambiar_estado="" data-product_id="" data-state="" data-description="" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Activar / Desactivar"><i class="fas fa-bell-slash"></i> </button>
+                <button data-cambiar_estado="" data-product_id="" data-state="" data-description="" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Activar productos"><i class="fas fa-check"></i> </button>
 
                 <button data-desactivar data-product_id="" data-description="" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Desactivar por tiempo"><i class="fas fa-times-circle"></i></button>
                 {{--<br>

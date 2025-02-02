@@ -683,12 +683,27 @@ function renderDataTable(data, activeColumns) {
     clone.querySelector("[data-categoria]").innerHTML = data.categoria;
     clone.querySelector("[data-ingredientes]").innerHTML = data.ingredientes;
     clone.querySelector("[data-estado]").innerHTML = data.estado;
-    clone.querySelector("[data-cambiar_estado]").setAttribute("data-cambiar_estado", data.state);
-    clone.querySelector("[data-cambiar_estado]").setAttribute("data-product_id", data.id);
-    clone.querySelector("[data-cambiar_estado]").setAttribute("data-state", data.textEstado);
-    clone.querySelector("[data-cambiar_estado]").setAttribute("data-description", data.nombre);
 
-    clone.querySelectorAll("[data-desactivar]").forEach(btn => {
+
+    // Manejo de visibilidad según el estado
+    let cambiarEstadoBtn = clone.querySelector("[data-cambiar_estado]");
+    let desactivarBtns = clone.querySelectorAll("[data-desactivar]");
+
+    if (data.state == 0) { // Inactivo -> Mostrar cambiar_estado, ocultar desactivar
+        cambiarEstadoBtn.style.display = "inline-block";
+        desactivarBtns.forEach(btn => btn.style.display = "none");
+    } else { // Activo -> Ocultar cambiar_estado, mostrar desactivar
+        cambiarEstadoBtn.style.display = "none";
+        desactivarBtns.forEach(btn => btn.style.display = "inline-block");
+    }
+
+    // Configurar atributos
+    cambiarEstadoBtn.setAttribute("data-cambiar_estado", data.state);
+    cambiarEstadoBtn.setAttribute("data-product_id", data.id);
+    cambiarEstadoBtn.setAttribute("data-state", data.textEstado);
+    cambiarEstadoBtn.setAttribute("data-description", data.nombre);
+
+    desactivarBtns.forEach(btn => {
         btn.setAttribute("data-product_id", data.id);
         btn.setAttribute("data-description", data.nombre);
     });
@@ -703,25 +718,8 @@ function renderDataTable(data, activeColumns) {
     clone.querySelector("[data-visibility_price_real]").innerHTML = data.visibility_price_real;
 
     // Configurar enlaces y botones según los permisos y datos
-    /*if ($.inArray('update_material', $permissions) !== -1) {*/
-        let url = document.location.origin + '/dashboard/editar/producto/' + data.id;
-        clone.querySelector("[data-editar_product]").setAttribute("href", url);
-    /*} else {
-        let element = clone.querySelector("[data-editar_material]");
-        if (element) {
-            element.style.display = 'none';
-        }
-    }*/
-
-    /*if ($.inArray('enable_material', $permissions) !== -1) {*/
-        /*clone.querySelector("[data-deshabilitar]").setAttribute("data-delete", data.id);
-        clone.querySelector("[data-deshabilitar]").setAttribute("data-description", data.nombre);*/
-    /*} else {
-        let element = clone.querySelector("[data-deshabilitar]");
-        if (element) {
-            element.style.display = 'none';
-        }
-    }*/
+    let url = document.location.origin + '/dashboard/editar/producto/' + data.id;
+    clone.querySelector("[data-editar_product]").setAttribute("href", url);
 
     // Agregar la fila clonada al cuerpo de la tabla
     $("#body-table").append(clone);
