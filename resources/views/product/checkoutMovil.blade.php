@@ -405,7 +405,7 @@
                     <!-- Sección para método de pago Yape/Plin -->
                     <div id="yape-section" style="display: none; margin-top: 15px;">
 
-                        <p style="font-size: 0.9rem">Paga con Yape o Plin usando nuestro número: <br><strong><span id="yape-phone" class="font-weight-bold mr-2 ">987 654 321</span></strong>
+                        <p style="font-size: 0.9rem">Paga con Yape o Plin usando nuestro número: <br><strong><span id="yape-phone" class="font-weight-bold mr-2 ">906343258</span></strong>
                             <!-- Botón para copiar al portapapeles -->
                             <button type="button" id="copy-phone" class="btn btn-link p-0" title="Copiar número">
                                 <i class="fas fa-copy"></i>
