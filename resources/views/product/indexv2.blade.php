@@ -403,6 +403,6 @@
 
         })
     </script>
-    <script src="{{ asset('js/product/indexV2.js') }}"></script>
+    <script src="{{ asset('js/product/indexV2.js') }}?v={{ time() }}"></script>
 
 @endsection
