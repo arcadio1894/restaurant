@@ -1,5 +1,4 @@
 $(document).ready(function () {
-
     // Detectar tamaño de la pantalla y ajustar número de productos
     function adjustCarousel() {
         if ($(window).width() < 768) {

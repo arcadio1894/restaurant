@@ -114,6 +114,46 @@ $(document).ready(function() {
         toastr.success('Producto eliminado del carrito.', 'Éxito');
     });
 
+    $(document).on('click', '#btn-delete_cart', function () {
+        $.confirm({
+            title: 'Confirmar eliminación',
+            content: '¿Estás seguro de que quieres borrar todo el carrito?',
+            type: 'red', // Color de alerta
+            theme: 'modern', // Tema del modal
+            buttons: {
+                confirmar: {
+                    text: 'Sí, borrar',
+                    btnClass: 'btn-red',
+                    action: function () {
+                        // Eliminar el carrito del localStorage
+                        localStorage.removeItem("cart");
+                        localStorage.removeItem("observations");
+
+                        // Mostrar mensaje de éxito y esperar confirmación antes de recargar
+                        $.alert({
+                            title: 'Carrito eliminado',
+                            content: 'Tu carrito ha sido eliminado correctamente.',
+                            type: 'green',
+                            buttons: {
+                                ok: {
+                                    text: 'OK',
+                                    action: function () {
+                                        location.reload(); // Ahora solo recarga después de que el usuario presione "OK"
+                                    }
+                                }
+                            }
+                        });
+                    }
+                },
+                cancelar: {
+                    text: 'Cancelar',
+                    action: function () {
+                        // No hacer nada si el usuario cancela
+                    }
+                }
+            }
+        });
+    });
 });
 
 const TAX_RATE = 0.18; // IGV (18%)

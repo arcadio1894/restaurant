@@ -332,8 +332,10 @@
                     <button data-href="{{ route('cart.checkout') }}" class="btn btn-success w-100 shadow-0 mb-2 d-lg-flex d-none text-center" id="go-to-checkout"> Ir a Pagar </button>
                     @auth()
                         <a href="{{ route('home') }}" class="btn btn-light w-100 border mt-2"> Seguir comprando </a>
+                        <button id="btn-delete_cart" class="btn btn-light w-100 border mt-2"> Borrar todo el carrito </button>
                     @else
                         <a href="{{ route('welcome') }}" class="btn btn-light w-100 border mt-2"> Seguir comprando </a>
+                        <button id="btn-delete_cart" class="btn btn-light w-100 border mt-2"> Borrar todo el carrito </button>
                     @endif
                 </div>
             </div>
