@@ -95,13 +95,46 @@ $(document).ready(function() {
         // Guardar las observaciones en el localStorage
         localStorage.setItem('observations', observations);
 
-        // Redirigir al enlace en data-href
         const href = $(this).data('href');
-        if (href) {
-            window.location.href = href;
-        } else {
-            console.error("El atributo data-href no está definido en el botón.");
-        }
+
+        $.ajax({
+            url: '/api/business-hours', // Cambia la ruta si es necesario
+            method: 'GET',
+            success: function (response) {
+                if (!response.is_open) {
+                    $.confirm({
+                        title: '¡Aún no estamos atendiendo!',
+                        content: `
+                    <img src="/images/checkout/cerrado.png" style="display:block; margin: 0 auto; padding-bottom: 15px; width: 100px; height: auto;" />
+                    <p class="text-center"><strong>Estamos fuera de horario. Te esperamos en nuestro próximo turno.</strong></p>
+                    <p class="text-center">En este momento no podemos atenderte, pues nos encontramos fuera del horario de servicio de atención al cliente.</p>
+                  
+                    <p class="mb-2 text-center"><strong >Estos son nuestros horarios:</strong></p>
+                    <p class="mb-0 text-center">Lunes a Domingos: 6:30pm - 11:30pm</p>
+                `,
+                        buttons: {
+                            close: {
+                                text: 'Cerrar',
+                                action: function () {
+                                    // Acción al cerrar el pop-up
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    // Redirigir al enlace en data-href
+                    if (href) {
+                        window.location.href = href;
+                    } else {
+                        console.error("El atributo data-href no está definido en el botón.");
+                    }
+                }
+            },
+            error: function () {
+                console.error('No se pudo verificar el horario de atención.');
+            }
+        });
+
     });
 
     // Eliminar producto del carrito
