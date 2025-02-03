@@ -15,6 +15,7 @@ use \App\Http\Controllers\TypeController;
 use \App\Http\Controllers\CategoryController;
 use \App\Http\Controllers\SliderController;
 use \App\Http\Controllers\CashRegisterController;
+use \App\Http\Controllers\FacturaController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -213,6 +214,7 @@ Route::middleware('auth')->group(function (){
             ->name('regularize.cashRegister');
         Route::get('/get/data/movements/V2/{numberPage}', [CashRegisterController::class, 'getDataMovements']);
 
+        Route::post('/factura/generar/{id}', [FacturaController::class, 'generarComprobante']);
     });
 });
 
