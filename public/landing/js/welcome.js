@@ -6,9 +6,25 @@ $(document).ready(function() {
         method: 'GET',
         success: function (response) {
             if (!response.is_open) {
-                // Mostrar mensaje si el negocio está cerrado
-                $('#business-message').text(response.message);
-                $('#business-status').fadeIn();
+                $.confirm({
+                    title: '¡Aún no estamos atendiendo!',
+                    content: `
+                    <img src="/images/checkout/cerrado.png" style="display:block; margin: 0 auto; padding-bottom: 15px; width: 100px; height: auto;" />
+                    <p class="text-center"><strong>Estamos fuera de horario. Te esperamos en nuestro próximo turno.</strong></p>
+                    <p class="text-center">En este momento no podemos atenderte, pues nos encontramos fuera del horario de servicio de atención al cliente.</p>
+                  
+                    <p class="mb-2 text-center"><strong >Estos son nuestros horarios:</strong></p>
+                    <p class="mb-0 text-center">Lunes a Domingos: 6:30pm - 11:30pm</p>
+                `,
+                    buttons: {
+                        close: {
+                            text: 'Cerrar',
+                            action: function () {
+                                // Acción al cerrar el pop-up
+                            }
+                        }
+                    }
+                });
             }
         },
         error: function () {

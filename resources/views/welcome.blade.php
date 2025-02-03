@@ -74,7 +74,8 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/css/nice-select.min.css" integrity="sha512-CruCP+TD3yXzlvvijET8wV5WxxEh5H8P4cmz0RFbKK6FlZ2sYl3AEsKlLPHbniXKSrDdFewhbmBK5skbdsASbQ==" crossorigin="anonymous" />
         <!-- font awesome style -->
         <link href="{{ asset('landing/css/fontawesome-all.min.css') }}" rel="stylesheet" />
-
+        <!-- Jquery-confirm -->
+        <link rel="stylesheet" href="{{ asset('plugins/jquery-confirm/jquery-confirm.min.css') }}">
         <!-- Custom styles for this template -->
         <link href="{{ asset('landing/css/style.css') }}" rel="stylesheet" />
         <!-- responsive style -->
@@ -820,7 +821,7 @@
         </footer>
         <!-- footer section -->
 
-        @if (request()->routeIs('cart.checkout'))
+        @if (request()->routeIs('cart.checkout') || request()->routeIs('welcome') || request()->routeIs('home'))
         <div id="business-status" style="display: none; position: fixed; top: 20px; left: 20px; background-color: rgba(255, 0, 0, 0.9); border: 1px solid #cc0000; padding: 15px; border-radius: 5px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); z-index: 9999; color: #fff;">
             <button id="close-business-status" style="background: none; border: none; font-size: 16px; font-weight: bold; color: #fff; float: right; cursor: pointer;">&times;</button>
             <p id="business-message" style="margin: 0; font-size: 14px; font-weight: bold;"></p>
@@ -864,6 +865,8 @@
         {{--<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCh39n5U-4IoWpsVGUHWdqB6puEkhRLdmI&callback=myMap">
         </script>--}}
         <!-- End Google Map -->
+        <!-- Jquery-confirm -->
+        <script src="{{ asset('plugins/jquery-confirm/jquery-confirm.min.js') }}"></script>
         <script src="{{ asset('landing/js/welcome.js') }}"></script>
 
     </body>
