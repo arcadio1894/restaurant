@@ -329,7 +329,14 @@
                 </div>
 
                 <div class="mt-3">
-                    <button data-href="{{ route('cart.checkout') }}" class="btn btn-success w-100 shadow-0 mb-2 d-lg-flex d-none text-center" id="go-to-checkout"> Ir a Pagar </button>
+                    <div class="d-flex justify-content-center">
+                        <button data-href="{{ route('cart.checkout') }}" class="btn btn-success shadow-0 mb-2 d-lg-flex d-none text-center w-100" id="go-to-checkout" style="display: flex; justify-content: center; align-items: center;">
+                            Ir a Pagar
+                        </button>
+                    </div>
+
+                    {{--<button data-href="{{ route('cart.checkout') }}" class="btn btn-success w-100 shadow-0 mb-2 d-lg-flex d-none text-center" id="go-to-checkout"> Ir a Pagar </button>
+                    --}}
                     @auth()
                         <a href="{{ route('home') }}" class="btn btn-light w-100 border mt-2"> Seguir comprando </a>
                         <button id="btn-delete_cart" class="btn btn-light w-100 border mt-2"> Borrar todo el carrito </button>
