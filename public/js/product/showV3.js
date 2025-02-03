@@ -24,10 +24,10 @@ $(document).ready(function () {
 
     // Escuchar el evento de cambio en los radios de tamaño de pizza
     $(document).on('change', 'input[name="pizza-size"]', function () {
-        console.log("cambio");
+        //console.log("cambio");
         // Obtener el precio del radio seleccionado
         let selectedPrice = parseFloat($(this).data('price'));
-        console.log(selectedPrice);
+        //console.log(selectedPrice);
 
         /*// Actualizar el precio en el elemento con id "product-price"
         $('#product-price').text(selectedPrice);
@@ -46,7 +46,7 @@ $(document).ready(function () {
             .text(selectedPrice.toFixed(2))
             .attr('data-base-price', selectedPrice);
 
-        console.log($('#product-price, #product-price-mobile'));
+        //console.log($('#product-price, #product-price-mobile'));
 
         // Llama a updatePrices para recalcular el total
         updatePrices();
@@ -150,7 +150,7 @@ $(document).ready(function () {
             return; // No continuar si las validaciones fallan
         }
 
-        console.log("Opciones seleccionadas:", options);
+        //console.log("Opciones seleccionadas:", options);
         let totalOptionsPrice = 0;
         // Recorrer las opciones en el objeto `options`
         for (const optionId in options) {
@@ -160,9 +160,9 @@ $(document).ready(function () {
                 totalOptionsPrice += selectedOptions.reduce((sum, item) => sum + item.additional_price, 0);
             }
         }
-        console.log("Total opciones: "+totalOptionsPrice);
+        //console.log("Total opciones: "+totalOptionsPrice);
 
-        let priceTotal = parseFloat($("#product-price, #product-price-mobile").data('base-price'), 2);
+        let priceTotal = parseFloat($("#product-price, #product-price-mobile").attr('data-base-price'), 2);
         console.log("Precio Total 1: "+priceTotal);
 
         let totalTotal = priceTotal + totalOptionsPrice;
@@ -257,6 +257,8 @@ $(document).ready(function () {
                 console.error("Error al verificar la autenticación:", error);
             }
         });
+
+        //location.reload();
     });
 
     $(document).on('click', '[data-add_to_cart_adicional]', function (e) {

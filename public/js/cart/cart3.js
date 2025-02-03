@@ -439,6 +439,7 @@ function updateCartView(button, cart, detailIndex) {
 function updateCartViewAfterDelete(cart) {
     // Si el carrito está vacío, mostramos el mensaje del template
     if (cart.length === 0) {
+        updateQuantityCart();
         loadCart();
         return; // Termina la ejecución de la función
     }
@@ -486,6 +487,8 @@ function updateCartViewAfterDelete(cart) {
             }
         }
     });
+
+    updateQuantityCart();
 }
 
 function deleteItem(button) {
@@ -502,7 +505,6 @@ function deleteItem(button) {
 
         // Actualizar el carrito en el localStorage
         localStorage.setItem('cart', JSON.stringify(cart));
-
         // Recargar la vista del carrito
         loadCart();
 
@@ -532,4 +534,16 @@ function deleteItem(button) {
 function activateTemplate(id) {
     var t = document.querySelector(id);
     return document.importNode(t.content, true);
+}
+
+function updateQuantityCart() {
+    // Si no está autenticado, obtener la cantidad desde localStorage
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    // Contar el número de productos únicos
+    let totalItems = cart.length;
+
+    // Actualizar el contenido del span
+    $("#quantityCart").html(`(${totalItems})`);
+    $("#quantityCart2").html(`(${totalItems})`);
 }
