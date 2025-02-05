@@ -26,7 +26,18 @@ class Order extends Model
         'amount_shipping',
         'shipping_district_id',
         'observations',
-        'state_annulled'
+        'state_annulled',
+
+        // Campos adicionales para facturación
+        'serie',              // Serie del documento (ejemplo: F001, B001)
+        'numero',             // Número correlativo del documento
+        'type_document',      // Tipo de documento (01 para factura, 03 para boleta)
+        'sunat_ticket',       // Ticket de respuesta de SUNAT
+        'sunat_status',       // Estado del comprobante en SUNAT (ejemplo: Enviado, Rechazado)
+        'sunat_message',      // Mensaje o error recibido de SUNAT
+        'xml_path',           // Ruta del archivo XML generado
+        'cdr_path',           // Ruta del archivo CDR generado
+        'fecha_emision'       // Fecha de emisión del documento
     ];
 
     public function user()

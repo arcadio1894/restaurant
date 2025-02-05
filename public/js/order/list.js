@@ -33,6 +33,48 @@ $(document).ready(function () {
     /*$(document).on('click', '[data-print_nota]', printOrder);*/
 
     $(document).on('click', '[data-anular]', anularOrder);
+
+    $(document).on('click', '[data-generar_comprobante]', function () {
+        const orderId = $(this).data('order-id');
+
+        $.confirm({
+            title: 'Confirmación',
+            content: '¿Deseas generar el comprobante?',
+            buttons: {
+                confirmar: {
+                    text: 'Sí, generar',
+                    action: function () {
+                        $.ajax({
+                            url: `/factura/generar/${orderId}`,
+                            type: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function (response) {
+                                if (response.error) {
+                                    $.alert('Error: ' + response.error);
+                                } else {
+                                    $.alert('Comprobante generado con éxito. Ticket: ' + response.ticket);
+                                }
+                            },
+                            error: function (xhr) {
+                                $.alert('Error al procesar la solicitud. Intenta nuevamente.');
+                            }
+                        });
+                    }
+                },
+                cancelar: {
+                    text: 'Cancelar',
+                    action: function () {}
+                }
+            }
+        });
+    });
+
+    $(document).on('click', '[data-imprimir_comprobante]', function () {
+        const orderId = $(this).data('order-id');
+        window.open(`/factura/imprimir/${orderId}`, '_blank');
+    });
 });
 
 var $formDelete;
@@ -568,6 +610,9 @@ function renderDataTable(data) {
     cloneBtnActive.querySelector("[data-print_comanda]").setAttribute("href", url_comanda);
 
     cloneBtnActive.querySelector("[data-anular]").setAttribute("data-id", data.id);
+
+    cloneBtnActive.querySelector("[data-generar_comprobante]").setAttribute("data-order-id", data.id);
+    cloneBtnActive.querySelector("[data-imprimir_comprobante]").setAttribute("data-order-id", data.id);
 
     botones.append(cloneBtnActive);
 

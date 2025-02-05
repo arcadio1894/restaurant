@@ -215,6 +215,7 @@ Route::middleware('auth')->group(function (){
         Route::get('/get/data/movements/V2/{numberPage}', [CashRegisterController::class, 'getDataMovements']);
 
         Route::post('/factura/generar/{id}', [FacturaController::class, 'generarComprobante']);
+        Route::get('/factura/imprimir/{id}', [FacturaController::class, 'descargarComprobante']);
     });
 });
 

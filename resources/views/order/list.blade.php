@@ -294,6 +294,12 @@
         <button data-ver_ruta_map data-id="" data-address="" data-latitude="" data-longitude="" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Ruta"><i class="fas fa-map-marker-alt" style="color: #e60a0a;"></i></button>
         <button data-anular data-id="" class="btn btn-outline-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Anular Orden"><i class="fas fa-trash-alt"></i></button>
 
+        <button data-generar_comprobante class="btn btn-primary btn-generar-comprobante" data-order-id="">
+            Generar Comprobante
+        </button>
+        <button data-imprimir_comprobante class="btn btn-secondary btn-imprimir-comprobante" data-order-id="">
+            Descargar/Imprimir
+        </button>
     </template>
 
     <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
