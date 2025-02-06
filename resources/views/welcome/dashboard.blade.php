@@ -65,10 +65,11 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="chart">
-                        <canvas id="lineChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                    <div class="table-responsive" >
+                        <div class="chart">
+                            <canvas id="lineChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                        </div>
                     </div>
-
                 </div>
                 <!-- /.card-body -->
                 <div class="card-footer bg-transparent">
@@ -100,73 +101,39 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card">
+            <div class="card card-success">
                 <div class="card-header">
                     <h3 class="card-title">Promociones usadas</h3>
 
                     <div class="card-tools">
                         <button type="button" class="btn btn-primary btn-sm filter-btn-promo" data-filter="daily">Diario</button>
-                        <button type="button" class="btn btn-secondary btn-sm filter-btn-promo" data-filter="weekly">Semanal</button>
+                        {{--<button type="button" class="btn btn-secondary btn-sm filter-btn-promo" data-filter="weekly">Semanal</button>
                         <button type="button" class="btn btn-warning btn-sm filter-btn-promo" data-filter="monthly">Mensual</button>
-                        <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#dateRangeModalPromo">
+                        --}}<button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#dateRangeModalPromo">
                             Por Fechas
                         </button>
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
                     </div>
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body p-0">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th style="width: 10px">#</th>
-                            <th>Código de promoción</th>
-                            <th>Progress</th>
-                            <th style="width: 40px">Label</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td>1.</td>
-                            <td>Update software</td>
-                            <td>
-                                <div class="progress progress-xs">
-                                    <div class="progress-bar progress-bar-danger" style="width: 55%"></div>
-                                </div>
-                            </td>
-                            <td><span class="badge bg-danger">55%</span></td>
-                        </tr>
-                        <tr>
-                            <td>2.</td>
-                            <td>Clean database</td>
-                            <td>
-                                <div class="progress progress-xs">
-                                    <div class="progress-bar bg-warning" style="width: 70%"></div>
-                                </div>
-                            </td>
-                            <td><span class="badge bg-warning">70%</span></td>
-                        </tr>
-                        <tr>
-                            <td>3.</td>
-                            <td>Cron job running</td>
-                            <td>
-                                <div class="progress progress-xs progress-striped active">
-                                    <div class="progress-bar bg-primary" style="width: 30%"></div>
-                                </div>
-                            </td>
-                            <td><span class="badge bg-primary">30%</span></td>
-                        </tr>
-                        <tr>
-                            <td>4.</td>
-                            <td>Fix and squish bugs</td>
-                            <td>
-                                <div class="progress progress-xs progress-striped active">
-                                    <div class="progress-bar bg-success" style="width: 90%"></div>
-                                </div>
-                            </td>
-                            <td><span class="badge bg-success">90%</span></td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive" >
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th style="width: 10px">#</th>
+                                <th>Código de promoción</th>
+                                <th>Progreso</th>
+                                <th style="width: 40px">Cantidades</th>
+                            </tr>
+                            </thead>
+                            <tbody id="body-promos">
+
+                            </tbody>
+                        </table>
+                        <h5 id="title-promo" class="text-center text-bold" style="font-size: 0.8rem"></h5>
+                    </div>
+
                 </div>
                 <!-- /.card-body -->
             </div>
@@ -178,6 +145,25 @@
 @endsection
 
 @section('content-report')
+    <template id="template-promo">
+        <tr>
+            <td data-i>1.</td>
+            <td data-code>Update software</td>
+            <td>
+                <div class="progress progress-xs">
+                    <div class="progress-bar progress-bar-danger" data-progress style="width: 55%"></div>
+                </div>
+            </td>
+            <td><span class="badge p-2" data-percentage>55%</span></td>
+        </tr>
+    </template>
+
+    <template id="template-promo-empty">
+        <tr>
+            <td colspan="4" align="center">No se ha encontrado ningún dato</td>
+        </tr>
+    </template>
+
     <div class="modal fade" id="dateRangeModal" role="dialog" aria-labelledby="dateRangeModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -218,18 +204,18 @@
                 <div class="modal-body">
                     <form id="dateRangeFormPromo">
                         <div class="form-group">
-                            <label for="start_date">Fecha Inicio</label>
-                            <input type="date" class="form-control" id="start_date">
+                            <label for="start_date_promo">Fecha Inicio</label>
+                            <input type="date" class="form-control" id="start_date_promo">
                         </div>
                         <div class="form-group">
-                            <label for="end_date">Fecha Fin</label>
-                            <input type="date" class="form-control" id="end_date">
+                            <label for="end_date_promo">Fecha Fin</label>
+                            <input type="date" class="form-control" id="end_date_promo">
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary filter-btn" data-filter="date_range" data-dismiss="modal">Aplicar</button>
+                    <button type="button" class="btn btn-primary filter-btn-promo" data-filter="date_range_promo" data-dismiss="modal">Aplicar</button>
                 </div>
             </div>
         </div>

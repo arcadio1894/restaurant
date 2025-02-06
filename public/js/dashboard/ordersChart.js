@@ -141,6 +141,8 @@ $(document).ready(function () {
     // Cargar datos iniciales (Diario por defecto)
     fetchChartData(selectedFilter);
 
+    fetchChartDataPromo(selectedFilter);
+
     // Manejo de botones de filtro
     $(".filter-btn").click(function () {
         selectedFilter = $(this).data("filter");
@@ -159,4 +161,94 @@ $(document).ready(function () {
             fetchChartData(selectedFilter);
         }
     });
+
+    $(".filter-btn-promo").click(function () {
+        selectedFilter = $(this).data("filter");
+
+        if (selectedFilter === "date_range_promo") {
+            let startDate = $("#start_date_promo").val();
+            let endDate = $("#end_date_promo").val();
+
+            if (!startDate || !endDate) {
+                alert("Por favor, seleccione ambas fechas.");
+                return;
+            }
+
+            fetchChartDataPromo(selectedFilter, startDate, endDate);
+        } else {
+            fetchChartDataPromo(selectedFilter);
+        }
+    });
+
+    function fetchChartDataPromo(filter, startDate = null, endDate = null) {
+
+        updateChartTitlePromo(filter, startDate, endDate);
+
+        $.ajax({
+            url: '/dashboard/promos/chart-data',
+            type: 'GET',
+            data: { filter, start_date: startDate, end_date: endDate },
+            success: function (response) {
+                updateChartPromo(response);
+            },
+            error: function () {
+                alert('Error al obtener los datos del gráfico.');
+            }
+        });
+    }
+
+    function updateChartPromo(data) {
+        let tbody = document.querySelector("#body-promos");
+        tbody.innerHTML = ""; // Limpiar la tabla antes de agregar nuevos datos
+
+        data.coupons.forEach((coupon, index) => {
+            let clone = activateTemplate("#template-promo");
+
+            clone.querySelector("[data-i]").innerHTML = (index + 1) + ".";
+            clone.querySelector("[data-code]").innerHTML = coupon.code;
+            clone.querySelector("[data-progress]").style.width = coupon.percentage + "%";
+            clone.querySelector("[data-progress]").classList.add(getProgressBarClass(coupon.percentage));
+            clone.querySelector("[data-percentage]").innerHTML = coupon.count;
+            clone.querySelector("[data-percentage]").classList.add(getProgressBarClass(coupon.percentage));
+
+            tbody.appendChild(clone);
+        });
+
+        $("#title-promo").html(window.chartTitlePromo);
+    }
+
+    function updateChartTitlePromo(filter, startDate, endDate) {
+        let title = "Promociones usadas el día de hoy"; // Default for 'daily'
+
+        if (filter === 'weekly') {
+            title = "Promociones usadas en la última semana";
+        } else if (filter === 'monthly') {
+            title = "Promociones usadas en los últimos 7 meses";
+        } else if (filter === 'date_range_promo') {
+            let start = startDate ? new Date(startDate).toLocaleDateString() : '';
+            let end = endDate ? new Date(endDate).toLocaleDateString() : '';
+            title = `Promociones usadas desde ${start} hasta ${end}`;
+        }
+
+        // Almacenar el título dinámico en una variable global para usarlo en Chart.js
+        window.chartTitlePromo = title;
+    }
+
+    // Función para asignar colores a la barra de progreso según el porcentaje
+    function getProgressBarClass(percentage) {
+        if (percentage >= 75) {
+            return "bg-success";
+        } else if (percentage >= 50) {
+            return "bg-primary";
+        } else if (percentage >= 25) {
+            return "bg-warning";
+        } else {
+            return "bg-danger";
+        }
+    }
 });
+
+function activateTemplate(id) {
+    var t = document.querySelector(id);
+    return document.importNode(t.content, true);
+}

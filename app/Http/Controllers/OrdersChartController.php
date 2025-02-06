@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Coupon;
+use App\Models\UserCoupon;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\User;
@@ -74,6 +76,59 @@ class OrdersChartController extends Controller
         $data['whatsapp_percentage'] = $whatsappPercentage;
         $data['web_percentage'] = $webPercentage;
         $data['total_percentage'] = 100;
+
+        return response()->json($data);
+    }
+
+    public function getChartDataPromo(Request $request)
+    {
+        $filter = $request->input('filter', 'daily');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        if ($filter === 'daily') {
+            $startDate = Carbon::today();
+            $endDate = Carbon::today();
+        } elseif ($filter === 'weekly') {
+            $startDate = Carbon::today()->subDays(6);
+            $endDate = Carbon::today();
+        } elseif ($filter === 'monthly') {
+            $startDate = Carbon::today()->subMonths(1)->startOfMonth();
+            $endDate = Carbon::today()->endOfMonth();
+        } elseif ($filter === 'date_range_promo' && $startDate && $endDate) {
+            $startDate = Carbon::parse($startDate);
+            $endDate = Carbon::parse($endDate);
+        } else {
+            return response()->json(['error' => 'Invalid filter'], 400);
+        }
+
+        // Obtener todas las órdenes en el rango de fechas
+        $orders = Order::whereBetween('created_at', [$startDate, $endDate])->pluck('id');
+
+        // Obtener los cupones usados en las órdenes del rango
+        $usedCoupons = UserCoupon::whereIn('order_id', $orders)
+            ->selectRaw('coupon_id, COUNT(*) as count')
+            ->groupBy('coupon_id')
+            ->pluck('count', 'coupon_id');
+
+        // Obtener todos los cupones (incluso los no usados)
+        $allCoupons = Coupon::select('id', 'name')->get();
+
+        // Calcular totales y porcentajes
+        $totalCouponsUsed = $usedCoupons->sum(); // Suma total de todos los usos de cupones
+
+        $data = ['coupons' => []];
+
+        foreach ($allCoupons as $coupon) {
+            $count = $usedCoupons[$coupon->id] ?? 0; // Si no está en `usedCoupons`, se usa 0
+            $percentage = ($totalCouponsUsed > 0) ? round(($count / $totalCouponsUsed) * 100, 2) : 0;
+
+            $data['coupons'][] = [
+                'code' => $coupon->name,
+                'count' => $count,
+                'percentage' => $percentage
+            ];
+        }
 
         return response()->json($data);
     }

@@ -220,6 +220,7 @@ Route::middleware('auth')->group(function (){
 
         // Rutas de graficos
         Route::get('/orders/chart-data', [OrdersChartController::class, 'getChartData']);
+        Route::get('/promos/chart-data', [OrdersChartController::class, 'getChartDataPromo']);
     });
 });
 
