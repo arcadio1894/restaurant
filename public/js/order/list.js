@@ -611,8 +611,8 @@ function renderDataTable(data) {
 
     cloneBtnActive.querySelector("[data-anular]").setAttribute("data-id", data.id);
 
-    cloneBtnActive.querySelector("[data-generar_comprobante]").setAttribute("data-order-id", data.id);
-    cloneBtnActive.querySelector("[data-imprimir_comprobante]").setAttribute("data-order-id", data.id);
+    /*cloneBtnActive.querySelector("[data-generar_comprobante]").setAttribute("data-order-id", data.id);
+    cloneBtnActive.querySelector("[data-imprimir_comprobante]").setAttribute("data-order-id", data.id);*/
 
     botones.append(cloneBtnActive);
 
