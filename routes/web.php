@@ -16,6 +16,7 @@ use \App\Http\Controllers\CategoryController;
 use \App\Http\Controllers\SliderController;
 use \App\Http\Controllers\CashRegisterController;
 use \App\Http\Controllers\FacturaController;
+use App\Http\Controllers\OrdersChartController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -216,6 +217,9 @@ Route::middleware('auth')->group(function (){
 
         Route::post('/factura/generar/{id}', [FacturaController::class, 'generarComprobante']);
         Route::get('/factura/imprimir/{id}', [FacturaController::class, 'descargarComprobante']);
+
+        // Rutas de graficos
+        Route::get('/orders/chart-data', [OrdersChartController::class, 'getChartData']);
     });
 });
 
