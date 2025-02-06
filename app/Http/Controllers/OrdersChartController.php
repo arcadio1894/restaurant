@@ -103,7 +103,9 @@ class OrdersChartController extends Controller
         }
 
         // Obtener todas las órdenes en el rango de fechas
-        $orders = Order::whereBetween('created_at', [$startDate, $endDate])->pluck('id');
+        $orders = Order::whereDate('created_at', '>=', $startDate)  // Mayor o igual a la fecha de inicio
+                        ->whereDate('created_at', '<=', $endDate)    // Menor o igual a la fecha de fin
+                        ->where('state_annulled', 0)->pluck('id');
 
         // Obtener los cupones usados en las órdenes del rango
         $usedCoupons = UserCoupon::whereIn('order_id', $orders)
