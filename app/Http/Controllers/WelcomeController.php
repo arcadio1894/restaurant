@@ -81,4 +81,9 @@ class WelcomeController extends Controller
         //dd($status);
         return view('welcome.dashboard', compact('status'));
     }
+
+    public function reclamaciones()
+    {
+        return view('welcome.reclamaciones');
+    }
 }

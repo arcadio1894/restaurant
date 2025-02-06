@@ -452,6 +452,11 @@
                                         fuegoymasaperu@gmail.com
                                     </span>
                         </a>
+
+                        <a href="{{ route('reclamaciones') }}">
+                            <img src="{{ asset('images/checkout/libro_reclamaciones.webp') }}" alt="libro_reclamaciones" style="width: 100px;" >
+
+                        </a>
                     </div>
                 </div>
             </div>
@@ -529,7 +534,7 @@
     <i class="fab fa-whatsapp"></i>
 </a>
 
-@if (!request()->routeIs('cart.show') && !request()->routeIs('cart.checkout') && !request()->routeIs('product.custom'))
+@if (!request()->routeIs('cart.show') && !request()->routeIs('cart.checkout') && !request()->routeIs('product.custom') && !request()->routeIs('reclamaciones'))
     {{-- Botón flotante --}}
     <a href="{{ route('cart.show') }}" id="cartButton" class="floating-cart d-sm-none">
         <i class="fas fa-shopping-cart"></i>

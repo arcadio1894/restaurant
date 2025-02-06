@@ -757,6 +757,10 @@
                                         fuegoymasaperu@gmail.com
                                     </span>
                                 </a>
+                                <a href="{{ route('reclamaciones') }}">
+                                    <img src="{{ asset('images/checkout/libro_reclamaciones.webp') }}" alt="libro_reclamaciones" style="width: 100px;" >
+
+                                </a>
                             </div>
                         </div>
                     </div>

@@ -1,0 +1,61 @@
+/* Estilo general de los enlaces */
+.sidebar .nav-link {
+    color: #e69c00; /* Naranja */
+    font-weight: bold;
+    text-decoration: none;
+    padding: 10px;
+    transition: all 0.3s ease;
+}
+
+/* Hover: Efecto al pasar el cursor */
+.sidebar .nav-link:hover {
+    color: #c87e00; /* Naranja más oscuro */
+    background-color: #fff2cc; /* Fondo naranja claro */
+    border-radius: 5px;
+}
+
+/* Activo: Enlace seleccionado */
+.sidebar .nav-link.active {
+    position: relative;
+    color: #804a00; /* Naranja muy oscuro */
+    background-color: #ffe5b3; /* Naranja claro */
+    padding-left: 16px; /* Espaciado para separar el texto del borde */
+}
+
+/* Raya decorativa a la izquierda */
+.sidebar .nav-link.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background-color: #e69c00; /* Naranja */
+    border-radius: 2px;
+}
+
+.info-reclamacion {
+    color: #000000;
+}
+
+.info-reclamacion h2 {
+    color: #000000;
+    margin-bottom: 20px;
+}
+
+.datos-reclamacion p {
+    font-size: 1rem;
+    margin: 2px 0;
+}
+
+.card-header {
+    background-color: #e69c00; /* Naranja */
+    font-weight: bold;
+    text-align: center;
+}
+
+.form-group label {
+    font-weight: bold;
+}
+
+

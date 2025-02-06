@@ -45,6 +45,8 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::get('/menu', [WelcomeController::class, 'menu'])->name('menu');
 Route::get('/nosotros', [WelcomeController::class, 'about'])->name('about');
 
+Route::get('/reclamaciones', [WelcomeController::class, 'reclamaciones'])->name('reclamaciones');
+
 /*Route::get('/producto/{id}', [ProductController::class, 'show'])->name('product.show');*/
 Route::get('/producto/{slug}', [ProductController::class, 'show'])->name('product.show');
 Route::get('/products/fill-slugs', [ProductController::class, 'fillSlugs']);
