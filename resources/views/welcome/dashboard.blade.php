@@ -48,7 +48,7 @@
     </div>
 
     <div class="row">
-        <div class="col-md-16">
+        <div class="col-md-6">
             <!-- TIPO USUARIO CHART -->
             <div class="card card-success">
                 <div class="card-header">
@@ -99,6 +99,79 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Promociones usadas</h3>
+
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-primary btn-sm filter-btn-promo" data-filter="daily">Diario</button>
+                        <button type="button" class="btn btn-secondary btn-sm filter-btn-promo" data-filter="weekly">Semanal</button>
+                        <button type="button" class="btn btn-warning btn-sm filter-btn-promo" data-filter="monthly">Mensual</button>
+                        <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#dateRangeModalPromo">
+                            Por Fechas
+                        </button>
+                    </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body p-0">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th style="width: 10px">#</th>
+                            <th>Código de promoción</th>
+                            <th>Progress</th>
+                            <th style="width: 40px">Label</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>1.</td>
+                            <td>Update software</td>
+                            <td>
+                                <div class="progress progress-xs">
+                                    <div class="progress-bar progress-bar-danger" style="width: 55%"></div>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-danger">55%</span></td>
+                        </tr>
+                        <tr>
+                            <td>2.</td>
+                            <td>Clean database</td>
+                            <td>
+                                <div class="progress progress-xs">
+                                    <div class="progress-bar bg-warning" style="width: 70%"></div>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-warning">70%</span></td>
+                        </tr>
+                        <tr>
+                            <td>3.</td>
+                            <td>Cron job running</td>
+                            <td>
+                                <div class="progress progress-xs progress-striped active">
+                                    <div class="progress-bar bg-primary" style="width: 30%"></div>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-primary">30%</span></td>
+                        </tr>
+                        <tr>
+                            <td>4.</td>
+                            <td>Fix and squish bugs</td>
+                            <td>
+                                <div class="progress progress-xs progress-striped active">
+                                    <div class="progress-bar bg-success" style="width: 90%"></div>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-success">90%</span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </div>
     </div>
 
 
@@ -116,6 +189,34 @@
                 </div>
                 <div class="modal-body">
                     <form id="dateRangeForm">
+                        <div class="form-group">
+                            <label for="start_date">Fecha Inicio</label>
+                            <input type="date" class="form-control" id="start_date">
+                        </div>
+                        <div class="form-group">
+                            <label for="end_date">Fecha Fin</label>
+                            <input type="date" class="form-control" id="end_date">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary filter-btn" data-filter="date_range" data-dismiss="modal">Aplicar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="dateRangeModalPromo" role="dialog" aria-labelledby="dateRangeModalPromoLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="dateRangeModalLabel">Seleccionar Rango de Fechas</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="dateRangeFormPromo">
                         <div class="form-group">
                             <label for="start_date">Fecha Inicio</label>
                             <input type="date" class="form-control" id="start_date">
