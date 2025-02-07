@@ -83,8 +83,8 @@
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label for="tipo_documento">Tipo documento:</label>
-                                    <select class="form-control select2" id="tipo_documento" name="tipo_documento" style="width: 100%;" required>
-                                        <option value="">Seleccione tipo de documento</option>
+                                    <select class="form-control" id="tipo_documento" name="tipo_documento" style="width: 100%;" required>
+                                        <option></option>
                                         <option value="DNI">DNI</option>
                                         <option value="RUC">RUC</option>
                                         <option value="CE">Carnet de Extranjería</option>
@@ -108,29 +108,32 @@
                                 </div>
                             </div>
 
-                            {{--<div class="form-row">
+                            <div class="form-row">
                                 <div class="form-group col-md-4">
                                     <label for="departamento">Departamento:</label>
                                     <select class="form-control" id="departamento" name="departamento" required>
-                                        <option value="">Seleccione departamento</option>
+                                        <option value=""></option>
                                         <!-- Opciones dinámicas -->
+                                        @foreach($departments as $department)
+                                            <option value="{{ $department->id }}">{{ $department->name }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label for="provincia">Provincia:</label>
                                     <select class="form-control" id="provincia" name="provincia" required>
-                                        <option value="">Seleccione provincia</option>
+                                        <option value=""></option>
                                         <!-- Opciones dinámicas -->
                                     </select>
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label for="distrito">Distrito:</label>
                                     <select class="form-control" id="distrito" name="distrito" required>
-                                        <option value="">Seleccione distrito</option>
+                                        <option value=""></option>
                                         <!-- Opciones dinámicas -->
                                     </select>
                                 </div>
-                            </div>--}}
+                            </div>
 
                             <div class="form-row">
                                 <div class="form-group col-md-12">
@@ -215,7 +218,7 @@
                         </div>
                     </div>
 
-                    <div class="card mb-5">
+                    <div class="card mb-3">
                         <div class="card-header text-center">
                             <h5 class="mb-0">3. Detalle de Reclamación y pedido del consumidor</h5>
                         </div>
@@ -246,9 +249,9 @@
                                 <label for="canal">Canal (Selecciona dónde realizaste la compra o intentaste realizarla):</label>
                                 <select class="form-control" id="canal" name="canal" required>
                                     <option value="">Seleccione canal</option>
-                                    <option value="Web">Web</option>
-                                    <option value="Tienda Física">Tienda Física</option>
-                                    <option value="Aplicación Móvil">Aplicación Móvil</option>
+                                    <option value="web">Tienda Virtual (fuegoymasa.com)</option>
+                                    <option value="whatsapp">Whatsapp</option>
+                                    <option value="movil">Aplicación Móvil</option>
                                 </select>
                             </div>
 
@@ -257,17 +260,16 @@
                                 <div class="form-group col-md-6">
                                     <label for="motivo">Motivo:</label>
                                     <select class="form-control" id="motivo" name="motivo" required>
-                                        <option value="">Seleccione motivo</option>
-                                        <option value="Producto Defectuoso">Producto Defectuoso</option>
-                                        <option value="Servicio Deficiente">Servicio Deficiente</option>
+                                        <option value=""></option>
+                                        @foreach($motivos as $motivo)
+                                            <option value="{{ $motivo->id }}">{{ $motivo->nombre }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label for="submotivo">Submotivo:</label>
                                     <select class="form-control" id="submotivo" name="submotivo" required>
-                                        <option value="">Seleccione submotivo</option>
-                                        <option value="Entrega Tardía">Entrega Tardía</option>
-                                        <option value="Atención Insatisfactoria">Atención Insatisfactoria</option>
+                                        <option value=""></option>
                                     </select>
                                 </div>
                             </div>
@@ -276,6 +278,7 @@
                             <div class="form-group">
                                 <label for="detalle">Detalle:</label>
                                 <textarea class="form-control" id="detalle" name="detalle" rows="4" maxlength="300" placeholder="Explicar el reclamo o queja" required></textarea>
+                                <small id="charCountDetalle" class="form-text text-muted">300 caracteres restantes</small>
                                 <small class="form-text text-danger">Máximo permitido 300 caracteres</small>
                             </div>
 
@@ -283,6 +286,7 @@
                             <div class="form-group">
                                 <label for="pedido_cliente">Pedido del cliente:</label>
                                 <textarea class="form-control" id="pedido_cliente" name="pedido_cliente" rows="4" maxlength="300" placeholder="Detallar lo que solicita" required></textarea>
+                                <small id="charCountPedidoCliente" class="form-text text-muted">300 caracteres restantes</small>
                                 <small class="form-text text-danger">Máximo permitido 300 caracteres</small>
                             </div>
 
@@ -294,19 +298,25 @@
                             </div>
 
                             <!-- Notas de reclamo y queja -->
-                            <div class="mt-4">
-                                <p><strong>RECLAMO:</strong> Disconformidad relacionada con los productos o servicios.</p>
-                                <p><strong>QUEJA:</strong> Disconformidad no relacionada a los productos o servicios; o, malestar o descontento respecto a la atención al público.</p>
-                                <p><em>* La formulación del reclamo no impide acudir a otras vías de solución de controversias ni es requisito previo para interponer una denuncia ante el INDECOPI.</em></p>
-                                <p><em>* El proveedor debe dar respuesta al reclamo o queja en un plazo no mayor a quince (15) días hábiles, el cual es improrrogable.</em></p>
+                            <div class="mt-2">
+                                <p style="font-size: 0.9rem"><strong>RECLAMO:</strong> Disconformidad relacionada con los productos o servicios.</p>
+                                <p style="font-size: 0.9rem"><strong>QUEJA:</strong> Disconformidad no relacionada a los productos o servicios; o, malestar o descontento respecto a la atención al público.</p>
+                                <p style="font-size: 0.9rem"><em>* La formulación del reclamo no impide acudir a otras vías de solución de controversias ni es requisito previo para interponer una denuncia ante el INDECOPI.</em></p>
+                                <p style="font-size: 0.9rem"><em>* El proveedor debe dar respuesta al reclamo o queja en un plazo no mayor a quince (15) días hábiles, el cual es improrrogable.</em></p>
                             </div>
 
                         </div>
                     </div>
 
+                    <!-- Código del formulario -->
+                    <div class="form-group text-center mt-3">
+                        <!-- Google reCAPTCHA -->
+                        <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+                    </div>
+
                     <!-- Botón de Envío -->
-                    <div class="form-group text-center">
-                        <button type="submit" class="btn btn-success">Enviar</button>
+                    <div class="form-group text-center mt-0">
+                        <button type="button" id="btn-submit" class="btn btn-success">Enviar reclamo</button>
                     </div>
                 </form>
             </div>
@@ -317,6 +327,7 @@
 @section('scripts')
     <!-- Select2 -->
     <script src="{{ asset('admin/plugins/select2/js/select2.full.min.js') }}"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
     <script src="{{ asset('js/welcome/reclamaciones.js') }}"></script>
 @endsection

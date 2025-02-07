@@ -46,6 +46,9 @@ Route::get('/menu', [WelcomeController::class, 'menu'])->name('menu');
 Route::get('/nosotros', [WelcomeController::class, 'about'])->name('about');
 
 Route::get('/reclamaciones', [WelcomeController::class, 'reclamaciones'])->name('reclamaciones');
+Route::get('/provincias/{departmentId}', [WelcomeController::class, 'getProvinces']);
+Route::get('/distritos/{provinceId}', [WelcomeController::class, 'getDistricts']);
+Route::get('/submotivos/{motivoId}', [WelcomeController::class, 'getSubmotivos']);
 
 /*Route::get('/producto/{id}', [ProductController::class, 'show'])->name('product.show');*/
 Route::get('/producto/{slug}', [ProductController::class, 'show'])->name('product.show');

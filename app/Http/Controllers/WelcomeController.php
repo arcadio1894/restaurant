@@ -4,8 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\DataGeneral;
+use App\Models\Department;
+use App\Models\District;
+use App\Models\Motivo;
 use App\Models\Product;
+use App\Models\Province;
 use App\Models\Slider;
+use App\Models\Submotivo;
 use Illuminate\Http\Request;
 
 class WelcomeController extends Controller
@@ -84,6 +89,26 @@ class WelcomeController extends Controller
 
     public function reclamaciones()
     {
-        return view('welcome.reclamaciones');
+        $departments = Department::all();
+        $motivos = Motivo::all();
+        return view('welcome.reclamaciones', compact('departments', 'motivos'));
+    }
+
+    public function getProvinces($departmentId)
+    {
+        $provinces = Province::where('department_id', $departmentId)->get();
+        return response()->json($provinces);
+    }
+
+    public function getDistricts($provinceId)
+    {
+        $districts = District::where('province_id', $provinceId)->get();
+        return response()->json($districts);
+    }
+
+    public function getSubmotivos($motivoId)
+    {
+        $submotivos = Submotivo::where('motivo_id', $motivoId)->get();
+        return response()->json($submotivos);
     }
 }
