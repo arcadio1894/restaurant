@@ -1628,8 +1628,8 @@ class CartController extends Controller
             $discount = $total;
         }
 
-        $newTotal = $total - $discount;
-
+        //$newTotal = $total - $discount;
+        $newTotal = $totalWithShipping - $discount;
         return response()->json([
             'success' => true,
             'code_name' => $coupon->name,
