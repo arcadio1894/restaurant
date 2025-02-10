@@ -56,6 +56,16 @@
 
 .form-group label {
     font-weight: bold;
+    font-size: 0.9rem;
 }
 
+.letraTabla {
+    font-family: "Calibri", Arial, sans-serif; /* Utiliza Calibri si está instalado, de lo contrario, usa Arial o una fuente sans-serif similar */
+    font-size: 15px; /* Tamaño de fuente 11 */
+}
+.normal-title {
+    background-color: #203764; /* Color deseado para el fondo */
+    color: #fff; /* Color deseado para el texto */
+    text-align: center;
+}
 

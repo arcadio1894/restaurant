@@ -19,9 +19,9 @@
                         <div class="title block-collapsible-nav-title">
                             <strong>Centro de Ayuda</strong>
                         </div>
-                        <div class="content block-collapsible-nav-content">
+                        <div class="content block-collapsible-nav-content mt-3">
                             <ul class="nav flex-column">
-                                <li class="nav-item">
+                                {{--<li class="nav-item">
                                     <a class="nav-link" href="/terminos-y-condiciones">Términos y Condiciones</a>
                                 </li>
                                 <li class="nav-item">
@@ -32,12 +32,12 @@
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="/derechos-arco">Derechos ARCO</a>
+                                </li>--}}
+                                <li class="nav-item">
+                                    <a class="nav-link active" href="{{ route('reclamaciones') }}">Libro de Reclamaciones</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link active" href="/reclamaciones">Libro de Reclamaciones</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="/estado-reclamos">Estado de reclamos</a>
+                                    <a class="nav-link" href="{{ route('estado-reclamos') }}">Estado de reclamos</a>
                                 </li>
 
                             </ul>
@@ -62,7 +62,7 @@
                 </div>
 
                 <!-- Formulario -->
-                <form id="form-identificacion" method="POST" action="{{--{{ route('reclamaciones.store') }}--}}">
+                <form id="form-identificacion" method="POST" data-url="{{ route('reclamaciones.store') }}" enctype="multipart/form-data">
                     @csrf
                     <div class="card mb-5">
                         <div class="card-header text-center">
@@ -71,18 +71,18 @@
                         <div class="card-body">
                             <div class="form-row">
                                 <div class="form-group col-md-6">
-                                    <label for="nombre">Nombres:</label>
+                                    <label for="nombre">Nombres: <span class="right text-danger">(*)</span></label>
                                     <input type="text" class="form-control" id="nombre" name="nombre" required>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label for="apellido">Apellidos:</label>
+                                    <label for="apellido">Apellidos: <span class="right text-danger">(*)</span></label>
                                     <input type="text" class="form-control" id="apellido" name="apellido" required>
                                 </div>
                             </div>
 
                             <div class="form-row">
                                 <div class="form-group col-md-6">
-                                    <label for="tipo_documento">Tipo documento:</label>
+                                    <label for="tipo_documento">Tipo documento: <span class="right text-danger">(*)</span></label>
                                     <select class="form-control" id="tipo_documento" name="tipo_documento" style="width: 100%;" required>
                                         <option></option>
                                         <option value="DNI">DNI</option>
@@ -92,25 +92,25 @@
                                     </select>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label for="numero_documento">N° Doc.:</label>
+                                    <label for="numero_documento">N° Doc.: <span class="right text-danger">(*)</span></label>
                                     <input type="text" class="form-control" id="numero_documento" name="numero_documento" required>
                                 </div>
                             </div>
 
                             <div class="form-row">
                                 <div class="form-group col-md-6">
-                                    <label for="telefono">Teléfono:</label>
+                                    <label for="telefono">Teléfono: <span class="right text-danger">(*)</span></label>
                                     <input type="text" class="form-control" id="telefono" name="telefono" required>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label for="email">Email:</label>
+                                    <label for="email">Email: <span class="right text-danger">(*)</span></label>
                                     <input type="email" class="form-control" id="email" name="email" required>
                                 </div>
                             </div>
 
                             <div class="form-row">
                                 <div class="form-group col-md-4">
-                                    <label for="departamento">Departamento:</label>
+                                    <label for="departamento">Departamento: <span class="right text-danger">(*)</span></label>
                                     <select class="form-control" id="departamento" name="departamento" required>
                                         <option value=""></option>
                                         <!-- Opciones dinámicas -->
@@ -120,14 +120,14 @@
                                     </select>
                                 </div>
                                 <div class="form-group col-md-4">
-                                    <label for="provincia">Provincia:</label>
+                                    <label for="provincia">Provincia: <span class="right text-danger">(*)</span></label>
                                     <select class="form-control" id="provincia" name="provincia" required>
                                         <option value=""></option>
                                         <!-- Opciones dinámicas -->
                                     </select>
                                 </div>
                                 <div class="form-group col-md-4">
-                                    <label for="distrito">Distrito:</label>
+                                    <label for="distrito">Distrito: <span class="right text-danger">(*)</span></label>
                                     <select class="form-control" id="distrito" name="distrito" required>
                                         <option value=""></option>
                                         <!-- Opciones dinámicas -->
@@ -137,7 +137,7 @@
 
                             <div class="form-row">
                                 <div class="form-group col-md-12">
-                                    <label for="direccion">Dirección:</label>
+                                    <label for="direccion">Dirección: <span class="right text-danger">(*)</span></label>
                                     <input type="text" class="form-control" id="direccion" name="direccion" required>
                                 </div>
                             </div>
@@ -159,22 +159,22 @@
                             <div id="datos-representante" class="mt-3" style="display: none;">
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
-                                        <label for="nombre_representante">Nombres de uno de los padres o representante:</label>
+                                        <label for="nombre_representante">Nombres de uno de los padres o representante: <span class="right text-danger">(*)</span></label>
                                         <input type="text" class="form-control" id="nombre_representante" name="nombre_representante">
                                     </div>
                                     <div class="form-group col-md-6">
-                                        <label for="telefono_representante">Teléfono de uno de los padres o representante:</label>
+                                        <label for="telefono_representante">Teléfono de uno de los padres o representante: <span class="right text-danger">(*)</span></label>
                                         <input type="text" class="form-control" id="telefono_representante" name="telefono_representante">
                                     </div>
                                 </div>
 
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
-                                        <label for="direccion_representante">Dirección de uno de los padres o representante:</label>
+                                        <label for="direccion_representante">Dirección de uno de los padres o representante: <span class="right text-danger">(*)</span></label>
                                         <input type="text" class="form-control" id="direccion_representante" name="direccion_representante">
                                     </div>
                                     <div class="form-group col-md-6">
-                                        <label for="correo_representante">Correo de uno de los padres o representante:</label>
+                                        <label for="correo_representante">Correo de uno de los padres o representante: <span class="right text-danger">(*)</span></label>
                                         <input type="email" class="form-control" id="correo_representante" name="correo_representante">
                                     </div>
                                 </div>
@@ -189,7 +189,7 @@
                         <div class="card-body">
                             <!-- Tipo de bien contratado -->
                             <div class="form-group">
-                                <label>Tipo:</label>
+                                <label>Tipo: <span class="right text-danger">(*)</span></label>
                                 <div>
                                     <div class="form-check form-check-inline">
                                         <input class="form-check-input" type="radio" id="tipo_producto" name="tipo_bien" value="Producto" checked required>
@@ -210,7 +210,7 @@
 
                             <!-- Descripción del bien contratado -->
                             <div class="form-group">
-                                <label for="descripcion">Descripción (Nombre del producto o servicio adquirido):</label>
+                                <label for="descripcion">Descripción (Nombre del producto o servicio adquirido): <span class="right text-danger">(*)</span></label>
                                 <textarea class="form-control" id="descripcion" name="descripcion" rows="4" maxlength="300" placeholder="Especificar el producto o servicio adquirido" required></textarea>
                                 <small id="charCount" class="form-text text-muted">300 caracteres restantes</small>
                                 <small class="form-text text-danger">Máximo permitido 300 caracteres</small>
@@ -225,7 +225,7 @@
                         <div class="card-body">
                             <!-- Tipo de reclamación -->
                             <div class="form-group">
-                                <label>Reclamación:</label>
+                                <label>Reclamación: <span class="right text-danger">(*)</span></label>
                                 <div>
                                     <div class="form-check form-check-inline position-relative">
                                         <input class="form-check-input" type="radio" id="tipo_reclamo" name="tipo_reclamacion" value="Reclamo" required>
@@ -246,7 +246,7 @@
 
                             <!-- Canal de compra -->
                             <div class="form-group">
-                                <label for="canal">Canal (Selecciona dónde realizaste la compra o intentaste realizarla):</label>
+                                <label for="canal">Canal (Selecciona dónde realizaste la compra o intentaste realizarla): <span class="right text-danger">(*)</span></label>
                                 <select class="form-control" id="canal" name="canal" required>
                                     <option value="">Seleccione canal</option>
                                     <option value="web">Tienda Virtual (fuegoymasa.com)</option>
@@ -258,7 +258,7 @@
                             <!-- Motivo y Submotivo -->
                             <div class="form-row">
                                 <div class="form-group col-md-6">
-                                    <label for="motivo">Motivo:</label>
+                                    <label for="motivo">Motivo: <span class="right text-danger">(*)</span></label>
                                     <select class="form-control" id="motivo" name="motivo" required>
                                         <option value=""></option>
                                         @foreach($motivos as $motivo)
@@ -267,7 +267,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label for="submotivo">Submotivo:</label>
+                                    <label for="submotivo">Submotivo: <span class="right text-danger">(*)</span></label>
                                     <select class="form-control" id="submotivo" name="submotivo" required>
                                         <option value=""></option>
                                     </select>
@@ -276,7 +276,7 @@
 
                             <!-- Detalle del Reclamo o Queja -->
                             <div class="form-group">
-                                <label for="detalle">Detalle:</label>
+                                <label for="detalle">Detalle: <span class="right text-danger">(*)</span></label>
                                 <textarea class="form-control" id="detalle" name="detalle" rows="4" maxlength="300" placeholder="Explicar el reclamo o queja" required></textarea>
                                 <small id="charCountDetalle" class="form-text text-muted">300 caracteres restantes</small>
                                 <small class="form-text text-danger">Máximo permitido 300 caracteres</small>
@@ -284,7 +284,7 @@
 
                             <!-- Pedido del cliente -->
                             <div class="form-group">
-                                <label for="pedido_cliente">Pedido del cliente:</label>
+                                <label for="pedido_cliente">Pedido del cliente: <span class="right text-danger">(*)</span></label>
                                 <textarea class="form-control" id="pedido_cliente" name="pedido_cliente" rows="4" maxlength="300" placeholder="Detallar lo que solicita" required></textarea>
                                 <small id="charCountPedidoCliente" class="form-text text-muted">300 caracteres restantes</small>
                                 <small class="form-text text-danger">Máximo permitido 300 caracteres</small>

@@ -1,0 +1,26 @@
+
+.info-reclamacion {
+    color: #000000;
+}
+
+.info-reclamacion h2 {
+    color: #000000;
+    margin-bottom: 20px;
+}
+
+.datos-reclamacion p {
+    font-size: 1rem;
+    margin: 2px 0;
+}
+
+.card-header {
+    background-color: #e69c00; /* Naranja */
+    font-weight: bold;
+    text-align: center;
+}
+
+.form-group label {
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+

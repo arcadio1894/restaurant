@@ -17,6 +17,7 @@ use \App\Http\Controllers\SliderController;
 use \App\Http\Controllers\CashRegisterController;
 use \App\Http\Controllers\FacturaController;
 use App\Http\Controllers\OrdersChartController;
+use \App\Http\Controllers\ReclamacionController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -45,10 +46,14 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::get('/menu', [WelcomeController::class, 'menu'])->name('menu');
 Route::get('/nosotros', [WelcomeController::class, 'about'])->name('about');
 
-Route::get('/reclamaciones', [WelcomeController::class, 'reclamaciones'])->name('reclamaciones');
-Route::get('/provincias/{departmentId}', [WelcomeController::class, 'getProvinces']);
-Route::get('/distritos/{provinceId}', [WelcomeController::class, 'getDistricts']);
-Route::get('/submotivos/{motivoId}', [WelcomeController::class, 'getSubmotivos']);
+Route::get('/reclamaciones', [ReclamacionController::class, 'reclamaciones'])->name('reclamaciones');
+Route::get('/provincias/{departmentId}', [ReclamacionController::class, 'getProvinces']);
+Route::get('/distritos/{provinceId}', [ReclamacionController::class, 'getDistricts']);
+Route::get('/submotivos/{motivoId}', [ReclamacionController::class, 'getSubmotivos']);
+Route::post('/reclamaciones/store', [ReclamacionController::class, 'store'])->name('reclamaciones.store');
+
+Route::get('/estado/reclamos', [ReclamacionController::class, 'estadoReclamos'])->name('estado-reclamos');
+Route::post('/consultar-estado-reclamo', [ReclamacionController::class, 'consultarEstado'])->name('reclamos.consultar');
 
 /*Route::get('/producto/{id}', [ProductController::class, 'show'])->name('product.show');*/
 Route::get('/producto/{slug}', [ProductController::class, 'show'])->name('product.show');
@@ -226,6 +231,14 @@ Route::middleware('auth')->group(function (){
         // Rutas de graficos
         Route::get('/orders/chart-data', [OrdersChartController::class, 'getChartData']);
         Route::get('/promos/chart-data', [OrdersChartController::class, 'getChartDataPromo']);
+
+        // Rutas de reclamos
+        Route::get('/reclamos/activos', [ReclamacionController::class, 'index'])->name('reclamos.index');
+        Route::get('/reclamos/finalizados', [ReclamacionController::class, 'delete'])->name('reclamos.delete');
+        Route::get('/get/data/reclamos/{page}', [ReclamacionController::class, 'getDataReclamos']);
+        Route::get('/reclamo/{id}/revisar', [ReclamacionController::class, 'show'])->name('reclamos.show');
+
+        Route::post('/reclamos/respuesta', [ReclamacionController::class, 'guardarRespuesta'])->name('reclamos.guardarRespuesta');
     });
 });
 

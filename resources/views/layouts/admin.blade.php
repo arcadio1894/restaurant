@@ -564,31 +564,31 @@
                         </ul>
                     </li>
 
-                    {{--@canany('list_report')
-                        <li class="nav-header">REPORTES</li>
-                    @endcanany
-                    @can('list_report')
-                        <li class="nav-item has-treeview @yield('openReport')">
-                            <a href="#" class="nav-link @yield('activeReport')">
-                                <i class="nav-icon fas fa-credit-card"></i>
-                                <p>
-                                    REPORTE COTIZACIÓN
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                @can('quote_report')
-                                    <li class="nav-item">
-                                        <a href="{{route('report.quote.index')}}" class="nav-link @yield('activeReportQuote')">
-                                            <i class="far fa-circle nav-icon"></i>
-                                            <p>Cotizaciones</p>
-                                        </a>
-                                    </li>
-                                @endcan
+                    <li class="nav-header">CENTRO DE AYUDA</li>
 
-                            </ul>
-                        </li>
-                    @endcan--}}
+                    <li class="nav-item has-treeview @yield('openHelpCenter')">
+                        <a href="#" class="nav-link @yield('activeReclamos')">
+                            <i class="nav-icon fas fa-credit-card"></i>
+                            <p>
+                                RECLAMOS
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{route('reclamos.index')}}" class="nav-link @yield('activeReclamosIndex')">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Reclamos pendientes</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{route('reclamos.delete')}}" class="nav-link @yield('activeReclamosDelete')">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Reclamos finalizados</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
             </nav>
             <!-- /.sidebar-menu -->

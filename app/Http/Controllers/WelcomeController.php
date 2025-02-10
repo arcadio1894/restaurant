@@ -86,29 +86,4 @@ class WelcomeController extends Controller
         //dd($status);
         return view('welcome.dashboard', compact('status'));
     }
-
-    public function reclamaciones()
-    {
-        $departments = Department::all();
-        $motivos = Motivo::all();
-        return view('welcome.reclamaciones', compact('departments', 'motivos'));
-    }
-
-    public function getProvinces($departmentId)
-    {
-        $provinces = Province::where('department_id', $departmentId)->get();
-        return response()->json($provinces);
-    }
-
-    public function getDistricts($provinceId)
-    {
-        $districts = District::where('province_id', $provinceId)->get();
-        return response()->json($districts);
-    }
-
-    public function getSubmotivos($motivoId)
-    {
-        $submotivos = Submotivo::where('motivo_id', $motivoId)->get();
-        return response()->json($submotivos);
-    }
 }

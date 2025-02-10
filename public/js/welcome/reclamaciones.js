@@ -214,4 +214,80 @@ $(document).ready(function() {
         $('#charCountPedidoCliente').text(`${maxLength - $(this).val().length} caracteres restantes`);
     });
 
+    $('#btn-submit').on('click', sendInfo);
 });
+
+function sendInfo() {
+    $.confirm({
+        title: 'Confirmar Envío',
+        content: '¿Estás seguro de que deseas enviar este reclamo?',
+        type: 'orange',
+        buttons: {
+            confirmar: {
+                text: 'Sí, enviar',
+                btnClass: 'btn-orange',
+                action: function() {
+                    // Deshabilitar el botón para evitar múltiples envíos
+                    $('#btn-submit').attr('disabled', true);
+
+                    // Obtener el valor del reCAPTCHA
+                    let recaptchaResponse = grecaptcha.getResponse();
+                    if (recaptchaResponse === "") {
+                        toastr.error('Por favor completa el CAPTCHA.', 'Error', {
+                            "closeButton": true,
+                            "progressBar": true,
+                            "positionClass": "toast-top-right"
+                        });
+                        $('#btn-submit').attr('disabled', false);
+                        return;
+                    }
+
+                    // Recopilar datos del formulario
+                    let form = new FormData(document.getElementById('form-identificacion'));
+                    form.append('g-recaptcha-response', recaptchaResponse);
+                    let url = $("#form-identificacion").data('url');
+                    // Enviar datos al backend usando AJAX
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        data: form,
+                        processData: false,
+                        contentType: false,
+                        success: function(data) {
+                            toastr.success(data.message, 'Éxito', {
+                                "closeButton": true,
+                                "progressBar": true,
+                                "positionClass": "toast-top-right"
+                            });
+                            setTimeout(function() {
+                                location.reload();
+                            }, 2000);
+                        },
+                        error: function(data) {
+                            let errors = data.responseJSON.errors;
+                            for (let property in errors) {
+                                toastr.error(errors[property], 'Error', {
+                                    "closeButton": true,
+                                    "progressBar": true,
+                                    "positionClass": "toast-top-right"
+                                });
+                            }
+                            $('#btn-submit').attr('disabled', false);
+                        }
+                    });
+                }
+            },
+            cancelar: {
+                text: 'Cancelar',
+                action: function() {
+                    // No hacer nada si se cancela
+                    toastr.info('El envío fue cancelado.', 'Cancelado', {
+                        "closeButton": true,
+                        "progressBar": true,
+                        "positionClass": "toast-top-right"
+                    });
+                }
+            }
+        }
+    });
+}
