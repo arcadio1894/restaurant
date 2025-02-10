@@ -5,6 +5,14 @@ $(document).ready(function() {
         queja: 'QUEJA: Disconformidad no relacionada a los productos o servicios; o, malestar o descontento respecto a la atención al público.'
     };
 
+    let fechaActual = new Date();
+    let dia = String(fechaActual.getDate()).padStart(2, '0');
+    let mes = String(fechaActual.getMonth() + 1).padStart(2, '0'); // Los meses empiezan desde 0
+    let anio = fechaActual.getFullYear();
+
+    // Mostrar la fecha en el formato día/mes/año
+    $('#fecha-actual').text(`${dia}/${mes}/${anio}`);
+
     $('#tipo_documento').select2({
         placeholder: "Selecione tipo de documento",
         allowClear: true,

@@ -54,10 +54,9 @@
                     <p class="text-center m-0">Conforme a lo establecido en el código de la Protección y Defensa del consumidor este establecimiento cuenta con un Libro de Reclamaciones a tu disposición. Registra la queja o reclamo aquí.</p>
                     <p class="text-center m-0">Al presentar tu reclamo autorizas el tratamiento de tus datos personales.</p>
                     <div class="datos-reclamacion mt-3">
-                        <p><strong>Fecha: 06/02/2025</strong></p>
-                        <p><strong>Razón Social: CORPORACIÓN PERUANA DE RESTAURANTES S.A.C.</strong></p>
-                        <p><strong>RUC: 20505897812</strong></p>
-                        <p><strong>Dirección fiscal: Calle Camino Real 1801, Int A4, Surco</strong></p>
+                        <p><strong>Fecha: <span id="fecha-actual"></span></strong></p>
+                        <p><strong>Razón Social: FUEGO Y MASA S.A.C.</strong></p>
+                        <p><strong>RUC: 20613407287</strong></p>
                     </div>
                 </div>
 
