@@ -10,6 +10,7 @@ use App\Models\CartDetail;
 use App\Models\CartDetailOption;
 use App\Models\CashMovement;
 use App\Models\CashRegister;
+use App\Models\CategoryCoupon;
 use App\Models\Coupon;
 use App\Models\DataGeneral;
 use App\Models\Order;
@@ -323,7 +324,7 @@ class CartController extends Controller
         return view('product.checkout3', compact( 'payment_methods', 'defaultAddress', 'districts'));
     }
 
-    public function pagar( CheckoutRequest $request )
+    public function pagar1( CheckoutRequest $request )
     {
         //dd($request);
         DB::beginTransaction();
@@ -898,6 +899,570 @@ class CartController extends Controller
         }
     }
 
+    public function pagar( CheckoutRequest $request )
+    {
+        //dd($request);
+        DB::beginTransaction();
+
+        try {
+            // Validar los datos y guardarlos
+            $validatedData = $request->validated();
+
+            $routeToRedirect = "";
+
+            // Manejar user_id
+            $userId = auth()->id();
+            if ($userId) {
+                //$userId = $userId;
+                $routeToRedirect = route('orders.index');
+            }
+            if (!$userId) {
+                $genericUser = User::where('name', 'generico')->first();
+                if (!$genericUser) {
+                    DB::rollBack();
+                    return response()->json(['success' => false, 'message' => 'Usuario genérico no encontrado.']);
+                }
+                $userId = $genericUser->id;
+                $routeToRedirect = route('welcome');
+            }
+
+            $method_payment = PaymentMethod::find($validatedData['paymentMethod']);
+
+            // Mapear tipo de pago a los nombres de las cajas
+            $paymentTypeMap = [
+                1 => 'efectivo',
+                2 => 'bancario'
+            ];
+
+            if ( $method_payment->code == 'pos' || $method_payment->code == 'yape_plin' )
+            {
+                // Obtener la caja del tipo de pago
+                $cashRegister = CashRegister::where('type', 'bancario')
+                    ->where('status', 1) // Caja abierta
+                    ->latest()
+                    ->first();
+
+                if (!isset($cashRegister)) {
+                    DB::rollBack();
+                    return response()->json(['message' => 'No hay caja abierta para este tipo de pago.'], 422);
+                }
+            } elseif ( $method_payment->code == 'efectivo' ) {
+                $cashRegister = CashRegister::where('type', 'efectivo')
+                    ->where('status', 1) // Caja abierta
+                    ->latest()
+                    ->first();
+
+                if (!isset($cashRegister)) {
+                    DB::rollBack();
+                    return response()->json(['message' => 'No hay caja abierta para este tipo de pago.'], 422);
+                }
+            }
+
+            $shippingAddressId = null;
+
+            // Guardar la dirección de envío
+            $isDefault = true;
+            $existingDefaultAddress = Address::where('user_id', $userId)->where('is_default', true)->first();
+            if ($existingDefaultAddress) {
+                $isDefault = false;
+            }
+
+            $address = Address::create([
+                'user_id' => $userId,
+                'type' => 'shipping',
+                'phone' => $validatedData['phone'],
+                'first_name' => $validatedData['first_name'],
+                'last_name' => $validatedData['last_name'],
+                'address_line' => $validatedData['address'],
+                'email' => $validatedData['email'],
+                'reference' => $request->input('reference', ''),
+                'city' => '',
+                'state' => '',
+                'postal_code' => '',
+                'country' => '',
+                'is_default' => $isDefault,
+                'latitude' => $request->input('latitude', null),
+                'longitude' => $request->input('longitude', null),
+            ]);
+
+            $shippingAddressId = $address->id;
+
+            // Procesar el carrito enviado
+            $cart = $request->input('cart');
+
+            // Si el carrito no es un array, decodificarlo
+            if (!is_array($cart)) {
+                $cart = json_decode($cart, true);
+            }
+
+            if (!$cart || !is_array($cart)) {
+                DB::rollBack();
+                return response()->json(['success' => false, 'message' => 'El carrito enviado no es válido.']);
+            }
+
+            $totalAmount = $this->getTotalCart($cart);
+
+            // Manejar el distrito y el costo de envío
+            $districtId = $request->input('district');
+            if (!$districtId) {
+                DB::rollBack();
+                return response()->json(['success' => false, 'message' => 'Debe seleccionar un distrito para el envío.']);
+            }
+
+            $district = ShippingDistrict::findOrFail($districtId);
+            $shippingCost = $district->shipping_cost;
+            $total = $this->getTotalCart($cart);
+            $totalWithShipping = $total + $shippingCost;
+
+            // Verificar el cupón
+            $code = $request->input('coupon_name');
+            $phone = preg_replace('/[^\d+]/', '', $validatedData['phone']);
+
+            $coupon = Coupon::where('name', $code)->where('status', 'active')->first();
+            if (!$coupon || $code == "") {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El código de promoción no es válido o está inactivo.',
+                    'new_total' => number_format($totalWithShipping, 2),
+                    'coupon_name' => ''
+                ]);
+            }
+
+            $userCoupon = UserCoupon::where('user_id', auth()->id())
+                ->where('coupon_id', $coupon->id)
+                ->first();
+
+            $phoneCoupon = UserCoupon::where('phone', $phone)
+                ->where('coupon_id', $coupon->id)
+                ->first();
+
+            if ((!$coupon->special && $userCoupon)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El cupón ya ha sido utilizado.',
+                    'new_total' => number_format($totalWithShipping, 2),
+                    'coupon_name' => ''
+                ]);
+            }
+
+            if ((!$coupon->special && $phoneCoupon)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sus datos ya han sido beneficiados con el cupón.',
+                    'new_total' => number_format($totalWithShipping, 2),
+                    'coupon_name' => ''
+                ]);
+            }
+
+            $discountAmount = 0;
+
+            if ($coupon->type == 'by_pass') {
+                $discountAmount = ($coupon->amount != 0) ? $coupon->amount : (($coupon->percentage != 0) ? $total * ($coupon->percentage / 100) : 0);
+            } else {
+                $cartCategories = array_unique(array_map(function ($item) {
+                    $product = Product::find($item['product_id']);
+                    return $product ? $product->category_id : null;
+                }, $cart));
+
+                $allowedCategories = CategoryCoupon::where('coupon_id', $coupon->id)->pluck('category_id')->toArray();
+                $hasAllowedCategory = !empty(array_intersect($cartCategories, $allowedCategories));
+
+                if (!$hasAllowedCategory) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'El cupón no se puede aplicar a estos productos.',
+                        'new_total' => number_format($totalWithShipping, 2),
+                        'coupon_name' => ''
+                    ]);
+                }
+
+                $total = array_sum(array_map(function ($item) {
+                    $product = Product::find($item['product_id']);
+                    return $product && $product->category->aplica_porcentaje ? $item['total'] * $item['quantity'] : 0;
+                }, $cart));
+
+                if ($coupon->type == 'total') {
+                    $discountAmount = ($coupon->amount != 0) ? $coupon->amount : (($coupon->percentage != 0) ? $total * ($coupon->percentage / 100) : 0);
+                } elseif ($coupon->type == 'detail') {
+                    $maxDetail = collect($cart)->filter(function ($item) use ($allowedCategories) {
+                        $product = Product::find($item['product_id']);
+                        return in_array($product ? $product->category_id : null, $allowedCategories);
+                    })->sortByDesc('total')->first();
+
+                    $discountAmount = ($coupon->amount != 0) ? $coupon->amount : (($coupon->percentage != 0) ? ($maxDetail['total'] ?? 0) * ($coupon->percentage / 100) : 0);
+                }
+            }
+
+            // Validacion del vuelto antes de crear la orden
+            if ( $validatedData['paymentMethod'] == 2 )
+            {
+                $vuelto = (float)$request->input('cashAmount') - (float)( $totalAmount - $discountAmount + $shippingCost );
+
+                if ($vuelto < 0) {
+                    DB::rollBack();
+                    return response()->json(['message' => 'Ingrese un valor mayor a la venta.'], 422);
+                }
+            }
+
+            // Crear la orden
+            $order = Order::create([
+                'user_id' => $userId,
+                'shipping_address_id' => $shippingAddressId,
+                'billing_address_id' => $shippingAddressId,
+                'total_amount' => $totalAmount /*- $discountAmount + $shippingCost*/,
+                'status' => 'created',
+                'payment_method_id' => $validatedData['paymentMethod'],
+                'amount_shipping' => $shippingCost,
+                'shipping_district_id' => $districtId,
+                'observations' => $request->input('observations', ''),
+            ]);
+
+            // Guardar los detalles de la orden
+            foreach ($cart as $cartItem) {
+                $price = 0;
+                $additionalPrice = 0;
+
+                if ($cartItem['custom'] === true) {
+                    // Si el producto es custom, tomar el total directamente
+                    $totalPrice = $cartItem['total'];
+                    $price = $totalPrice;
+                } else {
+
+                    // Obtener el precio base del producto o tipo de producto
+                    if (isset($cartItem['product_type_id']) && $cartItem['product_type_id'] != null) {
+                        $productType = ProductType::find($cartItem['product_type_id']);
+                        if ($productType) {
+                            $price = $productType->price;
+                        }
+                    } else {
+                        $product = Product::find($cartItem['product_id']);
+                        if ($product) {
+                            $price = $product->price_default;
+                        }
+                    }
+
+                    // Calcular el precio adicional de las opciones
+                    if (!empty($cartItem['options'])) {
+                        foreach ($cartItem['options'] as $optionGroupId => $optionIds) {
+                            foreach ($optionIds as $optionId) {
+                                $additionalPrice += isset($optionId['additional_price']) ? $optionId['additional_price'] : 0;
+                            }
+                        }
+                    }
+
+                    // Sumar el precio base y el adicional
+                    $totalPrice = $price + $additionalPrice;
+                }
+
+                // Crear el detalle de la orden
+                $orderDetail = OrderDetail::create([
+                    'order_id' => $order->id,
+                    'product_id' => $cartItem['product_id'],
+                    'product_type_id' => ($cartItem['product_type_id'] == null) ? null: $cartItem['product_type_id'],
+                    'quantity' => $cartItem['quantity'],
+                    'price' => $totalPrice,
+                    'subtotal' => $cartItem['quantity'] * $price,
+                ]);
+
+                // Guardar las opciones del detalle si existen
+                if (!empty($cartItem['options'])) {
+                    foreach ($cartItem['options'] as $optionGroupId => $optionIds) {
+                        foreach ($optionIds as $optionId) {
+                            //dd($optionId);
+                            OrderDetailOption::create([
+                                'order_detail_id' => $orderDetail->id,
+                                'option_id' => null, // Si deseas asociarlo a un `Option`, actualiza este campo.
+                                'product_id' => $optionId['product_id'], // ID del producto asociado a la opción.
+                            ]);
+                        }
+                    }
+                }
+
+                // Guardar los toppings si el producto es custom y tiene toppings
+                if ($cartItem['custom'] === true && !empty($cartItem['toppings'])) {
+                    foreach ($cartItem['toppings'] as $topping) {
+                        OrderDetailTopping::create([
+                            'order_detail_id' => $orderDetail->id,
+                            'topping_id' => $topping['topping_id'],
+                            'topping_name' => $topping['topping_name'],
+                            'type' => $topping['type'],
+                            'extra' => isset($topping['extra']) ? $topping['extra'] : 0,
+                        ]);
+                    }
+                }
+            }
+
+            // Asociar el cupón al usuario si se aplicó
+            if ($coupon) {
+                UserCoupon::create([
+                    'user_id' => $userId,
+                    'coupon_id' => $coupon->id,
+                    'discount_amount' => $discountAmount,
+                    'order_id' => $order->id,
+                    'phone' => $phone,
+                ]);
+            }
+
+
+
+            // Selección del método de pago
+            switch ($method_payment->code) {
+                /*case 'mercado_pago':
+                    // Procesar pago con Mercado Pago
+                    $payment = new Payment();
+                    $payment->transaction_amount = $totalAmount;
+                    $payment->token = $request->input('token');
+                    $payment->description = "Compra en tienda";
+                    $payment->installments = 1;
+                    $payment->payer = ["email" => $validatedData['email']];
+                    $payment->payment_method_id = "visa";
+
+                    $payment->save();
+
+                    if ($payment->status == 'approved') {
+                        $order->status = 'paid';
+                        $cart->status = 'completed';
+                        $cart->save();
+                        $order->save();
+                        DB::commit();
+
+                        return response()->json(['success' => true, 'message' => 'Pago con Mercado Pago exitoso']);
+                    } else {
+                        DB::rollBack();
+                        return response()->json(['success' => false, 'message' => 'Pago con Mercado Pago rechazado']);
+                    }*/
+
+                case 'pos':
+                    // Lógica para pago POS (Ej. Marca la orden como pagada con POS)
+                    //$order->status = 'paid';
+                    //$order->save();
+                    //$cart->status = 'proc';
+                    //$cart->save();
+                    $data = [
+                        'nameUser' => $order->user->name,
+                        'nameUserReal' => $order->shipping_address->first_name." ".$order->shipping_address->last_name,
+                        'phoneUser' => $order->shipping_address->phone,
+                        'dateOperation' => $order->created_at->format('d M Y, g:i a'),
+                        'order' => "ORDEN - ".$order->id
+                    ];
+
+                    /*$telegramController = new TelegramController();
+                    $telegramController->sendNotification('process', $data);*/
+
+                    // Agregar movimientos a la caja
+                    $paymentType = 2;
+                    // Obtener la caja del tipo de pago
+                    $cashRegister = CashRegister::where('type', $paymentTypeMap[$paymentType])
+                        ->where('status', 1) // Caja abierta
+                        ->latest()
+                        ->first();
+
+                    /*if (!isset($cashRegister)) {
+                        return response()->json(['message' => 'No hay caja abierta para este tipo de pago.'], 422);
+                    }*/
+
+                    // Crear el movimiento de ingreso (venta)
+                    $cashMovement = CashMovement::create([
+                        'cash_register_id' => $cashRegister->id,
+                        'order_id' => $order->id,
+                        'type' => 'sale', // Tipo de movimiento: venta
+                        'amount' => (float)$order->amount_pay,
+                        'subtype' => 'pos',
+                        'description' => 'Venta registrada con tipo de pago: pos',
+                        'regularize' => 0
+                    ]);
+
+                    // No Actualizar el saldo actual y el total de ventas en la caja
+                    /*$cashRegister->current_balance += (float)$cashMovement->amount;
+                    $cashRegister->total_sales += (float)$cashMovement->amount;
+                    $cashRegister->save();*/
+
+                    DB::commit();
+
+                    // Obtener el correo electrónico según la lógica.
+                    $email = $this->getEmailForOrder($order);
+
+                    if ($email) {
+                        // Enviar correo al cliente con el estado de la orden.
+                        Mail::to($email)->send(new OrderStatusEmail($order));
+                        Log::info('Correo enviado a: ' . $email . ' con el estado de la orden: ');
+                    } else {
+                        Log::warning('No se encontró un correo electrónico para enviar el estado de la orden.');
+                    }
+
+                    return response()->json(['success' => true, 'message' => 'Pago realizado con POS', 'redirect_url' => $routeToRedirect]);
+
+                case 'efectivo':
+                    // Lógica para pago en efectivo
+                    $order->payment_amount = $request->input('cashAmount');
+                    $order->save();
+
+                    $data = [
+                        'nameUser' => $order->user->name,
+                        'nameUserReal' => $order->shipping_address->first_name." ".$order->shipping_address->last_name,
+                        'phoneUser' => $order->shipping_address->phone,
+                        'dateOperation' => $order->created_at->format('d M Y, g:i a'),
+                        'order' => "ORDEN - ".$order->id
+                    ];
+
+                    $telegramController = new TelegramController();
+                    $telegramController->sendNotification('process', $data);
+
+                    // Agregar movimientos a la caja
+                    $vuelto = (float)$request->input('cashAmount') - (float)$order->amount_pay;
+
+                    // Obtener la caja del tipo de pago
+                    $cashRegister = CashRegister::where('type', $paymentTypeMap[1])
+                        ->where('status', 1) // Caja abierta
+                        ->latest()
+                        ->first();
+
+                    /*if (!isset($cashRegister)) {
+                        return response()->json(['message' => 'No hay caja abierta para este tipo de pago.'], 422);
+                    }*/
+
+                    // Crear el movimiento de ingreso (venta)
+                    CashMovement::create([
+                        'cash_register_id' => $cashRegister->id,
+                        'order_id' => $order->id,
+                        'type' => 'sale', // Tipo de movimiento: venta
+                        'amount' => (float)$request->input('cashAmount'),
+                        'description' => 'Venta registrada con tipo de pago: efectivo',
+                    ]);
+
+                    // Actualizar el saldo actual y el total de ventas en la caja
+                    $cashRegister->current_balance += (float)$request->input('cashAmount');
+                    $cashRegister->total_sales += (float)$request->input('cashAmount');
+                    $cashRegister->save();
+
+                    // Registrar el vuelto como egreso si el tipo de pago es efectivo y hay vuelto
+                    if ($vuelto > 0) {
+                        // Mapear el type_vuelto (la caja desde donde se dará el vuelto)
+                        // Obtener la caja para el vuelto
+                        /*$vueltoCashRegister = CashRegister::where('type', $paymentTypeMap[1])
+                            ->where('status', 1) // Caja abierta
+                            ->latest()
+                            ->first();
+
+                        if (!isset($vueltoCashRegister)) {
+                            return response()->json(['message' => 'No hay caja abierta para dar el vuelto.'], 422);
+                        }*/
+
+                        // Crear el movimiento de egreso (vuelto)
+                        CashMovement::create([
+                            'cash_register_id' => $cashRegister->id,
+                            'order_id' => $order->id,
+                            'type' => 'expense', // Tipo de movimiento: egreso
+                            'amount' => $vuelto,
+                            'description' => 'Vuelto entregado de la venta',
+                        ]);
+
+                        // Actualizar el saldo de la caja del vuelto
+                        $cashRegister->current_balance -= $vuelto;
+                        $cashRegister->total_expenses += $vuelto;
+                        $cashRegister->save();
+                    }
+
+                    DB::commit();
+
+                    // Obtener el correo electrónico según la lógica.
+                    $email = $this->getEmailForOrder($order);
+
+                    if ($email) {
+                        // Enviar correo al cliente con el estado de la orden.
+                        Mail::to($email)->send(new OrderStatusEmail($order));
+                        Log::info('Correo enviado a: ' . $email . ' con el estado de la orden: ');
+                    } else {
+                        Log::warning('No se encontró un correo electrónico para enviar el estado de la orden.');
+                    }
+
+                    return response()->json(['success' => true, 'message' => 'Orden creada. Pago en efectivo pendiente', 'redirect_url' => $routeToRedirect]);
+
+                case 'yape_plin':
+                    // Lógica para pago con Yape o Plin
+                    $operationCode = $request->input('operationCode');
+                    if ($operationCode) {
+                        //$order->status = 'paid';
+                        //$order->save();
+                        //$cart->status = 'completed';
+                        //$cart->save();
+                        $order->payment_code = $request->input('operationCode');
+                        $order->save();
+
+                        $data = [
+                            'nameUser' => $order->user->name,
+                            'nameUserReal' => $order->shipping_address->first_name." ".$order->shipping_address->last_name,
+                            'phoneUser' => $order->shipping_address->phone,
+                            'dateOperation' => $order->created_at->format('d M Y, g:i a'),
+                            'order' => "ORDEN - ".$order->id
+                        ];
+
+                        $telegramController = new TelegramController();
+                        $telegramController->sendNotification('process', $data);
+
+                        // Agregar movimientos a la caja
+                        $paymentType = 2;
+                        // Obtener la caja del tipo de pago
+                        $cashRegister = CashRegister::where('type', $paymentTypeMap[$paymentType])
+                            ->where('status', 1) // Caja abierta
+                            ->latest()
+                            ->first();
+
+                        /* if (!isset($cashRegister)) {
+                             return response()->json(['message' => 'No hay caja abierta para este tipo de pago.'], 422);
+                         }*/
+
+                        // Crear el movimiento de ingreso (venta)
+                        $cashMovement = CashMovement::create([
+                            'cash_register_id' => $cashRegister->id,
+                            'order_id' => $order->id,
+                            'type' => 'sale', // Tipo de movimiento: venta
+                            'amount' => (float)$order->amount_pay,
+                            'subtype' => 'yape',
+                            'description' => 'Venta registrada con tipo de pago: yape/plin'
+                        ]);
+
+                        // Actualizar el saldo actual y el total de ventas en la caja
+                        $cashRegister->current_balance += (float)$cashMovement->amount;
+                        $cashRegister->total_sales += (float)$cashMovement->amount;
+                        $cashRegister->save();
+
+                        DB::commit();
+
+                        // Obtener el correo electrónico según la lógica.
+                        $email = $this->getEmailForOrder($order);
+
+                        if ($email) {
+                            // Enviar correo al cliente con el estado de la orden.
+                            Mail::to($email)->send(new OrderStatusEmail($order));
+                            Log::info('Correo enviado a: ' . $email . ' con el estado de la orden: ');
+                        } else {
+                            Log::warning('No se encontró un correo electrónico para enviar el estado de la orden.');
+                        }
+
+                        return response()->json(['success' => true, 'message' => 'Pago realizado con Yape/Plin', 'redirect_url' => $routeToRedirect]);
+                    } else {
+                        DB::rollBack();
+                        return response()->json(['success' => false, 'message' => 'Falta el código de operación para Yape/Plin']);
+                    }
+
+                default:
+                    DB::rollBack();
+                    return response()->json(['success' => false, 'message' => 'Método de pago no válido']);
+            }
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Ocurrió un error al procesar el checkout. Inténtelo nuevamente.',
+                'error' => $e->getMessage(),
+                'linea' => $e->getTrace(),
+            ], 420);
+        }
+    }
+
     private function getEmailForOrder($order)
     {
         // Obtener shipping_address si existe
@@ -1256,25 +1821,6 @@ class CartController extends Controller
         $total = $totalWithShipping; // Considerar el total con envío
         $discount = 0;
 
-        /*if ($coupon->type == 'total') {
-            // Si el cupón aplica al total
-            if ($coupon->amount != 0) {
-                $discount = $coupon->amount;
-            } elseif ($coupon->percentage != 0) {
-                $discount = $total * ($coupon->percentage / 100);
-            }
-        } elseif ($coupon->type == 'detail') {
-            // Si el cupón aplica a un detalle
-            $maxDetail = $cart->details->sortByDesc('subtotal')->first();
-
-            if ($maxDetail) {
-                if ($coupon->amount != 0) {
-                    $discount = $coupon->amount;
-                } elseif ($coupon->percentage != 0) {
-                    $discount = $maxDetail->subtotal * ($coupon->percentage / 100);
-                }
-            }
-        }*/
         if ($coupon->type == 'total') {
             // Validar que no haya productos de categoría 'combo' (category_id = 3)
             $hasCombo = $cart->details->contains(function ($detail) {
@@ -1348,7 +1894,7 @@ class CartController extends Controller
         ]);
     }
 
-    public function calculateShipping(Request $request)
+    public function calculateShipping1(Request $request)
     {
         //dd($request->all());
         $districtId = $request->district_id;
@@ -1381,25 +1927,6 @@ class CartController extends Controller
         if ($couponName) {
             $coupon = Coupon::where('name', $couponName)->first();
 
-            /*if ($coupon) {
-                if ($coupon->type == 'total') {
-                    if ($coupon->amount != 0) {
-                        $discount = $coupon->amount;
-                    } elseif ($coupon->percentage != 0) {
-                        $discount = $total * ($coupon->percentage / 100);
-                    }
-                } elseif ($coupon->type == 'detail') {
-                    $maxDetail = $cart->details->sortByDesc('subtotal')->first();
-
-                    if ($maxDetail) {
-                        if ($coupon->amount != 0) {
-                            $discount = $coupon->amount;
-                        } elseif ($coupon->percentage != 0) {
-                            $discount = $maxDetail->subtotal * ($coupon->percentage / 100);
-                        }
-                    }
-                }
-            }*/
             // Lógica para calcular el descuento
             if ($coupon->type == 'total') {
                 // Validar que no haya productos de categoría 'combo' (category_id = 3)
@@ -1478,7 +2005,110 @@ class CartController extends Controller
         ]);
     }
 
-    public function applyCoupon(Request $request)
+    public function calculateShipping(Request $request)
+    {
+        $districtId = $request->district_id;
+        $cart = $request->input('cart');
+        $couponName = $request->coupon_name;
+
+        // Obtener el costo de envío
+        $shippingCost = 0;
+        if ($districtId) {
+            $district = ShippingDistrict::find($districtId);
+            if (!$district) {
+                return response()->json(['success' => false, 'message' => 'Distrito no válido.'], 400);
+            }
+            $shippingCost = $district->shipping_cost;
+        }
+
+        // Validar el carrito
+        if (!$cart || !is_array($cart)) {
+            return response()->json(['success' => false, 'message' => 'Carrito no encontrado o inválido.'], 400);
+        }
+
+        $total = $this->getTotalCart($cart);
+        $discount = 0;
+
+        if ($couponName) {
+            $coupon = Coupon::where('name', $couponName)->where('status', 'active')->first();
+
+            if (!$coupon) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El código de promoción no es válido o está inactivo.',
+                ]);
+            }
+
+            // Validar si el cupón ya ha sido usado por el usuario
+            $userCoupon = UserCoupon::where('user_id', auth()->id())
+                ->where('coupon_id', $coupon->id)
+                ->first();
+
+            // Validar si el número de teléfono ya utilizó el cupón
+            $phoneCoupon = UserCoupon::where('phone', $request->input('phone'))
+                ->where('coupon_id', $coupon->id)
+                ->first();
+
+            if (!$coupon->special && ($userCoupon || $phoneCoupon)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El cupón ya ha sido utilizado.',
+                ]);
+            }
+
+            if ($coupon->type == 'by_pass') {
+                $discount = ($coupon->amount != 0) ? $coupon->amount : (($coupon->percentage != 0) ? $total * ($coupon->percentage / 100) : 0);
+            } else {
+                $cartCategories = array_unique(array_map(function ($item) {
+                    $product = Product::find($item['product_id']);
+                    return $product ? $product->category_id : null;
+                }, $cart));
+
+                $allowedCategories = CategoryCoupon::where('coupon_id', $coupon->id)->pluck('category_id')->toArray();
+
+                $hasAllowedCategory = !empty(array_intersect($cartCategories, $allowedCategories));
+                if (!$hasAllowedCategory) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'El cupón no se puede aplicar a estos productos.',
+                    ]);
+                }
+
+                $total = array_sum(array_map(function ($item) {
+                    $product = Product::find($item['product_id']);
+                    return ($product && $product->category->aplica_porcentaje) ? ($item['total'] * $item['quantity']) : 0;
+                }, $cart));
+
+                if ($coupon->type == 'total') {
+                    $discount = ($coupon->amount != 0) ? $coupon->amount : (($coupon->percentage != 0) ? $total * ($coupon->percentage / 100) : 0);
+                } elseif ($coupon->type == 'detail') {
+                    $maxDetail = null;
+                    foreach ($cart as $item) {
+                        $product = Product::find($item['product_id']);
+                        if ($product && in_array($product->category_id, $allowedCategories)) {
+                            if (!$maxDetail || $item['total'] > $maxDetail['total']) {
+                                $maxDetail = $item;
+                            }
+                        }
+                    }
+                    $discount = ($coupon->amount != 0) ? $coupon->amount : (($coupon->percentage != 0 && $maxDetail) ? $maxDetail['total'] * ($coupon->percentage / 100) : 0);
+                }
+            }
+        }
+
+        if ($discount > $total) {
+            $discount = $total;
+        }
+
+        $newTotal = ($this->getTotalCart($cart) + $shippingCost) - $discount;
+        return response()->json([
+            'success' => true,
+            'shipping_cost' => (float)$shippingCost,
+            'new_total' => (float)$newTotal,
+        ]);
+    }
+
+    public function applyCoupon1(Request $request)
     {
         //dd($request);
         $cart = json_decode($request->input('cart'), true); // Decodificar cart
@@ -1546,30 +2176,8 @@ class CartController extends Controller
         //$total = $totalWithShipping; // Considerar el total con envío
         $discount = 0;
 
-        /*if ($coupon->type == 'total') {
-            // Si el cupón aplica al total
-            if ($coupon->amount != 0) {
-                $discount = $coupon->amount;
-            } elseif ($coupon->percentage != 0) {
-                $discount = $total * ($coupon->percentage / 100);
-            }
-        } elseif ($coupon->type == 'detail') {
-            // Si el cupón aplica a un detalle
-            $maxDetail = $cart->details->sortByDesc('subtotal')->first();
-
-            if ($maxDetail) {
-                if ($coupon->amount != 0) {
-                    $discount = $coupon->amount;
-                } elseif ($coupon->percentage != 0) {
-                    $discount = $maxDetail->subtotal * ($coupon->percentage / 100);
-                }
-            }
-        }*/
         if ($coupon->type == 'total') {
             // Validar que no haya productos de categoría 'combo' (category_id = 3)
-            /*$hasCombo = $cart->details->contains(function ($detail) {
-                return $detail->product->category_id == 3;
-            });*/
             $hasCombo = $this->hasCombo($cart);
 
             if ($hasCombo) {
@@ -1589,10 +2197,6 @@ class CartController extends Controller
             }
         } elseif ($coupon->type == 'detail') {
             // Verificar si todos los productos son de categoría 'combo' (category_id = 3)
-            /*$onlyCombos = $cart->details->every(function ($detail) {
-                return $detail->product->category_id == 3;
-            });*/
-
             $onlyCombos = $this->onlyCombos($cart);
 
             if ($onlyCombos) {
@@ -1638,6 +2242,119 @@ class CartController extends Controller
             'message' => 'Código aplicado. No borre el código.',
             'coupon_id' => $coupon->id,
             'district' => $districtId, // Devolver el distrito
+        ]);
+    }
+
+    public function applyCoupon(Request $request)
+    {
+        $cart = json_decode($request->input('cart'), true);
+        $districtId = $request->input('district');
+        $code = $request->input('code');
+        $phone = $request->input('phone');
+
+        if (!$cart || !is_array($cart)) {
+            return response()->json(['success' => false, 'message' => 'Carrito no encontrado o inválido.'], 400);
+        }
+
+        $shippingCost = 0;
+        if ($districtId) {
+            $district = ShippingDistrict::find($districtId);
+            if ($district) {
+                $shippingCost = $district->shipping_cost;
+            }
+        }
+
+        $total = $this->getTotalCart($cart);
+        $totalWithShipping = $total + $shippingCost;
+
+        $coupon = Coupon::where('name', $code)->where('status', 'active')->first();
+        if (!$coupon || $code == "") {
+            return response()->json([
+                'success' => false,
+                'message' => 'El código de promoción no es válido o está inactivo.',
+                'new_total' => number_format($totalWithShipping, 2),
+                'coupon_name' => ''
+            ]);
+        }
+
+        $userCoupon = UserCoupon::where('user_id', auth()->id())
+            ->where('coupon_id', $coupon->id)
+            ->first();
+
+        $phoneCoupon = UserCoupon::where('phone', $phone)
+            ->where('coupon_id', $coupon->id)
+            ->first();
+
+        if ((!$coupon->special && $userCoupon)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El cupón ya ha sido utilizado.',
+                'new_total' => number_format($totalWithShipping, 2),
+                'coupon_name' => ''
+            ]);
+        }
+
+        if ((!$coupon->special && $phoneCoupon)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sus datos ya han sido beneficiados con el cupón.',
+                'new_total' => number_format($totalWithShipping, 2),
+                'coupon_name' => ''
+            ]);
+        }
+
+        $discount = 0;
+
+        if ($coupon->type == 'by_pass') {
+            $discount = ($coupon->amount != 0) ? $coupon->amount : (($coupon->percentage != 0) ? $total * ($coupon->percentage / 100) : 0);
+        } else {
+            $cartCategories = array_unique(array_map(function ($item) {
+                $product = Product::find($item['product_id']);
+                return $product ? $product->category_id : null;
+            }, $cart));
+
+            $allowedCategories = CategoryCoupon::where('coupon_id', $coupon->id)->pluck('category_id')->toArray();
+            $hasAllowedCategory = !empty(array_intersect($cartCategories, $allowedCategories));
+
+            if (!$hasAllowedCategory) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El cupón no se puede aplicar a estos productos.',
+                    'new_total' => number_format($totalWithShipping, 2),
+                    'coupon_name' => ''
+                ]);
+            }
+
+            $total = array_sum(array_map(function ($item) {
+                $product = Product::find($item['product_id']);
+                return $product && $product->category->aplica_porcentaje ? $item['total'] * $item['quantity'] : 0;
+            }, $cart));
+
+            if ($coupon->type == 'total') {
+                $discount = ($coupon->amount != 0) ? $coupon->amount : (($coupon->percentage != 0) ? $total * ($coupon->percentage / 100) : 0);
+            } elseif ($coupon->type == 'detail') {
+                $maxDetail = collect($cart)->filter(function ($item) use ($allowedCategories) {
+                    $product = Product::find($item['product_id']);
+                    return in_array($product ? $product->category_id : null, $allowedCategories);
+                })->sortByDesc('total')->first();
+
+                $discount = ($coupon->amount != 0) ? $coupon->amount : (($coupon->percentage != 0) ? ($maxDetail['total'] ?? 0) * ($coupon->percentage / 100) : 0);
+            }
+        }
+
+        if ($discount > $total) {
+            $discount = $total;
+        }
+
+        $newTotal = $totalWithShipping - $discount;
+        return response()->json([
+            'success' => true,
+            'code_name' => $coupon->name,
+            'discount_display' => '-S/ ' . number_format($discount, 2),
+            'new_total' => number_format($newTotal, 2),
+            'message' => 'Código aplicado. No borre el código.',
+            'coupon_id' => $coupon->id,
+            'district' => $districtId,
         ]);
     }
 
