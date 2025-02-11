@@ -24,4 +24,9 @@ class Coupon extends Model
     {
         return $this->status === 'active';
     }
+
+    public function categories()
+    {
+        return $this->hasMany(CategoryCoupon::class);
+    }
 }

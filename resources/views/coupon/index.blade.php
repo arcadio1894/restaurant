@@ -238,7 +238,7 @@
             <td data-column="estado" data-estado></td>
             <td>
                 <a data-editar_coupon href="" class="btn btn-outline-warning btn-sm" data-toggle="tooltip" data-placement="top" title="Editar"><i class="fa fa-pen"></i> </a>
-                <button data-deshabilitar data-delete="" data-description="" data-state class="btn btn-outline-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Cambiar estado"><i class="fas fa-bell-slash"></i> </button>
+                <button data-cambiar_estado data-coupon_id="" data-description="" data-state="" class="btn btn-sm" data-toggle="tooltip" data-placement="top" title="Cambiar estado"> </button>
             </td>
         </tr>
     </template>

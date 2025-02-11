@@ -56,62 +56,100 @@
 @section('content')
     <form id="formEdit" class="form-horizontal" data-url="{{ route('coupons.update') }}" enctype="multipart/form-data">
         @csrf
-        <input type="hidden" name="coupon_id" value="{{ $coupon->id }}">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card card-success">
+                    <div class="card-header">
+                        <h3 class="card-title">Datos del cupón</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+                                <i class="fas fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body">
 
-        <div class="form-group row">
-            <div class="col-md-4">
-                <label for="name" class="col-12 col-form-label">Nombre <span class="right badge badge-danger">(*)</span></label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" name="name" id="name" value="{{ $coupon->name }}">
-                </div>
-            </div>
-            <div class="col-md-4">
-                <label for="description" class="col-12 col-form-label">Descripción</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" name="description" id="description" value="{{ $coupon->description }}">
-                </div>
-            </div>
-            <div class="col-md-4">
-                {{--<label for="type" class="col-12 col-form-label">Tipo <span class="right badge badge-danger">(*)</span></label>
-                <input type="hidden" name="type" value="off"> <!-- Valor predeterminado si no está seleccionado -->
-                <input id="type" type="checkbox" name="type" data-bootstrap-switch
-                       data-off-color="primary"
-                       data-on-text="TOTAL"
-                       data-off-text="DETALLE"
-                       data-on-color="success"
-                        {{ ($coupon->type == 'total') ? 'checked' : '' }}>--}}
-                <label for="type">Tipo </label>
-                <select id="type" name="type" class="form-control select2" style="width: 100%;">
-                    <option></option>
-                    <option value="total" {{ ($coupon->type == 'total') ? 'selected' : '' }}>TOTAL</option>
-                    <option value="detail" {{ ($coupon->type == 'detail') ? 'selected' : '' }}>DETALLE</option>
-                    <option value="by_pass" {{ ($coupon->type == 'by_pass') ? 'selected' : '' }}>BY PASS</option>
-                </select>
-            </div>
-        </div>
+                        <input type="hidden" name="coupon_id" value="{{ $coupon->id }}">
 
-        <div class="form-group row">
-            <div class="col-md-4">
-                <label for="amount" class="col-12 col-form-label">Monto <span class="right badge badge-danger">(*)</span></label>
-                <div class="col-sm-10">
-                    <input type="number" class="form-control" name="amount" id="amount" value="{{ $coupon->amount }}">
+                        <div class="form-group row">
+                            <div class="col-md-5">
+                                <label for="name" class="col-12 col-form-label">Nombre <span class="right badge badge-danger">(*)</span></label>
+                                <div class="col-sm-12">
+                                    <input type="text" class="form-control" name="name" id="name" value="{{ $coupon->name }}">
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <label for="description" class="col-12 col-form-label">Descripción</label>
+                                <div class="col-sm-12">
+                                    <input type="text" class="form-control" name="description" id="description" value="{{ $coupon->description }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-4">
+                                <label for="type">Tipo </label>
+                                <select id="type" name="type" class="form-control select2" style="width: 100%;">
+                                    <option></option>
+                                    <option value="total" {{ ($coupon->type == 'total') ? 'selected' : '' }}>TOTAL</option>
+                                    <option value="detail" {{ ($coupon->type == 'detail') ? 'selected' : '' }}>DETALLE</option>
+                                    <option value="by_pass" {{ ($coupon->type == 'by_pass') ? 'selected' : '' }}>BY PASS</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="amount" class="col-12 col-form-label">Monto <span class="right badge badge-danger">(*)</span></label>
+                                <div class="col-sm-12">
+                                    <input type="number" class="form-control" name="amount" id="amount" value="{{ $coupon->amount }}">
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="percentage" class="col-12 col-form-label">Porcentaje <span class="right badge badge-danger">(*)</span></label>
+                                <div class="col-sm-12">
+                                    <input type="number" class="form-control" name="percentage" id="percentage" value="{{ $coupon->percentage }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-md-6">
+                                <label for="special" class="col-12 col-form-label">Especial <span class="right badge badge-danger">(*)</span></label>
+                                <input type="hidden" name="special" value="off"> <!-- Valor predeterminado si no está seleccionado -->
+                                <input id="special" type="checkbox" name="special" value="on" data-bootstrap-switch
+                                       data-off-color="primary"
+                                       data-on-text="ESPECIAL"
+                                       data-off-text="NORMAL"
+                                       data-on-color="success"
+                                        {{ $coupon->special ? 'checked' : '' }}>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <label for="percentage" class="col-12 col-form-label">Porcentaje <span class="right badge badge-danger">(*)</span></label>
-                <div class="col-sm-10">
-                    <input type="number" class="form-control" name="percentage" id="percentage" value="{{ $coupon->percentage }}">
+                <!-- /.card -->
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Categorias permitidas</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+                                <i class="fas fa-minus"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @foreach ($categories as $category)
+                            <div class="form-group clearfix">
+                                <div class="icheck-primary d-inline">
+                                    <input type="checkbox" name="categories[]" value="{{ $category->id }}" id="checkboxPrimary{{ $category->id }}"
+                                           @if(in_array($category->id, $allowedCategories)) checked @endif>
+                                    <label for="checkboxPrimary{{ $category->id }}">
+                                        {{ $category->name }}
+                                    </label>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <label for="special" class="col-12 col-form-label">Especial <span class="right badge badge-danger">(*)</span></label>
-                <input type="hidden" name="special" value="off"> <!-- Valor predeterminado si no está seleccionado -->
-                <input id="special" type="checkbox" name="special" value="on" data-bootstrap-switch
-                       data-off-color="primary"
-                       data-on-text="ESPECIAL"
-                       data-off-text="NORMAL"
-                       data-on-color="success"
-                        {{ $coupon->special ? 'checked' : '' }}>
             </div>
         </div>
 
@@ -121,7 +159,6 @@
                 <button type="button" id="btn-submit" class="btn btn-outline-success float-right">Guardar cupón</button>
             </div>
         </div>
-        <!-- /.card-footer -->
     </form>
 @endsection
 

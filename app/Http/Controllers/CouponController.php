@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
+use App\Models\CategoryCoupon;
 use App\Models\Coupon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -103,7 +105,9 @@ class CouponController extends Controller
 
     public function create()
     {
-        return view('coupon.create');
+        $categories = Category::all();
+
+        return view('coupon.create', compact('categories'));
     }
 
     public function store(Request $request)
@@ -122,14 +126,12 @@ class CouponController extends Controller
         DB::beginTransaction();
         try {
 
-
-
             // Convertimos el valor de "status" y "special" a booleano
             //$type = $request->get('type') === 'on' ? 'total' : 'detail';
             $special = $request->get('special') === 'on' ? 1 : 0;
 
             // Creamos el cupón
-            Coupon::create([
+            $coupon = Coupon::create([
                 'name' => $request->get('name'),
                 'description' => $request->get('description'),
                 'amount' => $request->get('amount'),
@@ -137,6 +139,17 @@ class CouponController extends Controller
                 'special' => $special,
                 'type' => $request->get('type'),
             ]);
+
+            $selectedCategories = $request->input('categories', []); // Ahora funciona con el nombre correcto
+
+            // **Insertar nuevas relaciones solo si no existen**
+            foreach ($selectedCategories as $categoryId) { // Eliminar $value y usar directamente $categoryId
+                CategoryCoupon::create([
+                    'coupon_id' => $coupon->id,
+                    'category_id' => $categoryId
+                ]);
+
+            }
 
             DB::commit();
             return response()->json(['message' => 'Cambios guardados con éxito.'], 200);
@@ -150,7 +163,9 @@ class CouponController extends Controller
 
     public function edit(Coupon $coupon)
     {
-        return view('coupon.edit', compact('coupon'));
+        $categories = Category::all();
+        $allowedCategories = CategoryCoupon::where('coupon_id', $coupon->id)->pluck('category_id')->toArray(); // Solo IDs en array
+        return view('coupon.edit', compact('coupon', 'categories', 'allowedCategories'));
     }
 
     public function update(Request $request)
@@ -184,6 +199,28 @@ class CouponController extends Controller
                 'special' => $special,
             ]);
 
+            $selectedCategories = $request->input('categories', []); // Ahora funciona con el nombre correcto
+
+            $existingCategories = CategoryCoupon::where('coupon_id', $coupon->id)->pluck('category_id')->toArray();
+
+            // **Insertar nuevas relaciones solo si no existen**
+            foreach ($selectedCategories as $categoryId) { // Eliminar $value y usar directamente $categoryId
+                if (!in_array($categoryId, $existingCategories)) {
+                    CategoryCoupon::create([
+                        'coupon_id' => $coupon->id,
+                        'category_id' => $categoryId
+                    ]);
+                }
+            }
+
+            // **Eliminar relaciones que el usuario desmarcó**
+            $categoriesToDelete = array_diff($existingCategories, $selectedCategories);
+            if (!empty($categoriesToDelete)) {
+                CategoryCoupon::where('coupon_id', $coupon->id)
+                    ->whereIn('category_id', $categoriesToDelete)
+                    ->delete();
+            }
+
             DB::commit();
             return response()->json(['message' => 'Cupón actualizado con éxito.'], 200);
 
@@ -195,20 +232,17 @@ class CouponController extends Controller
 
     }
 
-    public function destroy(Coupon $coupon)
+    public function cambiarEstado(Request $request)
     {
-        DB::beginTransaction();
-        try {
+        $coupon = Coupon::find($request->coupon_id);
 
-            $coupon->update(['status' => 'inactive']); // Cambiar estado a inactivo
-
-            DB::commit();
-        } catch ( \Throwable $e ) {
-            DB::rollBack();
-            return response()->json(['message' => $e->getMessage()], 422);
+        if (!$coupon) {
+            return response()->json(['success' => false, 'message' => 'Cupón no encontrado']);
         }
 
-        return response()->json(['message' => 'Cupón desactivado con éxito.'], 200);
+        $coupon->status = $request->state; // Guarda "active" o "inactive"
+        $coupon->save();
 
+        return response()->json(['success' => true, 'message' => 'Estado cambiado exitosamente']);
     }
 }

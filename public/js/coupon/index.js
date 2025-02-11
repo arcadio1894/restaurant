@@ -33,7 +33,75 @@ $(document).ready(function () {
     $modalDelete = $('#modalDelete');
     $(document).on('click', '[data-delete]', openModalDisable);
 
+    $(document).on("click", "[data-cambiar_estado]", function () {
+        let button = $(this);
+        let couponId = button.attr("data-coupon_id");
+        let description = button.attr("data-description");
+        let currentState = button.attr("data-state");
+        let newState = (currentState === "active") ? "inactive" : "active"; // Cambia active ↔ inactive
+        let newStateText = (currentState === "active") ? "INACTIVO" : "ACTIVO";
 
+        $.confirm({
+            title: "Confirmar acción",
+            content: `¿Está seguro de cambiar el estado de <strong>${description}</strong> a <strong>${newStateText}</strong>?`,
+            type: "orange",
+            buttons: {
+                cancelar: {
+                    text: "Cancelar",
+                    action: function () {
+                        // No hacer nada
+                    }
+                },
+                confirmar: {
+                    text: "Sí, cambiar",
+                    btnClass: "btn-blue",
+                    action: function () {
+                        $.ajax({
+                            url: "/dashboard/cupones/cambiar-estado", // Ruta en tu backend
+                            method: "POST",
+                            data: {
+                                coupon_id: couponId,
+                                state: newState,
+                                _token: $('meta[name="csrf-token"]').attr('content') // Para Laravel CSRF
+                            },
+                            beforeSend: function () {
+                                button.prop("disabled", true);
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    button.attr("data-state", newState);
+                                    button.toggleClass("btn-outline-danger btn-outline-success");
+                                    button.find("i").toggleClass("fa-bell-slash fa-bell");
+                                    initData();
+                                    $.alert({
+                                        title: "Éxito",
+                                        content: "Estado cambiado correctamente",
+                                        type: "green"
+                                    });
+                                } else {
+                                    $.alert({
+                                        title: "Error",
+                                        content: response.message,
+                                        type: "red"
+                                    });
+                                }
+                            },
+                            error: function () {
+                                $.alert({
+                                    title: "Error",
+                                    content: "Hubo un problema al cambiar el estado.",
+                                    type: "red"
+                                });
+                            },
+                            complete: function () {
+                                button.prop("disabled", false);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    });
 });
 
 var $formDelete;
@@ -330,16 +398,26 @@ function renderDataTable(data, activeColumns) {
         }
     }*/
 
-    /*if ($.inArray('enable_material', $permissions) !== -1) {*/
-        clone.querySelector("[data-deshabilitar]").setAttribute("data-delete", data.id);
-        clone.querySelector("[data-deshabilitar]").setAttribute("data-description", data.nombre);
-        clone.querySelector("[data-deshabilitar]").setAttribute("data-state", data.state);
-    /*} else {
-        let element = clone.querySelector("[data-deshabilitar]");
-        if (element) {
-            element.style.display = 'none';
-        }
-    }*/
+    let button = clone.querySelector("[data-cambiar_estado]");
+
+    // Obtener estado
+    let state = data.status; // "active" o "inactive"
+
+    // Cambiar atributos según el estado
+    button.setAttribute("data-coupon_id", data.id);
+    button.setAttribute("data-description", data.nombre);
+    button.setAttribute("data-state", data.status);
+
+    // Ajustar clases e ícono
+    if (state == "active") {
+        button.classList.add("btn-outline-success");
+        button.classList.remove("btn-outline-danger");
+        button.innerHTML = '<i class="fas fa-bell"></i>'; // Ícono de campana normal
+    } else {
+        button.classList.add("btn-outline-danger");
+        button.classList.remove("btn-outline-success");
+        button.innerHTML = '<i class="fas fa-bell-slash"></i>'; // Ícono de campana con slash
+    }
 
     // Agregar la fila clonada al cuerpo de la tabla
     $("#body-table").append(clone);

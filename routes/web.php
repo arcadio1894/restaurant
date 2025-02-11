@@ -158,8 +158,7 @@ Route::middleware('auth')->group(function (){
             ->name('coupons.edit');
         Route::post('/coupons/update', [CouponController::class, 'update'])
             ->name('coupons.update');
-        Route::delete('/coupons/{coupon}', [CouponController::class, 'destroy'])
-            ->name('coupons.destroy');
+        Route::post('/cupones/cambiar-estado', [CouponController::class, 'cambiarEstado'])->name('cupones.cambiar-estado');
 
         // Mostrar listado de types
         Route::get('/types', [TypeController::class, 'index'])
