@@ -1019,80 +1019,81 @@ class CartController extends Controller
             $phone = preg_replace('/[^\d+]/', '', $validatedData['phone']);
 
             $coupon = Coupon::where('name', $code)->where('status', 'active')->first();
-            if (!$coupon || $code == "") {
+            /*if (!$coupon || $code == "") {
                 return response()->json([
                     'success' => false,
                     'message' => 'El código de promoción no es válido o está inactivo.',
                     'new_total' => number_format($totalWithShipping, 2),
                     'coupon_name' => ''
                 ]);
-            }
-
-            $userCoupon = UserCoupon::where('user_id', auth()->id())
-                ->where('coupon_id', $coupon->id)
-                ->first();
-
-            $phoneCoupon = UserCoupon::where('phone', $phone)
-                ->where('coupon_id', $coupon->id)
-                ->first();
-
-            if ((!$coupon->special && $userCoupon)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'El cupón ya ha sido utilizado.',
-                    'new_total' => number_format($totalWithShipping, 2),
-                    'coupon_name' => ''
-                ]);
-            }
-
-            if ((!$coupon->special && $phoneCoupon)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Sus datos ya han sido beneficiados con el cupón.',
-                    'new_total' => number_format($totalWithShipping, 2),
-                    'coupon_name' => ''
-                ]);
-            }
-
+            }*/
             $discountAmount = 0;
+            if ($coupon) {
+                $userCoupon = UserCoupon::where('user_id', auth()->id())
+                    ->where('coupon_id', $coupon->id)
+                    ->first();
 
-            if ($coupon->type == 'by_pass') {
-                $discountAmount = ($coupon->amount != 0) ? $coupon->amount : (($coupon->percentage != 0) ? $total * ($coupon->percentage / 100) : 0);
-            } else {
-                $cartCategories = array_unique(array_map(function ($item) {
-                    $product = Product::find($item['product_id']);
-                    return $product ? $product->category_id : null;
-                }, $cart));
+                $phoneCoupon = UserCoupon::where('phone', $phone)
+                    ->where('coupon_id', $coupon->id)
+                    ->first();
 
-                $allowedCategories = CategoryCoupon::where('coupon_id', $coupon->id)->pluck('category_id')->toArray();
-                $hasAllowedCategory = !empty(array_intersect($cartCategories, $allowedCategories));
-
-                if (!$hasAllowedCategory) {
+                if ((!$coupon->special && $userCoupon)) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'El cupón no se puede aplicar a estos productos.',
+                        'message' => 'El cupón ya ha sido utilizado.',
                         'new_total' => number_format($totalWithShipping, 2),
                         'coupon_name' => ''
                     ]);
                 }
 
-                $total = array_sum(array_map(function ($item) {
-                    $product = Product::find($item['product_id']);
-                    return $product && $product->category->aplica_porcentaje ? $item['total'] * $item['quantity'] : 0;
-                }, $cart));
+                if ((!$coupon->special && $phoneCoupon)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Sus datos ya han sido beneficiados con el cupón.',
+                        'new_total' => number_format($totalWithShipping, 2),
+                        'coupon_name' => ''
+                    ]);
+                }
 
-                if ($coupon->type == 'total') {
+
+
+                if ($coupon->type == 'by_pass') {
                     $discountAmount = ($coupon->amount != 0) ? $coupon->amount : (($coupon->percentage != 0) ? $total * ($coupon->percentage / 100) : 0);
-                } elseif ($coupon->type == 'detail') {
-                    $maxDetail = collect($cart)->filter(function ($item) use ($allowedCategories) {
+                } else {
+                    $cartCategories = array_unique(array_map(function ($item) {
                         $product = Product::find($item['product_id']);
-                        return in_array($product ? $product->category_id : null, $allowedCategories);
-                    })->sortByDesc('total')->first();
+                        return $product ? $product->category_id : null;
+                    }, $cart));
 
-                    $discountAmount = ($coupon->amount != 0) ? $coupon->amount : (($coupon->percentage != 0) ? ($maxDetail['total'] ?? 0) * ($coupon->percentage / 100) : 0);
+                    $allowedCategories = CategoryCoupon::where('coupon_id', $coupon->id)->pluck('category_id')->toArray();
+                    $hasAllowedCategory = !empty(array_intersect($cartCategories, $allowedCategories));
+
+                    if (!$hasAllowedCategory) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'El cupón no se puede aplicar a estos productos.',
+                            'new_total' => number_format($totalWithShipping, 2),
+                            'coupon_name' => ''
+                        ]);
+                    }
+
+                    $total = array_sum(array_map(function ($item) {
+                        $product = Product::find($item['product_id']);
+                        return $product && $product->category->aplica_porcentaje ? $item['total'] * $item['quantity'] : 0;
+                    }, $cart));
+
+                    if ($coupon->type == 'total') {
+                        $discountAmount = ($coupon->amount != 0) ? $coupon->amount : (($coupon->percentage != 0) ? $total * ($coupon->percentage / 100) : 0);
+                    } elseif ($coupon->type == 'detail') {
+                        $maxDetail = collect($cart)->filter(function ($item) use ($allowedCategories) {
+                            $product = Product::find($item['product_id']);
+                            return in_array($product ? $product->category_id : null, $allowedCategories);
+                        })->sortByDesc('total')->first();
+
+                        $discountAmount = ($coupon->amount != 0) ? $coupon->amount : (($coupon->percentage != 0) ? ($maxDetail['total'] ?? 0) * ($coupon->percentage / 100) : 0);
+                    }
                 }
             }
-
             // Validacion del vuelto antes de crear la orden
             if ( $validatedData['paymentMethod'] == 2 )
             {
