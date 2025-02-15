@@ -52,8 +52,9 @@ class HomeController extends Controller
             ->orderBy('id') // Ordenar por ID como criterio secundario
             ->get();
 
-        $slidersSmalls = Slider::where('size', 's')->orderBy('order', 'asc')->get();
-        $slidersLarges = Slider::where('size', 'l')->orderBy('order', 'asc')->get();
+        $slidersSmalls = Slider::where('size', 's')->where('active', 1)->orderBy('order', 'asc')->get();
+        $slidersLarges = Slider::where('size', 'l')->where('active', 1)->orderBy('order', 'asc')->get();
+
 
         return view('home', compact('categories', 'products', 'slidersSmalls', 'slidersLarges'));
     }

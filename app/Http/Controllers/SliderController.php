@@ -186,9 +186,24 @@ class SliderController extends Controller
 
     }
 
+    public function updateState($id, Request $request)
+    {
+        $slider = Slider::find($id);
+        if (!$slider) {
+            return response()->json(['success' => false, 'message' => 'Elemento no encontrado'], 404);
+        }
+
+        $slider->active = $request->state;
+        $slider->save();
+
+        $message = $request->state ? 'Elemento activado correctamente' : 'Elemento desactivado correctamente';
+
+        return response()->json(['success' => true, 'message' => $message]);
+    }
+
     public function getSliders()
     {
-        $sliders = Slider::select('id', 'image', 'order', 'size', 'link')->get();
+        $sliders = Slider::select('id', 'image', 'order', 'size', 'link', 'active')->get();
         return datatables($sliders)->toJson();
 
     }

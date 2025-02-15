@@ -32,6 +32,24 @@ $(document).ready(function () {
                 }},
             { data: 'link' },
             { data: null,
+                title: 'Estado',
+                wrap: true,
+                "render": function (item)
+                {
+                    var text = '';
+
+                    if ( item.active == 1 )
+                    {
+                        text = text + "ACTIVO";
+                    } else {
+                        text = text + "INACTIVO";
+                    }
+
+                    return text;
+
+                }
+            },
+            { data: null,
                 title: 'Acciones',
                 wrap: true,
                 "render": function (item)
@@ -48,6 +66,10 @@ $(document).ready(function () {
                     text = text + ' <button data-delete="'+item.id+'" data-description="'+item.image+'" '+
                         ' class="btn btn-outline-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Eliminar "><i class="fa fa-trash"></i></button>';
                     //}
+
+                    text = text + ' <button data-id="'+item.id+'" data-state="'+item.active+'" data-description="'+item.image+'" '+
+                        ' class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Desactivar/Activar "><i class="far fa-bell-slash"></i></button>';
+
                     return text;
 
                 } },
@@ -202,11 +224,67 @@ $(document).ready(function () {
 
     $(document).on('click', '[data-image]', showImage);
     $modalImage = $('#modalImage');
+
+    $(document).on("click", "[data-state]", function() {
+        var button = $(this);
+        var itemId = button.data("id");
+        var currentState = button.data("state");
+        var newState = currentState == 1 ? 0 : 1;
+        var message = currentState == 1 ? "¿Estás seguro de desactivar este elemento?" : "¿Estás seguro de activar este elemento?";
+
+        $.confirm({
+            title: 'Confirmación',
+            content: message,
+            type: 'orange',
+            buttons: {
+                confirmar: {
+                    text: 'Sí',
+                    btnClass: 'btn-success',
+                    action: function() {
+                        $.ajax({
+                            url: '/dashboard/update-state/' + itemId,
+                            type: 'POST',
+                            data: {
+                                _token: $('meta[name="csrf-token"]').attr('content'),
+                                state: newState
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    $.alert({
+                                        title: 'Éxito',
+                                        content: response.message,
+                                        type: 'green',
+                                        buttons: {
+                                            ok: function() {
+                                                location.reload();
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    $.alert("Error al actualizar el estado.");
+                                }
+                            },
+                            error: function() {
+                                $.alert("Hubo un problema con la solicitud.");
+                            }
+                        });
+                    }
+                },
+                cancelar: {
+                    text: 'No',
+                    btnClass: 'btn-danger',
+                    action: function() {}
+                }
+            }
+        });
+    });
 });
 
 var $formDelete;
 var $modalDelete;
 var $modalImage;
+
+
 
 function showImage() {
     var image = $(this).data('image');
@@ -251,7 +329,7 @@ function destroyImages() {
                     "onclick": null,
                     "showDuration": "300",
                     "hideDuration": "1000",
-                    "timeOut": "2000",
+                    "timeOut": "1000",
                     "extendedTimeOut": "1000",
                     "showEasing": "swing",
                     "hideEasing": "linear",
@@ -262,7 +340,7 @@ function destroyImages() {
             setTimeout( function () {
                 $("#btn-submit").attr("disabled", false);
                 location.reload();
-            }, 2000 )
+            }, 1000 )
         },
         error: function (data) {
             if( data.responseJSON.message && !data.responseJSON.errors )
