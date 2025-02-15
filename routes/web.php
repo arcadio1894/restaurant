@@ -208,6 +208,8 @@ Route::middleware('auth')->group(function (){
             ->name('sliders.edit');
         Route::post('/sliders/update', [SliderController::class, 'update'])
             ->name('sliders.update');
+        Route::post('/update-state/{id}', [SliderController::class, 'updateState']);
+
 
         //Rutas de la caja
         Route::get('/ver/caja/{type}', [CashRegisterController::class, 'indexCashRegister'])
