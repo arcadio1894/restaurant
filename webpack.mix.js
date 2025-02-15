@@ -15,3 +15,4 @@ const mix = require('laravel-mix');
     .sass('resources/sass/app.scss', 'public/css')
     .sourceMaps();*/
 mix.js('resources/js/orderPusher.js', 'public/js');
+mix.js('resources/js/orderCreated.js', 'public/js').version();

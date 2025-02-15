@@ -238,6 +238,11 @@ Route::middleware('auth')->group(function (){
         Route::get('/reclamo/{id}/revisar', [ReclamacionController::class, 'show'])->name('reclamos.show');
 
         Route::post('/reclamos/respuesta', [ReclamacionController::class, 'guardarRespuesta'])->name('reclamos.guardarRespuesta');
+
+        // Routes KANBAN
+        Route::get('/kanban/ordenes', [OrderController::class, 'indexKanban'])->name('orders.kanban');
+        Route::get('/generar/orden', [OrderController::class, 'generarOrder'])->name('generarOrder');
+
     });
 });
 

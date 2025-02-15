@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\OrderCreated;
 use App\Events\OrderStatusUpdated;
 use App\Mail\OrderStatusEmail;
 use App\Models\Address;
@@ -25,6 +26,11 @@ class OrderController extends Controller
 
         // Retorna la vista con los pedidos paginados
         return view('order.index', compact('orders'));
+    }
+
+    public function indexKanban()
+    {
+        return view('kanban.index');
     }
 
     public function getOrders()
@@ -350,9 +356,72 @@ class OrderController extends Controller
         //
     }
 
-    public function show(Order $order)
+    public function show($id)
     {
-        //
+        // Buscar la orden en la base de datos
+        $order = Order::find($id);
+
+        // Verificar si la orden existe
+        if (!$order) {
+            return response()->json(['error' => 'Orden no encontrada'], 404);
+        }
+
+        // Devolver la orden en formato JSON
+        return response()->json($order);
+    }
+
+    public function updateTime(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:orders,id',
+            'estimated_time' => 'required|integer|min:1',
+            'status' => 'required|string'
+        ]);
+
+        $order = Order::findOrFail($request->id);
+        $order->estimated_time = $request->estimated_time; // Guardar el tiempo estimado
+        $order->date_processing = Carbon::now('America/Lima');
+        $order->status = $request->status; // Cambiar estado a "processing"
+        $order->save();
+
+        return response()->json([
+            'message' => 'Tiempo estimado actualizado correctamente',
+            'order' => $order
+        ]);
+    }
+
+    public function updateStatus(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:orders,id',
+            'status' => 'required|string'
+        ]);
+
+        $order = Order::findOrFail($request->id);
+        $order->status = $request->status;
+        $order->save();
+
+        return response()->json([
+            'message' => 'Estado actualizado correctamente',
+            'order' => $order
+        ]);
+    }
+
+    public function updateDistributor(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:orders,id',
+            'status' => 'required|string|in:shipped',
+            'distributor_id' => 'required|exists:distributors,id'
+        ]);
+
+        $order = Order::findOrFail($request->id);
+        $order->status = $request->status;
+        $order->distributor_id = $request->distributor_id;
+        $order->save();
+
+        // 🚀 Retornar la orden actualizada para su renderización
+        return response()->json($order);
     }
 
     public function edit(Order $order)
@@ -368,5 +437,12 @@ class OrderController extends Controller
     public function destroy(Order $order)
     {
         //
+    }
+
+    public function generarOrder()
+    {
+        $orden = Order::find(70);
+
+        broadcast(new OrderCreated($orden));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\OrderCreated;
 use App\Http\Requests\CheckoutRequest;
 use App\Mail\OrderStatusEmail;
 use App\Models\Address;
@@ -1247,8 +1248,8 @@ class CartController extends Controller
                         'order' => "ORDEN - ".$order->id
                     ];
 
-                    $telegramController = new TelegramController();
-                    $telegramController->sendNotification('process', $data);
+                    /*$telegramController = new TelegramController();
+                    $telegramController->sendNotification('process', $data);*/
 
                     // Agregar movimientos a la caja
                     $paymentType = 2;
@@ -1290,6 +1291,9 @@ class CartController extends Controller
                     } else {
                         Log::warning('No se encontró un correo electrónico para enviar el estado de la orden.');
                     }
+
+                    // Emitir el evento a Pusher
+                    broadcast(new OrderCreated($order));
 
                     return response()->json(['success' => true, 'message' => 'Pago realizado con POS', 'redirect_url' => $routeToRedirect]);
 
@@ -1377,6 +1381,9 @@ class CartController extends Controller
                         Log::warning('No se encontró un correo electrónico para enviar el estado de la orden.');
                     }
 
+                    // Emitir el evento a Pusher
+                    broadcast(new OrderCreated($order));
+
                     return response()->json(['success' => true, 'message' => 'Orden creada. Pago en efectivo pendiente', 'redirect_url' => $routeToRedirect]);
 
                 case 'yape_plin':
@@ -1440,6 +1447,9 @@ class CartController extends Controller
                         } else {
                             Log::warning('No se encontró un correo electrónico para enviar el estado de la orden.');
                         }
+
+                        // Emitir el evento a Pusher
+                        broadcast(new OrderCreated($order));
 
                         return response()->json(['success' => true, 'message' => 'Pago realizado con Yape/Plin', 'redirect_url' => $routeToRedirect]);
                     } else {

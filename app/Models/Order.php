@@ -13,6 +13,7 @@ class Order extends Model
     const STATUS_SHIPPED = 'shipped';
     const STATUS_COMPLETED = 'completed';
 
+    protected $appends = ['data_payment','status_name', 'active_step', 'formatted_date', 'formatted_created_date', 'amount_pay', 'total_amount_print', 'order_phone', 'order_user'];
 
     protected $fillable = [
         'user_id',
@@ -27,6 +28,9 @@ class Order extends Model
         'shipping_district_id',
         'observations',
         'state_annulled',
+        'estimated_time',
+        'distributor_id',
+        'date_processing',
 
         // Campos adicionales para facturación
         'serie',              // Serie del documento (ejemplo: F001, B001)
@@ -43,6 +47,11 @@ class Order extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function distributor()
+    {
+        return $this->belongsTo(Distributor::class);
     }
 
     public function shipping_address()
@@ -63,6 +72,24 @@ class Order extends Model
     public function details()
     {
         return $this->hasMany(OrderDetail::class);
+    }
+
+    public function getOrderPhoneAttribute()
+    {
+        if ($this->shipping_address)
+        {
+            return $this->shipping_address->phone;
+        }
+        return "N/N";
+    }
+
+    public function getOrderUserAttribute()
+    {
+        if ($this->shipping_address)
+        {
+            return $this->shipping_address->first_name . " " .$this->shipping_address->last_name;
+        }
+        return "N/N";
     }
 
     // Accesor para obtener el pago o codigo yape

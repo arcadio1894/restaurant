@@ -398,6 +398,12 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
+                                <a href="{{route('orders.kanban')}}" class="nav-link @yield('activeKanbanOrders')">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Kanban pedidos</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="{{route('orders.list')}}" class="nav-link @yield('activeListOrders')">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Listar pedidos</p>
