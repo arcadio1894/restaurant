@@ -106,11 +106,9 @@ function getOrderCard(order) {
                 ${order.order_user} <br> ${order.order_phone}
             </h5>
         </div>
-        <div class="widget-user-image" style="width: 40px; height: 40px; margin-top: -15px;">
-            <img class="img-circle elevation-2" src="/images/users/1.jpg" alt="User Avatar" style="width: 40px; height: 40px;">
-        </div>
+        
         <div class="card-footer" style="padding: 8px;">
-            <div class="row mt-3">
+            <div class="row">
                 <div class="col-sm-3 border-right">
                     <div class="description-block">
                         <a href="#" data-imprimir_comanda="${order.id}">

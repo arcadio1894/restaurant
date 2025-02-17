@@ -74,8 +74,35 @@ $(document).ready(function () {
         // ❌ Evitar que se procese automáticamente
         event.cancel = true;
 
-        // Ajustar el ID con el prefijo "kanban_"
-        let kanbanItemId = `kanban_${itemId}`;
+        // 🚫 Definir movimientos NO PERMITIDOS
+        const movimientosInvalidos = [
+            { de: "shipped", a: "processing" },
+            { de: "shipped", a: "created" },
+            { de: "processing", a: "created" },
+            { de: "created", a: "shipped" }
+        ];
+
+        // 📌 Si el movimiento es inválido, mostrar mensaje y regresar el pedido a su estado original
+        if (movimientosInvalidos.some(m => m.de === oldStatus && m.a === newStatus)) {
+            $.confirm({
+                title: "🚫 Movimiento No Permitido",
+                content: "No puedes mover un pedido a este estado.",
+                buttons: {
+                    ok: {
+                        text: "OK",
+                        btnClass: "btn-red",
+                        action: function () {
+                            console.log(`↩️ Devolviendo pedido ${itemId} a ${oldStatus}.`);
+                            setTimeout(() => {
+                                $("#kanban").jqxKanban("removeItem", itemId);
+                                renderOrder(itemId);
+                            }, 50);
+                        }
+                    }
+                }
+            });
+            return; // 🔴 Detener la ejecución aquí
+        }
 
         if (oldStatus === "created" && newStatus === "processing") {
             $.confirm({
@@ -93,6 +120,20 @@ $(document).ready(function () {
                                 return false;
                             }
 
+                            // 🚀 Mostrar loader en toda la pantalla
+                            $.blockUI({
+                                message: '<h3>⏳ Procesando solicitud...</h3>',
+                                css: {
+                                    border: 'none',
+                                    padding: '15px',
+                                    backgroundColor: '#000',
+                                    '-webkit-border-radius': '10px',
+                                    '-moz-border-radius': '10px',
+                                    opacity: 0.5,
+                                    color: '#fff'
+                                }
+                            });
+
                             // ✅ Enviar actualización al backend
                             $.post({
                                 url: '/api/orders/update-time',
@@ -101,6 +142,9 @@ $(document).ready(function () {
                                 success: function (response) {
                                     console.log("✅ Tiempo de cocción actualizado:", response);
                                     $.alert(`✅ Tiempo estimado guardado: ${tiempoEstimado} minutos`);
+
+                                    // 🛑 Quitar loader
+                                    $.unblockUI();
 
                                     // 🗑️ Eliminar temporalmente el item
                                     $("#kanban").jqxKanban("removeItem", itemId);
@@ -128,9 +172,15 @@ $(document).ready(function () {
                     }
                 }
             });
+
+            return; // 🔴 Detener la ejecución aquí
         }
 
-        else if (oldStatus === "processing" && newStatus === "shipped") {
+        if (oldStatus === "processing" && newStatus === "shipped") {
+            let item = itemId;
+            let itemIDClear = item.replace("kanban_", "");
+            console.log(item);
+            console.log(itemIDClear);
             $.confirm({
                 title: "🚚 Seleccionar Repartidor",
                 content: function () {
@@ -160,17 +210,35 @@ $(document).ready(function () {
                                 return false;
                             }
 
+                            // 🚀 Mostrar loader en toda la pantalla
+                            $.blockUI({
+                                message: '<h3>⏳ Procesando solicitud...</h3>',
+                                css: {
+                                    border: 'none',
+                                    padding: '15px',
+                                    backgroundColor: '#000',
+                                    '-webkit-border-radius': '10px',
+                                    '-moz-border-radius': '10px',
+                                    opacity: 0.5,
+                                    color: '#fff'
+                                }
+                            });
+
                             // ✅ Enviar actualización al backend con el repartidor seleccionado
                             $.post({
+
                                 url: '/api/orders/update-distributor',
-                                data: { id: itemId, status: "shipped", distributor_id: distributorId },
+                                data: { id: itemIDClear, status: "shipped", distributor_id: distributorId },
                                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                                 success: function (response) {
                                     console.log("✅ Pedido asignado a repartidor:", response);
 
+                                    // 🛑 Quitar loader
+                                    $.unblockUI();
+
                                     // 🗑️ Eliminar temporalmente el item y volver a renderizarlo
                                     $("#kanban").jqxKanban("removeItem", itemId);
-                                    renderOrder(itemId);
+                                    renderOrder(itemIDClear);
                                 },
                                 error: function (error) {
                                     console.error("❌ Error al actualizar el repartidor:", error);
@@ -192,36 +260,22 @@ $(document).ready(function () {
                     }
                 }
             });
-        }
 
-        else {
-            $.confirm({
-                title: "🚫 Movimiento No Permitido",
-                content: "No puedes mover un pedido a este estado.",
-                buttons: {
-                    ok: {
-                        text: "OK",
-                        btnClass: "btn-red",
-                        action: function () {
-                            console.log(`↩️ Devolviendo pedido ${itemId} a ${oldStatus}.`);
-                            setTimeout(() => {
-                                $("#kanban").jqxKanban("removeItem", itemId);
-                                renderOrder(itemId);
-                            }, 50);
-                        }
-                    }
-                }
-            });
             return; // 🔴 Detener la ejecución aquí
         }
+
     });
 
     $(document).on('click', '[data-anular]', anularOrder);
 
     $(document).on("click", "[data-entregar]", function (event) {
         event.preventDefault(); // Evitar navegación
-
-        let itemId = $(this).data("id");
+        let button = $(this);
+        //console.log("📦 Entregando pedido ID:", $(this).data("id"));
+        let rawItemId = limpiarItemId($(this).data("id").toString()); // Limpiar ID
+        //console.log("📦 Entregando pedido ID:", rawItemId);
+        let itemId = rawItemId.toString().replace("kanban_", ""); // Limpiar el ID si tiene el prefijo
+        console.log("📦 Entregando pedido ID:", itemId);
 
         $.confirm({
             title: "📦 Confirmar Entrega",
@@ -238,11 +292,11 @@ $(document).ready(function () {
                             headers: { "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content") },
                             success: function (response) {
                                 console.log("✅ Pedido entregado correctamente:", response);
-
-                                // 🗑️ Eliminar la orden del Kanban
-                                $("#kanban").jqxKanban("removeItem", itemId);
-
+                                console.log("✅ Pedido:", itemId);
+                                // 🗑️ Eliminar directamente del DOM sin usar jqxKanban
+                                button.closest(".jqx-kanban-item").remove();
                                 $.alert("✅ Pedido marcado como entregado.");
+
                             },
                             error: function (error) {
                                 console.error("❌ Error al actualizar el pedido:", error);
@@ -361,6 +415,8 @@ function renderOrder(itemId) {
             return;
         }
 
+        console.log(order.status);
+
         let newOrderData = {
             id: String(order.id),
             status: order.status.trim().toLowerCase(),
@@ -412,11 +468,9 @@ function getOrderCardCreated(order) {
                 ${order.order_user} <br> ${order.order_phone}
             </h5>
         </div>
-        <div class="widget-user-image" style="width: 40px; height: 40px; margin-top: -15px;">
-            <img class="img-circle elevation-2" src="/images/users/1.jpg" alt="User Avatar" style="width: 40px; height: 40px;">
-        </div>
+       
         <div class="card-footer" style="padding: 8px;">
-            <div class="row mt-3">
+            <div class="row">
                 <div class="col-sm-3 border-right">
                     <div class="description-block">
                         <a href="${url_comanda}" target="_blank" data-imprimir_comanda="${order.id}">
@@ -459,6 +513,35 @@ function getOrderCardProcessing(order) {
     let latitude = ( order.shipping_address == null ) ? '': order.shipping_address.latitude;
     let longitude = ( order.shipping_address == null ) ? '': order.shipping_address.longitude;
 
+    // Convertir date_processing a un objeto Date
+    let processingDate = new Date(order.date_processing);
+    console.log(order.date_processing);
+
+    // Sumar los minutos del estimated_time
+    processingDate.setMinutes(processingDate.getMinutes() + parseInt(order.estimated_time));
+
+    // Formatear la fecha y hora en 12 horas (AM/PM)
+    let options = { year: 'numeric', month: 'long', day: 'numeric' };
+    let formattedDate = "No hay fecha";
+    if ( order.date_processing )
+    {
+        formattedDate = processingDate.toLocaleDateString('es-ES', options);
+    }
+
+    let hours = processingDate.getHours();
+    let minutes = processingDate.getMinutes();
+    let ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12; // Convertir 0 a 12
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+
+    let formattedTime = "No hay hora";
+
+    if ( order.date_processing )
+    {
+        formattedTime = `${hours}:${minutes} ${ampm}`;
+    }
+
+
     return `
     <div class="card card-widget widget-user" style="margin: 5px; padding: 5px; width: 100%; min-height: 120px;">
         <div class="widget-user-header ${bgColor}" style="padding: 8px;">
@@ -467,17 +550,21 @@ function getOrderCardProcessing(order) {
                 ${order.order_user} <br> ${order.order_phone}
             </h5>
         </div>
-        <div class="widget-user-image" style="width: 40px; height: 40px; margin-top: -15px;">
+        <!--<div class="widget-user-image" style="width: 40px; height: 40px; margin-top: -15px;">
             <img class="img-circle elevation-2" src="/images/users/1.jpg" alt="User Avatar" style="width: 40px; height: 40px;">
-        </div>
-        <div class="card-footer" style="padding: 8px;">
-            <div class="row mt-3">
+        </div>-->
+        <div class="card-footer" style="padding: 10px;">
+            <div class="row">
                 <div class="col-sm-3 border-right">
                     <div class="description-block">
                         <a href="${url_comanda}" target="_blank" data-imprimir_comanda="${order.id}">
                             <h6 class="description-header" style="font-size: 0.5rem; font-weight: bold; color: black">COMANDA</h6>
                         </a>
-                        <br>
+                    </div>
+                </div>
+                <div class="col-sm-3 border-right">
+                    <div class="description-block">
+                       
                         <a href="${url_boleta}" target="_blank" data-imprimir_boleta="${order.id}">
                             <h6 class="description-header" style="font-size: 0.5rem; font-weight: bold; color: black">BOLETA</h6>
                         </a>
@@ -490,13 +577,7 @@ function getOrderCardProcessing(order) {
                         </a>
                     </div>
                 </div>
-                <div class="col-sm-3 border-right">
-                    <div class="description-block">
-                        <a href="#" data-tiempo="${order.id}">
-                            <h6 class="description-header" style="font-size: 0.5rem; font-weight: bold; color: black">TIEMPO</h6>
-                        </a>
-                    </div>
-                </div>
+                
                 <div class="col-sm-3">
                     <div class="description-block">
                         <a href="#" data-anular data-id="${order.id}">
@@ -504,6 +585,10 @@ function getOrderCardProcessing(order) {
                         </a>
                     </div>
                 </div>
+            </div>
+            <div class="row ml-1 mt-2">
+                <p style="font-size: 0.7rem; font-weight: bold; margin-bottom: 0px">🗓️ ${formattedDate}</p>
+                <p style="font-size: 0.7rem; font-weight: bold; margin-left: 8px; margin-bottom: 0px">⏱️ ${formattedTime}</p>
             </div>
         </div>
     </div>`;
@@ -526,17 +611,21 @@ function getOrderCardShipped(order) {
                 ${order.order_user} <br> ${order.order_phone}
             </h5>
         </div>
-        <div class="widget-user-image" style="width: 40px; height: 40px; margin-top: -15px;">
+       <!-- <div class="widget-user-image" style="width: 40px; height: 40px; margin-top: -15px;">
             <img class="img-circle elevation-2" src="/images/users/1.jpg" alt="User Avatar" style="width: 40px; height: 40px;">
-        </div>
+        </div>-->
         <div class="card-footer" style="padding: 8px;">
-            <div class="row mt-3">
+            <div class="row">
                 <div class="col-sm-3 border-right">
                     <div class="description-block">
                         <a href="${url_comanda}" target="_blank" data-imprimir_comanda="${order.id}">
                             <h6 class="description-header" style="font-size: 0.5rem; font-weight: bold; color: black">COMANDA</h6>
                         </a> 
-                        <br>
+                    </div>
+                </div>
+                <div class="col-sm-3 border-right">
+                    <div class="description-block">
+                        
                         <a href="${url_boleta}" target="_blank" data-imprimir_boleta="${order.id}">
                             <h6 class="description-header" style="font-size: 0.5rem; font-weight: bold; color: black">BOLETA</h6>
                         </a>
@@ -556,13 +645,12 @@ function getOrderCardShipped(order) {
                         </a>
                     </div>
                 </div>
-                <div class="col-sm-3">
-                    <div class="description-block">
-                        <a href="#" data-entregar data-id="${order.id}">
-                            <h6 class="description-header" style="font-size: 0.5rem; font-weight: bold; color: black">ENTREGAR</h6>
-                        </a>
-                    </div>
-                </div>
+               
+            </div>
+            <div class="row">
+                <a href="#" data-entregar class="btn btn-success btn-block" data-id="${order.id}">
+                    <h6 class="description-header mb-0" style="font-size: 0.8rem; font-weight: bold; color: black">ENTREGAR</h6>
+                </a>
             </div>
         </div>
     </div>`;
@@ -582,4 +670,15 @@ function verRutaMap() {
     } else {
         alert("No se encontraron coordenadas.");
     }
+}
+
+function limpiarItemId(itemId) {
+    // Verificar si tiene formato kanban_XX o kanban_XX_YY
+    if (itemId.startsWith("kanban_")) {
+        let partes = itemId.split("_"); // Separar por "_"
+        if (partes.length >= 2) {
+            return partes[1]; // Devolver solo el primer número después de "kanban_"
+        }
+    }
+    return itemId; // Devolver el mismo ID si no tiene el formato esperado
 }

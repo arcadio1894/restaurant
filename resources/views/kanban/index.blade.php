@@ -42,6 +42,7 @@
 
         #kanban {
             white-space: nowrap; /* Evita que las columnas se vayan a otra fila */
+            height: 1000px !important;
         }
 
         .jqx-kanban-column {
@@ -55,7 +56,7 @@
         }
 
         .widget-user-header {
-            height: 75px !important;
+            height: 65px !important;
         }
 
         .widget-user-image {
@@ -110,6 +111,8 @@
     <script src="{{ asset('admin/plugins/jqxwidgets/js/jqxbuttons.js') }}"></script>
     <script src="{{ asset('admin/plugins/jqxwidgets/js/jqxsortable.js') }}"></script>
     <script src="{{ asset('admin/plugins/jqxwidgets/js/jqxkanban.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.min.js"></script>
+
 @endsection
 
 @section('scripts')

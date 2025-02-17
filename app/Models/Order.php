@@ -171,4 +171,17 @@ class Order extends Model
         return number_format($this->total_amount + $this->amount_shipping, 2, '.', '');
 
     }
+
+    public function getDateEstimatedFormatAttribute()
+    {
+        if (!$this->date_processing || !$this->estimated_time) {
+            return null;
+        }
+
+        $deliveryDate = Carbon::parse($this->date_processing)->addMinutes($this->estimated_time);
+
+        return $deliveryDate->format('d/m/Y \a \l\a\s g:i a');
+
+    }
+
 }

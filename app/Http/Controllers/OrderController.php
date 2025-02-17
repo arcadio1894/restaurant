@@ -384,6 +384,22 @@ class OrderController extends Controller
         $order->status = $request->status; // Cambiar estado a "processing"
         $order->save();
 
+        $order2 = Order::find($request->id);
+
+        // Obtener el correo electrónico según la lógica.
+        $email = $this->getEmailForOrder($order2);
+
+        if ($email) {
+            // Enviar correo al cliente con el estado de la orden.
+            Mail::to($email)->send(new OrderStatusEmail($order2));
+            Log::info('Correo enviado a: ' . $email . ' con el estado de la orden: ' . $order2->status);
+        } else {
+            Log::warning('No se encontró un correo electrónico para enviar el estado de la orden.');
+        }
+
+        Log::info('Emitiendo evento para la orden:', $order2->toArray());
+        broadcast(new OrderStatusUpdated($order2));
+
         return response()->json([
             'message' => 'Tiempo estimado actualizado correctamente',
             'order' => $order
@@ -400,6 +416,22 @@ class OrderController extends Controller
         $order = Order::findOrFail($request->id);
         $order->status = $request->status;
         $order->save();
+
+        $order2 = Order::find($request->id);
+
+        // Obtener el correo electrónico según la lógica.
+        $email = $this->getEmailForOrder($order2);
+
+        if ($email) {
+            // Enviar correo al cliente con el estado de la orden.
+            Mail::to($email)->send(new OrderStatusEmail($order2));
+            Log::info('Correo enviado a: ' . $email . ' con el estado de la orden: ' . $order2->status);
+        } else {
+            Log::warning('No se encontró un correo electrónico para enviar el estado de la orden.');
+        }
+
+        Log::info('Emitiendo evento para la orden:', $order2->toArray());
+        broadcast(new OrderStatusUpdated($order2));
 
         return response()->json([
             'message' => 'Estado actualizado correctamente',
@@ -419,6 +451,22 @@ class OrderController extends Controller
         $order->status = $request->status;
         $order->distributor_id = $request->distributor_id;
         $order->save();
+
+        $order2 = Order::find($request->id);
+
+        // Obtener el correo electrónico según la lógica.
+        $email = $this->getEmailForOrder($order2);
+
+        if ($email) {
+            // Enviar correo al cliente con el estado de la orden.
+            Mail::to($email)->send(new OrderStatusEmail($order2));
+            Log::info('Correo enviado a: ' . $email . ' con el estado de la orden: ' . $order2->status);
+        } else {
+            Log::warning('No se encontró un correo electrónico para enviar el estado de la orden.');
+        }
+
+        Log::info('Emitiendo evento para la orden:', $order2->toArray());
+        broadcast(new OrderStatusUpdated($order2));
 
         // 🚀 Retornar la orden actualizada para su renderización
         return response()->json($order);

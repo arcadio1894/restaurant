@@ -100,7 +100,7 @@
                         <h6 class="text-center">PEDIDO ID: #{{ $order->id }}</h6>
                         <article class="card">
                             <div class="card-body row">
-                                <div class="col"> <strong>Tu pedido llegará aproximadamente:</strong> <br> {{ $order->formatted_date }} </div>
+                                <div class="col"> <strong>Tu pedido llegará aproximadamente:</strong> <br> {{ $order->date_estimated_format ?? 'Fecha no disponible' }}</div>
                                 <div class="col"> <strong>Monto a pagar:</strong> <br> S/. {{ $order->amount_pay }} </div>
                             </div>
                         </article>
