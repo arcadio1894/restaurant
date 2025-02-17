@@ -489,7 +489,7 @@ class OrderController extends Controller
 
     public function generarOrder()
     {
-        $orden = Order::find(70);
+        $orden = Order::find(3);
 
         broadcast(new OrderCreated($orden));
     }

@@ -78,7 +78,7 @@ window.Echo.channel('ordersCreated')
                 });*/
 
                 // 🔊 Intentar reproducir sonido usando Web Audio API
-                playNotificationSound();
+                //playNotificationSound();
 
                 console.log("✅ Orden agregada correctamente.");
             } catch (error) {
