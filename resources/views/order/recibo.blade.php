@@ -19,6 +19,21 @@
             width: 100%;
             display: block;
         }
+
+        .line2 {
+            display: block;
+            text-align: center;
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        .line2::after {
+            content: "***********************";
+            letter-spacing: 2px;
+            font-weight: bold;
+            font-family: monospace;
+        }
+
         .bold {
             font-weight: bold;
         }
@@ -93,6 +108,12 @@
         <p>¡Gracias por su compra!</p>
         <p>www.fuegoymasa.com</p>
     </div>
+    <div class="line2"></div>
+    <div class="text-center" >
+        <p>¿Ya conoces nuestra web?</p>
+        <p>En <strong>www.fuegoymasa.com</strong> puedes explorar nuestro menú, descubrir <strong>promociones especiales</strong> y hacer tu pedido de manera fácil y rápida.</p>
+    </div>
+    <div class="line2"></div>
 {{--style="border-style: solid" esto va en comanda para observaciones--}}
 </body>
 </html>
