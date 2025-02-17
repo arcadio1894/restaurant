@@ -21,7 +21,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/orders', function () {
-    return response()->json(Order::with('user', 'payment_method')->orderBy('created_at', 'desc')->get());
+    $orders = Order::with('user', 'payment_method')
+        ->whereDate('created_at', \Carbon\Carbon::today())
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    return response()->json($orders);
 });
 
 Route::get('/order/{id}', [OrderController::class, 'show']);
