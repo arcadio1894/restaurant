@@ -16,3 +16,4 @@ const mix = require('laravel-mix');
     .sourceMaps();*/
 mix.js('resources/js/orderPusher.js', 'public/js');
 mix.js('resources/js/orderCreated.js', 'public/js').version();
+mix.js('resources/js/dashboardPusher.js', 'public/js').version();

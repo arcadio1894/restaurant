@@ -48,6 +48,36 @@
     </div>
 
     <div class="row">
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-warning">
+                <div class="inner">
+                    <h3 id="activeUsersCount">0</h3> <!-- Se actualizará dinámicamente -->
+
+                    <p>Usuarios Activos</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-user-clock"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-primary">
+                <div class="inner">
+                    <h3 id="registerUsersCount">0</h3> <!-- Se actualizará dinámicamente -->
+
+                    <p>Usuarios Registrados</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
         <div class="col-md-6">
             <!-- TIPO USUARIO CHART -->
             <div class="card card-success">
@@ -246,4 +276,6 @@
     </script>
     <script src="{{ asset('js/dashboard/dashboard.js')}}"></script>
     <script src="{{ asset('js/dashboard/ordersChart.js')}}"></script>
+
+    <script src="{{ asset('js/dashboardPusher.js')}}"></script>
 @endsection

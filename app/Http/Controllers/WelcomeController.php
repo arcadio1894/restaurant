@@ -12,6 +12,7 @@ use App\Models\Province;
 use App\Models\Slider;
 use App\Models\Submotivo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class WelcomeController extends Controller
 {
@@ -85,5 +86,27 @@ class WelcomeController extends Controller
         $status = DataGeneral::getValue('status_store');
         //dd($status);
         return view('welcome.dashboard', compact('status'));
+    }
+
+    public function getRegisteredUsers()
+    {
+        // Obtener los teléfonos desde la base de datos
+        $phones = DB::table('addresses')->pluck('phone')->toArray();
+
+        $uniquePhones = [];
+
+        foreach ($phones as $phone) {
+            // Eliminar espacios en blanco
+            $phone = str_replace(' ', '', $phone); // ✅ Elimina TODOS los espacios
+
+            // Si el número comienza con "+XX", eliminarlo (donde XX son dos dígitos)
+            $phone = preg_replace('/^\+\d{2}/', '', $phone);
+
+            // Guardar solo teléfonos únicos
+            $uniquePhones[$phone] = true;
+        }
+
+        // Devolver la cantidad de usuarios únicos
+        return response()->json(['registeredUsers' => count($uniquePhones)]);
     }
 }

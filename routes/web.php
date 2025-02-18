@@ -18,6 +18,7 @@ use \App\Http\Controllers\CashRegisterController;
 use \App\Http\Controllers\FacturaController;
 use App\Http\Controllers\OrdersChartController;
 use \App\Http\Controllers\ReclamacionController;
+use Illuminate\Support\Facades\Cache;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -101,7 +102,17 @@ Route::get('/api/business-hours', [BusinessController::class, 'getBusinessHours'
 
 Route::post('/save/custom/product', [CartController::class, 'saveCustomProduct']);
 
+Route::get('/api/usuarios-activos', function () {
+    $activeUsers = Cache::get("active_users", []);
+    return response()->json(['activeUsers' => count($activeUsers)]);
+});
+
+Route::get('/api/usuarios-registrados', [WelcomeController::class, 'getRegisteredUsers']);
+
 Route::middleware('auth')->group(function (){
+    Route::post('/broadcasting/auth', function () {
+        return \Illuminate\Support\Facades\Broadcast::auth(request());
+    });
     Route::prefix('dashboard')->group(function (){
         Route::get('/principal', [WelcomeController::class, 'goToDashboard'])->name('dashboard.principal');
 
@@ -245,8 +256,11 @@ Route::middleware('auth')->group(function (){
         Route::get('/kanban/ordenes', [OrderController::class, 'indexKanban'])->name('orders.kanban');
         Route::get('/generar/orden', [OrderController::class, 'generarOrder'])->name('generarOrder');
 
+
     });
 });
+
+
 
 Route::get('/telegram/send', [TelegramController::class, 'sendMessage']);
 

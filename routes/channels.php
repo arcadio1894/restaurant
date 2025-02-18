@@ -20,3 +20,7 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 Broadcast::channel('orders', function ($user) {
     return true; // Permitir acceso al canal para todos los usuarios
 });
+
+Broadcast::channel('active-users', function ($user) {
+    return true; // Permitir acceso a todos los usuarios
+});
