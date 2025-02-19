@@ -109,4 +109,58 @@ class WelcomeController extends Controller
         // Devolver la cantidad de usuarios únicos
         return response()->json(['registeredUsers' => count($uniquePhones)]);
     }
+
+    public function getTopClients()
+    {
+        // Obtener los teléfonos y nombres desde la tabla addresses
+        $addresses = DB::table('addresses')->select('phone', 'first_name', 'last_name')->get();
+
+        $clientsData = [];
+
+        foreach ($addresses as $address) {
+            // Eliminar espacios internos
+            $phone = str_replace(' ', '', $address->phone);
+
+            // Si el número comienza con "+XX", eliminar el código de país
+            $phone = preg_replace('/^\+\d{2}/', '', $phone);
+
+            // Crear clave única para cada cliente
+            $key = $phone;
+
+            // Si ya existe en el array, aumentar el contador de pedidos
+            if (isset($clientsData[$key])) {
+                $clientsData[$key]['orders'] += 1;
+            } else {
+                // Si es la primera vez que se encuentra este número, inicializar
+                $clientsData[$key] = [
+                    'phone' => $phone,
+                    'first_name' => $address->first_name,
+                    'last_name' => $address->last_name,
+                    'orders' => 1
+                ];
+            }
+        }
+
+        // Convertir el array a colección y ordenar por pedidos descendente
+        $clients = collect($clientsData)->sortByDesc('orders')->values();
+
+        // Si no hay datos, retornar estructura vacía
+        if ($clients->isEmpty()) {
+            return response()->json(['clients' => []]);
+        }
+
+        // Obtener el máximo de pedidos para calcular porcentajes
+        $maxOrders = $clients->first()['orders'];
+
+        // Calcular el porcentaje de cada cliente basado en el mayor número de pedidos
+        $clients = $clients->map(function ($client) use ($maxOrders) {
+            $client['percentage'] = round(($client['orders'] / $maxOrders) * 100, 1);
+            return $client;
+        });
+
+        return response()->json([
+            'clients' => $clients,
+            'maxOrders' => $maxOrders
+        ]);
+    }
 }

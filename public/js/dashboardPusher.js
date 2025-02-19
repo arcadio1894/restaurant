@@ -6441,6 +6441,49 @@ window.Echo.connector.pusher.connection.bind('connected', function () {
   console.log('Conexión establecida con Pusher.');
 });
 
+// ✅ Obtener el TOP 10 clientes con más pedidos
+fetch('/api/top-clientes').then(function (response) {
+  return response.json();
+}).then(function (data) {
+  console.log("Clientes con más pedidos:", data.clients);
+  if (data.clients.length === 0) {
+    document.getElementById("topClientsContainer").innerHTML = "<p>No hay datos disponibles.</p>";
+    return;
+  }
+  var topClients = data.clients.slice(0, 10); // ✅ Top 10 clientes
+  var otherClients = data.clients.slice(10); // ✅ Clientes restantes
+  var container = document.getElementById("topClientsContainer");
+  var html = "";
+
+  // ✅ Construir el HTML para el Top 10
+  topClients.forEach(function (client) {
+    html += "\n                <div class=\"progress-group\">\n                    ".concat(client.first_name, " ").concat(client.last_name, " (").concat(client.phone, ")\n                    <span class=\"float-right\"><b>").concat(client.orders, "</b> pedidos</span>\n                    <div class=\"progress progress-sm\">\n                        <div class=\"progress-bar bg-primary\" style=\"width: ").concat(client.percentage, "%;\"></div>\n                    </div>\n                </div>\n            ");
+  });
+
+  // ✅ Botón para mostrar más clientes
+  if (otherClients.length > 0) {
+    html += "<div id=\"moreClients\" style=\"display: none;\">";
+    otherClients.forEach(function (client) {
+      html += "\n                    <div class=\"progress-group\">\n                        ".concat(client.first_name, " ").concat(client.last_name, " (").concat(client.phone, ")\n                        <span class=\"float-right\"><b>").concat(client.orders, "</b> pedidos</span>\n                        <div class=\"progress progress-sm\">\n                            <div class=\"progress-bar bg-secondary\" style=\"width: ").concat(client.percentage, "%;\"></div>\n                        </div>\n                    </div>\n                ");
+    });
+    html += "</div>";
+    html += "<a href=\"#\" id=\"showMoreClients\">Ver m\xE1s</a>";
+  }
+  container.innerHTML = html;
+
+  // ✅ Evento para mostrar más clientes
+  var showMoreLink = document.getElementById("showMoreClients");
+  if (showMoreLink) {
+    showMoreLink.addEventListener("click", function (e) {
+      e.preventDefault();
+      document.getElementById("moreClients").style.display = "block";
+      showMoreLink.style.display = "none";
+    });
+  }
+})["catch"](function (error) {
+  return console.error("Error obteniendo clientes:", error);
+});
+
 // ✅ 1️⃣ Obtener cantidad inicial de usuarios activos al cargar la página
 fetch('/api/usuarios-activos').then(function (response) {
   return response.json();

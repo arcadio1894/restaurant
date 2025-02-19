@@ -108,6 +108,7 @@ Route::get('/api/usuarios-activos', function () {
 });
 
 Route::get('/api/usuarios-registrados', [WelcomeController::class, 'getRegisteredUsers']);
+Route::get('/api/top-clientes', [WelcomeController::class, 'getTopClients']);
 
 Route::middleware('auth')->group(function (){
     Route::post('/broadcasting/auth', function () {
