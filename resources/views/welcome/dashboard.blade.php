@@ -174,13 +174,23 @@
 
     <div class="row">
         <div class="col-md-6">
-            <p class="text-center">
-                <strong>Clientes con Más Pedidos</strong>
-            </p>
+            <div class="card card-success">
+                <div class="card-header">
+                    <h3 class="card-title"><strong>Clientes con Más Pedidos</strong></h3>
 
-            <div id="topClientsContainer">
-                <p>Cargando...</p>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                    </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body p-2">
+                    <div class="col-md-12" id="topClientsContainer">
+                        <p>Cargando...</p>
+                    </div>
+                </div>
+                <!-- /.card-body -->
             </div>
+
         </div>
     </div>
 
