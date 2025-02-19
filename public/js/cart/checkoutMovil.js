@@ -300,6 +300,7 @@ $(document).ready(function() {
                     $('#business-message').text(response.message);
                     $('#business-status').fadeIn();
                     $('#btn-submit').attr("disabled", true); // Deshabilitar el botón
+                    $('#btn-cancel').attr("disabled", false);
                     $('#btn-continue').text("Continuar").attr("disabled", false); // Restaurar el botón
                     return; // Detener el flujo del código
                 } else {

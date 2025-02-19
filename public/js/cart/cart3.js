@@ -114,9 +114,14 @@ $(document).ready(function() {
                 `,
                         buttons: {
                             close: {
-                                text: 'Cerrar',
+                                text: 'Ir igualmente',
                                 action: function () {
                                     // Acción al cerrar el pop-up
+                                    if (href) {
+                                        window.location.href = href;
+                                    } else {
+                                        console.error("El atributo data-href no está definido en el botón.");
+                                    }
                                 }
                             }
                         }
