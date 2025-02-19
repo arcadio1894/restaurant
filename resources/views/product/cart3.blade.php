@@ -420,6 +420,6 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('js/cart/cart3.js') }}"></script>
-    <script src="{{ asset('js/cart/cartNew.js') }}"></script>
+    <script src="{{ asset('js/cart/cart3.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/cart/cartNew.js') }}?v={{ time() }}"></script>
 @endsection
