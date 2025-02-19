@@ -76,15 +76,6 @@
             </div>
         </div>
 
-        <div class="col-md-4">
-            <p class="text-center">
-                <strong>Clientes con Más Pedidos</strong>
-            </p>
-
-            <div id="topClientsContainer">
-                <p>Cargando...</p>
-            </div>
-        </div>
     </div>
 
     <div class="row">
@@ -181,6 +172,17 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-md-6">
+            <p class="text-center">
+                <strong>Clientes con Más Pedidos</strong>
+            </p>
+
+            <div id="topClientsContainer">
+                <p>Cargando...</p>
+            </div>
+        </div>
+    </div>
 
 @endsection
 
