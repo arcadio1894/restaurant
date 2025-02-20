@@ -83,7 +83,10 @@
             <!-- TIPO USUARIO CHART -->
             <div class="card card-success">
                 <div class="card-header">
-                    <h3 class="card-title">Tipo Usuario</h3>
+                    <h3 class="card-title">
+                        <i class="fas fa-users mr-1"></i>
+                        Tipo Usuario
+                    </h3>
 
                     <div class="card-tools">
                         <button type="button" class="btn btn-primary btn-sm filter-btn" data-filter="daily">Diario</button>
@@ -132,9 +135,63 @@
             </div>
         </div>
         <div class="col-md-6">
+
+            <div class="card bg-gradient-info">
+                <div class="card-header border-0">
+                    <h3 class="card-title">
+                        <i class="fas fa-th mr-1"></i>
+                        Grafico de ventas
+                    </h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-primary btn-sm filter-btn-sale" data-filter="daily">Diario</button>
+                        <button type="button" class="btn btn-secondary btn-sm filter-btn-sale" data-filter="weekly">Semanal</button>
+                        <button type="button" class="btn btn-warning btn-sm filter-btn-sale" data-filter="monthly">Mensual</button>
+                        <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#dateRangeModalSale">
+                            Por Fechas
+                        </button>
+                        <button type="button" class="btn bg-info btn-sm" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas class="chart" id="sale-chart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                </div>
+                <!-- /.card-body -->
+                <div class="card-footer bg-transparent">
+                    <div class="row">
+                        <div class="col-4 text-center">
+                            <input type="text" id="knobWhatsappSale" class="knob text-white" data-readonly="true" value="0" data-width="60" data-height="60" data-fgColor="#39CCCC">
+                            <div class="text-white">WhatsApp</div>
+                            <span id="quantityKnobWhatsappSale">0</span>
+                        </div>
+                        <div class="col-4 text-center">
+                            <input type="text" id="knobWebSale" class="knob text-white" data-readonly="true" value="0" data-width="60" data-height="60" data-fgColor="#39CCCC">
+                            <div class="text-white">Web</div>
+                            <span id="quantityKnobWebSale">0</span>
+                        </div>
+                        <div class="col-4 text-center">
+                            <input type="text" id="knobTotalSale" class="knob text-white" data-readonly="true" value="0" data-width="60" data-height="60" data-fgColor="#39CCCC">
+                            <div class="text-white">Total</div>
+                            <span id="quantityKnobTotalSale">0</span>
+                        </div>
+                    </div>
+                </div>
+            <!-- /.card-footer -->
+            </div>
+            <!-- /.card -->
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
             <div class="card card-success">
                 <div class="card-header">
-                    <h3 class="card-title">Promociones usadas</h3>
+                    <h3 class="card-title">
+                        <i class="fas fa-percent mr-1"></i>
+                        Promociones usadas
+                    </h3>
 
                     <div class="card-tools">
                         <button type="button" class="btn btn-primary btn-sm filter-btn-promo" data-filter="daily">Diario</button>
@@ -170,13 +227,13 @@
             </div>
             <!-- /.card -->
         </div>
-    </div>
-
-    <div class="row">
         <div class="col-md-6">
             <div class="card card-success">
                 <div class="card-header">
-                    <h3 class="card-title"><strong>Clientes con Más Pedidos</strong></h3>
+                    <h3 class="card-title">
+                        <i class="fas fa-shopping-cart mr-1"></i>
+                        Clientes con Más Pedidos
+                    </h3>
 
                     <div class="card-tools">
                         <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
@@ -192,6 +249,8 @@
             </div>
 
         </div>
+
+
     </div>
 
 @endsection
@@ -272,6 +331,35 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="dateRangeModalSale" role="dialog" aria-labelledby="dateRangeModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="dateRangeModalLabel">Seleccionar Rango de Fechas</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="dateRangeForm">
+                        <div class="form-group">
+                            <label for="start_date">Fecha Inicio</label>
+                            <input type="date" class="form-control" id="start_date_sale">
+                        </div>
+                        <div class="form-group">
+                            <label for="end_date">Fecha Fin</label>
+                            <input type="date" class="form-control" id="end_date_sale">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary filter-btn-sale" data-filter="date_range" data-dismiss="modal">Aplicar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @section('scripts')
@@ -296,8 +384,8 @@
 
         })
     </script>
-    <script src="{{ asset('js/dashboard/dashboard.js')}}"></script>
-    <script src="{{ asset('js/dashboard/ordersChart.js')}}"></script>
+    <script src="{{ asset('js/dashboard/dashboard.js')}}?v={{ time() }}"></script>
+    <script src="{{ asset('js/dashboard/ordersChart.js')}}?v={{ time() }}"></script>
 
     <script src="{{ asset('js/dashboardPusher.js')}}"></script>
 @endsection

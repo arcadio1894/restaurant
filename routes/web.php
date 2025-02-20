@@ -244,6 +244,7 @@ Route::middleware('auth')->group(function (){
         // Rutas de graficos
         Route::get('/orders/chart-data', [OrdersChartController::class, 'getChartData']);
         Route::get('/promos/chart-data', [OrdersChartController::class, 'getChartDataPromo']);
+        Route::get('/orders/chart-data-sale', [OrdersChartController::class, 'getChartDataSale']);
 
         // Rutas de reclamos
         Route::get('/reclamos/activos', [ReclamacionController::class, 'index'])->name('reclamos.index');

@@ -151,4 +151,123 @@ class OrdersChartController extends Controller
                 ->count()
         ];
     }
+
+    public function getChartDataSale(Request $request)
+    {
+        $filter = $request->input('filter', 'daily');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        // Obtener IDs de administradores (WhatsApp)
+        $adminIds = User::where('is_admin', 1)->pluck('id');
+
+        $data = [
+            'labels' => [],
+            'sales' => [] // Array de ventas por fecha
+        ];
+
+        // Variables para el total de ventas generales
+        $whatsappSalesTotal = 0;
+        $webSalesTotal = 0;
+
+        if ($filter === 'daily') {
+            $startDate = Carbon::today();
+            $endDate = Carbon::today();
+            $salesData = $this->getSalesData($startDate, $endDate, $adminIds);
+
+            $data['labels'][] = $startDate->format('d-m-Y');
+            $data['sales'][] = $salesData['sales_total'];
+
+            $whatsappSalesTotal = $salesData['whatsapp_sales'];
+            $webSalesTotal = $salesData['web_sales'];
+
+        } elseif ($filter === 'weekly') {
+            for ($i = 6; $i >= 0; $i--) {
+                $date = Carbon::today()->subDays($i);
+                $data['labels'][] = $date->format('d-m-Y');
+
+                $salesData = $this->getSalesData($date, $date, $adminIds);
+                $data['sales'][] = $salesData['sales_total'];
+
+                $whatsappSalesTotal += $salesData['whatsapp_sales'];
+                $webSalesTotal += $salesData['web_sales'];
+            }
+
+        } elseif ($filter === 'monthly') {
+            for ($i = 6; $i >= 0; $i--) {
+                $date = Carbon::today()->subMonths($i)->startOfMonth();
+                $endMonth = $date->copy()->endOfMonth();
+
+                $data['labels'][] = $date->format('m-Y');
+
+                $salesData = $this->getSalesData($date, $endMonth, $adminIds);
+                $data['sales'][] = $salesData['sales_total'];
+
+                $whatsappSalesTotal += $salesData['whatsapp_sales'];
+                $webSalesTotal += $salesData['web_sales'];
+            }
+
+        } elseif ($filter === 'date_range' && $startDate && $endDate) {
+            $startDate = Carbon::parse($startDate);
+            $endDate = Carbon::parse($endDate);
+
+            while ($startDate <= $endDate) {
+                $data['labels'][] = $startDate->format('d-m-Y');
+
+                $salesData = $this->getSalesData($startDate, $startDate, $adminIds);
+                $data['sales'][] = $salesData['sales_total'];
+
+                $whatsappSalesTotal += $salesData['whatsapp_sales'];
+                $webSalesTotal += $salesData['web_sales'];
+
+                $startDate->addDay();
+            }
+        } else {
+            return response()->json(['error' => 'Invalid filter'], 400);
+        }
+
+        // Calcular totales y porcentajes
+        $totalSales = $whatsappSalesTotal + $webSalesTotal;
+        $whatsappPercentage = $totalSales > 0 ? round(($whatsappSalesTotal / $totalSales) * 100, 2) : 0;
+        $webPercentage = $totalSales > 0 ? round(($webSalesTotal / $totalSales) * 100, 2) : 0;
+
+        // Agregar datos de totales SIN afectar el formato del gráfico
+        $data['total_whatsapp'] = $whatsappSalesTotal;
+        $data['total_web'] = $webSalesTotal;
+        $data['total'] = $totalSales;
+        $data['whatsapp_percentage'] = $whatsappPercentage;
+        $data['web_percentage'] = $webPercentage;
+        $data['total_percentage'] = 100;
+
+        return response()->json($data);
+    }
+
+    private function getSalesData($startDate, $endDate, $adminIds)
+    {
+        // Obtener todas las órdenes del rango de fechas
+        $whatsappOrders = Order::whereIn('user_id', $adminIds)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->where('state_annulled', 0)
+            ->get(); // Obtener los modelos para acceder al accesor
+
+        $webOrders = Order::whereNotIn('user_id', $adminIds)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->where('state_annulled', 0)
+            ->get();
+
+        // Usar collect()->sum() con función anónima tradicional
+        $whatsappSales = $whatsappOrders->sum(function ($order) {
+            return $order->amount_pay;
+        });
+
+        $webSales = $webOrders->sum(function ($order) {
+            return $order->amount_pay;
+        });
+
+        return [
+            'sales_total' => $whatsappSales + $webSales, // Total para el gráfico por fecha
+            'whatsapp_sales' => $whatsappSales,
+            'web_sales' => $webSales
+        ];
+    }
 }

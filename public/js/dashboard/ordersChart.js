@@ -246,6 +246,149 @@ $(document).ready(function () {
             return "bg-danger";
         }
     }
+
+    // Graficos de ventas
+    let saleChart;
+    let selectedFilterSale = 'daily';
+
+    function fetchChartDataSale(filter, startDate = null, endDate = null) {
+        // Actualizar el título según el filtro seleccionado
+        updateChartTitleSale(filter, startDate, endDate);
+
+        $.ajax({
+            url: '/dashboard/orders/chart-data-sale',
+            type: 'GET',
+            data: { filter, start_date: startDate, end_date: endDate },
+            success: function (response) {
+                updateChartSale(response);
+                updateKnobsSale(response)
+            },
+            error: function () {
+                alert('Error al obtener los datos del gráfico.');
+            }
+        });
+    }
+
+    function updateChartTitleSale(filter, startDate, endDate) {
+        let title = "Total de ventas de hoy"; // Default for 'daily'
+
+        if (filter === 'weekly') {
+            title = "Total de ventas de la última semana";
+        } else if (filter === 'monthly') {
+            title = "Total de ventas de los últimos 7 meses";
+        } else if (filter === 'date_range') {
+            let start = startDate ? new Date(startDate).toLocaleDateString() : '';
+            let end = endDate ? new Date(endDate).toLocaleDateString() : '';
+            title = `Total de ventas desde ${start} hasta ${end}`;
+        }
+
+        // Almacenar el título dinámico en una variable global para usarlo en Chart.js
+        window.chartTitleSale = title;
+    }
+
+    function updateChartSale(data) {
+        let ctx = $("#sale-chart").get(0).getContext("2d");
+
+        // Destruir el gráfico anterior si existe
+        if (saleChart) {
+            saleChart.destroy();
+        }
+
+        saleChart = new Chart(ctx, {
+            type: 'line',  // Gráfico de línea para visualizar tendencia
+            data: {
+                labels: data.labels,
+                datasets: [
+                    {
+                        label: "Total de ventas (S/.)", // Etiqueta del dataset
+                        fill: false,
+                        borderColor: "#ffffff", // Color amarillo para resaltar
+                        borderWidth: 2,
+                        data: data.sales,
+                        lineTension: 0.1 // Pequeña curvatura en la línea
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                title: {
+                    display: true,
+                    text: window.chartTitleSale, // Usar el título dinámico
+                    fontSize: 14,
+                    fontStyle: 'bold',
+                    padding: 3,
+                    align: 'center',
+                    fontColor: "#ffffff", // Título en blanco
+                },
+                scales: {
+                    xAxes: [{
+                        ticks: {
+                            fontColor: "#ffffff", // Números del eje X en blanco
+                            autoSkip: false,
+                            padding: 10
+                        },
+                        gridLines: {
+                            color: "#ffffff", // Líneas del grid en blanco
+                            zeroLineColor: "#ffffff"
+                        },
+                        offset: true
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            fontColor: "#ffffff", // Números del eje Y en blanco
+                            beginAtZero: true,
+                            callback: function(value) {
+                                return "S/ " + value.toLocaleString(); // Formato en soles
+                            }
+                        },
+                        gridLines: {
+                            color: "#ffffff", // Líneas del grid en blanco
+                            zeroLineColor: "#ffffff"
+                        }
+                    }]
+                },
+                legend: {
+                    labels: {
+                        fontColor: "#ffffff" // Color blanco para la leyenda
+                    }
+                }
+            }
+        });
+    }
+
+    // Cargar datos iniciales (Diario por defecto)
+    fetchChartDataSale(selectedFilterSale);
+
+    // Manejo de botones de filtro
+    $(".filter-btn-sale").click(function () {
+        selectedFilter = $(this).data("filter");
+
+        if (selectedFilter === "date_range") {
+            let startDate = $("#start_date_sale").val();
+            let endDate = $("#end_date_sale").val();
+
+            if (!startDate || !endDate) {
+                alert("Por favor, seleccione ambas fechas.");
+                return;
+            }
+
+            fetchChartDataSale(selectedFilter, startDate, endDate);
+        } else {
+            fetchChartDataSale(selectedFilter);
+        }
+    });
+
+    function updateKnobsSale(data) {
+        $('#knobWhatsappSale').val(data.whatsapp_percentage).trigger('change');
+        $('#knobWebSale').val(data.web_percentage).trigger('change');
+        $('#knobTotalSale').val(data.total_percentage).trigger('change');
+
+        $('#quantityKnobWhatsappSale').text('S/. '+data.total_whatsapp);
+        $('#quantityKnobWebSale').text('S/. '+data.total_web);
+        $('#quantityKnobTotalSale').text('S/. '+data.total);
+    }
+
 });
 
 function activateTemplate(id) {
