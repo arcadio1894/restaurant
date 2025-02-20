@@ -265,7 +265,7 @@ class OrdersChartController extends Controller
         });
 
         return [
-            'sales_total' => $whatsappSales + $webSales, // Total para el gráfico por fecha
+            'sales_total' => round($whatsappSales + $webSales, 2), // Total para el gráfico por fecha
             'whatsapp_sales' => $whatsappSales,
             'web_sales' => $webSales
         ];
