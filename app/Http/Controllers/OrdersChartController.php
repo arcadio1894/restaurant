@@ -232,11 +232,11 @@ class OrdersChartController extends Controller
         $webPercentage = $totalSales > 0 ? round(($webSalesTotal / $totalSales) * 100, 2) : 0;
 
         // Agregar datos de totales SIN afectar el formato del gráfico
-        $data['total_whatsapp'] = round($whatsappSalesTotal, 2);
-        $data['total_web'] = round($webSalesTotal, 2);
-        $data['total'] = round($totalSales, 2);
-        $data['whatsapp_percentage'] = round($whatsappPercentage, 2);
-        $data['web_percentage'] = round($webPercentage, 2);
+        $data['total_whatsapp'] = number_format($whatsappSalesTotal, 2, '.', '');
+        $data['total_web'] = number_format($webSalesTotal, 2, '.', '');
+        $data['total'] = number_format($totalSales, 2, '.', '');
+        $data['whatsapp_percentage'] = number_format($whatsappPercentage, 2, '.', '');
+        $data['web_percentage'] = number_format($webPercentage, 2, '.', '');
         $data['total_percentage'] = 100;
 
         return response()->json($data);
