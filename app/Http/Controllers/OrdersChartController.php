@@ -246,12 +246,14 @@ class OrdersChartController extends Controller
     {
         // Obtener todas las órdenes del rango de fechas
         $whatsappOrders = Order::whereIn('user_id', $adminIds)
-            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereDate('created_at', '>=', $startDate)
+            ->whereDate('created_at', '<=', $endDate)
             ->where('state_annulled', 0)
             ->get(); // Obtener los modelos para acceder al accesor
 
         $webOrders = Order::whereNotIn('user_id', $adminIds)
-            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereDate('created_at', '>=', $startDate)
+            ->whereDate('created_at', '<=', $endDate)
             ->where('state_annulled', 0)
             ->get();
 
