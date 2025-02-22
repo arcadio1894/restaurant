@@ -365,7 +365,7 @@ $(document).ready(function () {
 
 function anularOrder() {
     var order_id = $(this).data('id');
-
+    let button = $(this);
     $.confirm({
         icon: 'fas fa-trash-alt',
         theme: 'modern',
@@ -378,6 +378,22 @@ function anularOrder() {
             confirm: {
                 text: 'CONFIRMAR',
                 action: function (e) {
+
+                    // 🚀 Mostrar loader en toda la pantalla
+                    $.blockUI({
+                        message: '<h3>⏳ Procesando solicitud...</h3>',
+                        css: {
+                            border: 'none',
+                            padding: '15px',
+                            backgroundColor: '#000',
+                            '-webkit-border-radius': '10px',
+                            '-moz-border-radius': '10px',
+                            opacity: 0.5,
+                            color: '#fff'
+                        }
+                    });
+
+
                     $.ajax({
                         url: '/dashboard/anular/order/'+order_id,
                         method: 'POST',
@@ -386,10 +402,12 @@ function anularOrder() {
                         contentType:false,
                         success: function (data) {
                             console.log(data);
+                            // 🛑 Quitar loader
+                            $.unblockUI();
                             $.alert(data.message);
                             setTimeout( function () {
-                                getDataOrders(1);
-                            }, 2000 )
+                                button.closest(".jqx-kanban-item").remove();
+                            }, 500 )
                         },
                         error: function (data) {
                             $.alert("Sucedió un error en el servidor. Intente nuevamente.");

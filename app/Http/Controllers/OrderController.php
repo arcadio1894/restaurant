@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Events\OrderCreated;
+use App\Events\OrderStatusAnulled;
 use App\Events\OrderStatusUpdated;
 use App\Mail\OrderStatusEmail;
+use App\Mail\OrderStatusEmailAnulled;
 use App\Models\Address;
 use App\Models\Order;
 use App\Models\ShippingDistrict;
@@ -263,7 +265,21 @@ class OrderController extends Controller
             $order->state_annulled = 1;
             $order->save();
 
+            // Obtener el correo electrónico según la lógica.
+            $email = $this->getEmailForOrder($order);
+
+            if ($email) {
+                // Enviar correo al cliente con el estado de la orden.
+                Mail::to($email)->send(new OrderStatusEmailAnulled($order));
+                Log::info('Correo enviado a: ' . $email . ' con el estado de la orden: Rechazado');
+            } else {
+                Log::warning('No se encontró un correo electrónico para enviar el estado de la orden.');
+            }
+
             Log::info('Emitiendo evento para la orden:', $order->toArray());
+            broadcast(new OrderStatusUpdated($order));
+
+            /*Log::info('Emitiendo evento para la orden:', $order->toArray());*/
 
             DB::commit();
 

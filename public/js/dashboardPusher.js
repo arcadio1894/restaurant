@@ -6445,7 +6445,7 @@ window.Echo.connector.pusher.connection.bind('connected', function () {
 fetch('/api/top-clientes').then(function (response) {
   return response.json();
 }).then(function (data) {
-  console.log("Clientes con más pedidos:", data.clients);
+  console.log("Clientes con más pedidos:", data);
   if (data.clients.length === 0) {
     document.getElementById("topClientsContainer").innerHTML = "<p>No hay datos disponibles.</p>";
     return;

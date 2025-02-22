@@ -23,6 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/orders', function () {
     $orders = Order::with('user', 'payment_method')
         ->whereDate('created_at', \Carbon\Carbon::today())
+        ->where('state_annulled', 0)
         ->orderBy('created_at', 'desc')
         ->get();
 

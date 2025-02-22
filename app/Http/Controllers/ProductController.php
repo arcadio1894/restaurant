@@ -6,6 +6,7 @@ use App\Http\Requests\DeleteProductRequest;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Category;
+use App\Models\DataGeneral;
 use App\Models\Option;
 use App\Models\Product;
 use App\Models\ProductDay;
@@ -733,8 +734,9 @@ class ProductController extends Controller
 
     public function customPizza()
     {
-        $product = Product::where('id', 1)->firstOrFail();
-
+        //$product = Product::where('id', 1)->firstOrFail();
+        $dataGeneral = DataGeneral::where('name', 'product_id_custom')->firstOrFail();
+        $product = Product::where('id', $dataGeneral->valueNumber)->firstOrFail();
         // Obtener los tipos relacionados al producto
         $productTypes = $product->productTypes()
             ->whereHas('type', function ($query) {
@@ -752,7 +754,26 @@ class ProductController extends Controller
 
         $toppingVeggies = Topping::where('type', 'veggie')->get();
 
-        return view('product.custom', compact('product', 'productTypes', 'defaultProductType', 'adicionales', 'toppingMeats', 'toppingVeggies'));
+        // Mapeo de los IDs de la base de datos a los nombres personalizados
+        $typeMap = [
+            1 => ['id' => 'familiar', 'label' => 'Familiar'],
+            2 => ['id' => 'large', 'label' => 'Grande'],
+            3 => ['id' => 'personal', 'label' => 'Personal']
+        ];
+
+        // Filtrar solo los tipos que existen en la base de datos y agregar información extra
+        $sizes = [];
+        foreach ($productTypes as $type) {
+            if (isset($typeMap[$type->type_id])) {
+                $sizes[] = [
+                    'id' => $typeMap[$type->type_id]['id'],
+                    'label' => $typeMap[$type->type_id]['label'],
+                    'checked' => $type->default ? 'checked' : ''
+                ];
+            }
+        }
+
+        return view('product.custom', compact('product', 'sizes', 'productTypes', 'defaultProductType', 'adicionales', 'toppingMeats', 'toppingVeggies'));
     }
 
     public function getProduct($id, $productTypeId)

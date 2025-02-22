@@ -31,7 +31,7 @@
                 </div>
                 <div id="size-options" class="dropdown-options">
                     <div class="option-controls">
-                        <div>
+                        {{--<div>
                             <input type="radio" id="personal" name="size" value="personal">
                             <label for="personal" style="border: 1px solid #ddd;">Personal</label>
                         </div>
@@ -42,7 +42,13 @@
                         <div>
                             <input type="radio" id="familiar" name="size" value="familiar" checked>
                             <label for="familiar" style="border: 1px solid #ddd;">Familiar</label>
-                        </div>
+                        </div>--}}
+                        @foreach ($sizes as $size)
+                            <div>
+                                <input type="radio" id="{{ $size['id'] }}" name="size" value="{{ $size['id'] }}" {{ $size['checked'] }}>
+                                <label for="{{ $size['id'] }}" style="border: 1px solid #ddd;">{{ $size['label'] }}</label>
+                            </div>
+                        @endforeach
                     </div>
 
                 </div>

@@ -117,9 +117,13 @@ class Order extends Model
             'completed' => 'ENTREGADO',
         ];
 
-        return array_key_exists($this->status, $statusNames)
-            ? $statusNames[$this->status]
-            : 'Desconocido';
+        if ( $this->state_annulled == 1 ) {
+            return 'RECHAZADO';
+        } else {
+            return array_key_exists($this->status, $statusNames)
+                ? $statusNames[$this->status]
+                : 'DESCONOCIDO';
+        }
     }
 
     // Método para obtener el número del paso activo según el estado

@@ -6442,7 +6442,7 @@ window.Echo.channel('orders').subscribed(function () {
     var orderElement = $("#order-".concat(order.id));
     if (orderElement.length) {
       // Actualizar el estado en el encabezado
-      orderElement.find('.card-header').text(status_name);
+      orderElement.find('.card-header').html("<strong>" + status_name + "</strong>");
 
       // Actualizar los pasos del estado
       orderElement.find('.step').each(function (index) {
