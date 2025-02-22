@@ -763,12 +763,12 @@ class ProductController extends Controller
 
         // Filtrar solo los tipos que existen en la base de datos y agregar información extra
         $sizes = [];
-        foreach ($productTypes as $type) {
-            if (isset($typeMap[$type->type_id])) {
+        foreach ($productTypes as $productType) {
+            if (isset($typeMap[$productType->type_id])) {
                 $sizes[] = [
-                    'id' => $typeMap[$type->type_id]['id'],
-                    'label' => $typeMap[$type->type_id]['label'],
-                    'checked' => $type->default ? 'checked' : ''
+                    'id' => $typeMap[$productType->type_id]['id'],
+                    'label' => $typeMap[$productType->type_id]['label'],
+                    'checked' => $productType->default ? 'checked' : ''
                 ];
             }
         }
