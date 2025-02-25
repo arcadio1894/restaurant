@@ -24,6 +24,7 @@ Route::get('/orders', function () {
     $orders = Order::with('user', 'payment_method')
         ->whereDate('created_at', \Carbon\Carbon::today())
         ->where('state_annulled', 0)
+        ->where('status', '<>', 'completed')
         ->orderBy('created_at', 'desc')
         ->get();
 
@@ -45,3 +46,4 @@ Route::post('/orders/update', [OrderController::class, 'updateStatus']); // Actu
 Route::post('/orders/update-time', [OrderController::class, 'updateTime']); // Actualizar tiempo y estado
 Route::get('/distributors', [DistributorController::class, 'index']);
 Route::post('/orders/update-distributor', [OrderController::class, 'updateDistributor']);
+Route::post('/orders/entregar', [OrderController::class, 'entregarOrder']);

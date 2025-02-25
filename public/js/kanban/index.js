@@ -2,14 +2,23 @@ $(document).ready(function () {
 
     $(document).on("click", '[data-ver_ruta_map]', verRutaMap);
 
-    $.get('/api/orders', function (data) {
+    /*$.get('/api/orders', function (data) {
         let source = {
-            localData: data.map(order => ({
-                id: String(order.id), // Asegurar que el ID sea string
-                status: order.status.trim().toLowerCase(), // Normalizar status
-                text: getOrderCardByStatus(order), // Renderizado inicial
-                content: `Pedido #${order.id}` // Obligatorio para evitar errores en addItem()
-            })),
+            localData: data.map(order => {
+                // Normaliza el estado
+                let orderStatus = order.status.trim().toLowerCase();
+                // Puedes agregar validación si es necesario, asignando un valor por defecto en caso de estado no reconocido
+
+                // Devuelve el objeto con la propiedad dinámica que coincida con el dataField
+                return {
+                    id: String(order.id),              // Asegura que el ID sea string
+                    status: orderStatus,               // Estado normalizado
+                    text: getOrderCardByStatus(order), // Renderizado inicial
+                    content: `Pedido #${order.id}`,     // Obligatorio para evitar errores en addItem()
+                    // Agrega una propiedad dinámica cuyo nombre es el estado
+                    [orderStatus]: orderStatus
+                };
+            }),
             dataType: "array"
         };
 
@@ -17,7 +26,7 @@ $(document).ready(function () {
             { name: "id", type: "string" },
             { name: "status", type: "string" },
             { name: "text", type: "string" },
-            { name: "content", type: "string" } // Agregamos content
+            { name: "content", type: "string" }
         ];
 
         let dataAdapter = new $.jqx.dataAdapter(source, { autoBind: true });
@@ -31,7 +40,7 @@ $(document).ready(function () {
                 { text: "Cocinando", dataField: "processing", width: 300 },
                 { text: "En Trayecto", dataField: "shipped", width: 300 }
             ],
-            resources: [ // Se agrega resources para evitar errores en _resources.length
+            resources: [ // Se agregan resources para evitar errores en _resources.length
                 { id: 1, name: "Default", image: "default.png" }
             ],
             columnRenderer: function (element, collapsedElement, column) {
@@ -43,6 +52,84 @@ $(document).ready(function () {
             },
             ready: function () {
                 console.log("📌 Kanban inicializado correctamente.");
+            }
+        });
+
+        // Forzar el diseño con CSS
+        setTimeout(() => {
+            $(".jqx-kanban-column").css({
+                "display": "inline-block",
+                "vertical-align": "top",
+                "text-align": "center",
+                "min-width": "350px",
+                "max-width": "350px"
+            });
+
+            $(".jqx-kanban").css({
+                "display": "flex",
+                "justify-content": "center"
+            });
+        }, 500);
+    });*/
+    $.get('/api/orders', function (data) {
+        let localData = data.map(order => {
+            let orderStatus = order.status.trim().toLowerCase();
+            return {
+                id: String(order.id),
+                status: orderStatus,
+                text: getOrderCardByStatus(order),
+                content: `Pedido #${order.id}`,
+                [orderStatus]: orderStatus
+            };
+        });
+
+        // Si no hay órdenes, insertar ítems dummy para cada columna
+        if (localData.length === 0) {
+            localData = [
+                { id: "dummy_created", status: "created", text: "", content: "", created: "created", dummy: true },
+                { id: "dummy_processing", status: "processing", text: "", content: "", processing: "processing", dummy: true },
+                { id: "dummy_shipped", status: "shipped", text: "", content: "", shipped: "shipped", dummy: true }
+            ];
+        }
+
+        let fields = [
+            { name: "id", type: "string" },
+            { name: "status", type: "string" },
+            { name: "text", type: "string" },
+            { name: "content", type: "string" }
+        ];
+
+        let source = {
+            localData: localData,
+            dataType: "array",
+            dataFields: fields
+        };
+
+        let dataAdapter = new $.jqx.dataAdapter(source, { autoBind: true });
+
+        $("#kanban").jqxKanban({
+            width: '100%',
+            height: 600,
+            source: dataAdapter,
+            columns: [
+                { text: "Recibido", dataField: "created", width: 300 },
+                { text: "Cocinando", dataField: "processing", width: 300 },
+                { text: "En Trayecto", dataField: "shipped", width: 300 }
+            ],
+            resources: [
+                { id: 1, name: "Default", image: "default.png" }
+            ],
+            columnRenderer: function (element, collapsedElement, column) {
+                element.css({
+                    "min-width": "320px",
+                    "max-width": "320px",
+                    "text-align": "center"
+                });
+            },
+            ready: function () {
+                console.log("📌 Kanban inicializado correctamente.");
+                // Remover los ítems dummy una vez que se ha renderizado el Kanban
+                setTimeout(removeDummyItems, 1000);
             }
         });
 
@@ -134,6 +221,9 @@ $(document).ready(function () {
                                 }
                             });
 
+                            // 🗑️ Eliminar temporalmente el item
+                            //$("#kanban").jqxKanban("removeItem", itemId);
+
                             // ✅ Enviar actualización al backend
                             $.post({
                                 url: '/api/orders/update-time',
@@ -147,10 +237,10 @@ $(document).ready(function () {
                                     $.unblockUI();
 
                                     // 🗑️ Eliminar temporalmente el item
-                                    $("#kanban").jqxKanban("removeItem", itemId);
+                                    //$("#kanban").jqxKanban("removeItem", itemId);
 
                                     // 🔄 Recuperar la orden actualizada y volver a agregarla
-                                    renderOrder(itemId);
+                                    //renderOrder(itemId);
                                 },
                                 error: function (error) {
                                     console.error("❌ Error al actualizar el tiempo estimado:", error);
@@ -237,8 +327,8 @@ $(document).ready(function () {
                                     $.unblockUI();
 
                                     // 🗑️ Eliminar temporalmente el item y volver a renderizarlo
-                                    $("#kanban").jqxKanban("removeItem", itemId);
-                                    renderOrder(itemIDClear);
+                                    //$("#kanban").jqxKanban("removeItem", itemId);
+                                    //renderOrder(itemIDClear);
                                 },
                                 error: function (error) {
                                     console.error("❌ Error al actualizar el repartidor:", error);
@@ -285,20 +375,38 @@ $(document).ready(function () {
                     text: "Sí, Entregado",
                     btnClass: "btn-green",
                     action: function () {
+                        // 🚀 Mostrar loader en toda la pantalla
+                        $.blockUI({
+                            message: '<h3>⏳ Procesando solicitud...</h3>',
+                            css: {
+                                border: 'none',
+                                padding: '15px',
+                                backgroundColor: '#000',
+                                '-webkit-border-radius': '10px',
+                                '-moz-border-radius': '10px',
+                                opacity: 0.5,
+                                color: '#fff'
+                            }
+                        });
+
                         // ✅ Enviar actualización al backend
                         $.post({
-                            url: "/api/orders/update",
+                            url: "/api/orders/entregar",
                             data: { id: itemId, status: "completed" },
                             headers: { "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content") },
                             success: function (response) {
                                 console.log("✅ Pedido entregado correctamente:", response);
                                 console.log("✅ Pedido:", itemId);
                                 // 🗑️ Eliminar directamente del DOM sin usar jqxKanban
-                                button.closest(".jqx-kanban-item").remove();
+                                //button.closest(".jqx-kanban-item").remove();
+                                // 🛑 Quitar loader
+                                $.unblockUI();
                                 $.alert("✅ Pedido marcado como entregado.");
 
                             },
                             error: function (error) {
+                                // 🛑 Quitar loader
+                                $.unblockUI();
                                 console.error("❌ Error al actualizar el pedido:", error);
                                 $.alert("⚠️ No se pudo actualizar el estado del pedido.");
                             }
@@ -363,6 +471,21 @@ $(document).ready(function () {
     });
 });
 
+function removeDummyItems() {
+    var items = $("#kanban").jqxKanban("getItems");
+    console.log("📌 Items para eliminar:", items);
+    items.forEach(function(item) {
+        // Verifica si el id comienza con "dummy_"
+        if(item.id.indexOf("dummy_") === 0) {
+            console.log("📌 Eliminando item dummy con id:", item.id);
+            $("#kanban").jqxKanban("removeItem", item.id);
+            console.log("📌 Item eliminado.");
+        }
+    });
+    // Opcional: refrescar el widget para forzar la actualización visual
+    //$("#kanban").jqxKanban("refresh");
+}
+
 function anularOrder() {
     var order_id = $(this).data('id');
     let button = $(this);
@@ -405,11 +528,13 @@ function anularOrder() {
                             // 🛑 Quitar loader
                             $.unblockUI();
                             $.alert(data.message);
-                            setTimeout( function () {
+                            /*setTimeout( function () {
                                 button.closest(".jqx-kanban-item").remove();
-                            }, 500 )
+                            }, 500 )*/
                         },
                         error: function (data) {
+                            // 🛑 Quitar loader
+                            $.unblockUI();
                             $.alert("Sucedió un error en el servidor. Intente nuevamente.");
                         },
                     });

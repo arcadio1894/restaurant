@@ -36,7 +36,7 @@ function playNotificationSound() {
 }
 
 // Suscribirse al canal de órdenes creadas
-window.Echo.channel('ordersCreated')
+/*window.Echo.channel('ordersCreated')
     .subscribed(() => {
         console.log('✅ Suscripción exitosa al canal "ordersCreated".');
     })
@@ -69,13 +69,13 @@ window.Echo.channel('ordersCreated')
             try {
                 $("#kanban").jqxKanban("addItem", newOrderData);
 
-                /*// 🔊 Intentar reproducir sonido de notificación
+                /!*!// 🔊 Intentar reproducir sonido de notificación
                 let audio = new Audio("/sounds/orderCreated.mp3");
                 audio.play().then(() => {
                     console.log("🔊 Sonido de nueva orden reproducido.");
                 }).catch(error => {
                     console.warn("⚠️ No se pudo reproducir el sonido automáticamente debido a restricciones del navegador.");
-                });*/
+                });*!/
 
                 // 🔊 Intentar reproducir sonido usando Web Audio API
                 //playNotificationSound();
@@ -89,9 +89,87 @@ window.Echo.channel('ordersCreated')
         } else {
             console.warn("⚠️ Kanban no inicializado correctamente o no encontrado en el DOM.");
         }
+    });*/
+window.Echo.channel('ordersCreated')
+    .subscribed(() => {
+        console.log('✅ Suscripción exitosa al canal "ordersCreated".');
+    })
+    .listen('.order.created', (e) => {
+        console.log('🔔 Nueva orden recibida:', e);
+        console.log('🔔 Nueva orden recibida:', e.id_kanban);
+        let order = e.order;
+        let id_kanban_eliminar = e.id_kanban;
+
+        if (!order || !order.id || !order.status) {
+            console.error('❌ Error: El evento no contiene datos de la orden.', e);
+            return;
+        }
+
+        // Normalizar el estado
+        let orderStatus = order.status.trim().toLowerCase();
+
+        let newOrderData = {
+            id: String(order.id), // Convertir a string
+            status: orderStatus,  // Estado normalizado
+            text: getOrderCardByStatus(order),
+            content: `Pedido #${order.id}`, // Contenido en HTML
+            tags: "pedido",
+            color: obtenerColorEstado(order.status) // Función para asignar color
+        };
+
+        // Agregar la propiedad dinámica que coincide con el dataField de la columna
+        newOrderData[orderStatus] = orderStatus;
+
+        // Primero, intenta remover el ítem con ese ID para eliminar la versión antigua
+        try {
+            //$("#kanban").jqxKanban("removeItem", newOrderData.id);
+            //$("#kanban").jqxKanban("removeItem", id_kanban_eliminar);
+            // Remover cualquier ítem antiguo asociado a esta orden
+            removeOldKanbanItemByOrderId(newOrderData.id);
+            console.log("✅ Orden removida, para actualizarla.");
+        } catch (err) {
+            // Si no existe, se ignora el error (por ejemplo, es una orden nueva)
+            console.warn("⚠️ No se encontró ítem previo con el id:", id_kanban_eliminar);
+        }
+
+        if ( order.state_annulled == 0 || order.status == 'completed' )
+        {
+            // Verificar que el Kanban esté listo y agregar el nuevo ítem
+            if ($("#kanban").length && $("#kanban").data('jqxKanban')) {
+                console.log("📌 Kanban detectado, agregando orden...");
+                try {
+                    $("#kanban").jqxKanban("addItem", newOrderData);
+                    console.log("✅ Orden agregada correctamente.");
+                } catch (error) {
+                    console.error("❌ Error al agregar la orden al Kanban:", error.message);
+                    console.error("🛠 Detalles del error:", error);
+                }
+            } else {
+                console.warn("⚠️ Kanban no inicializado correctamente o no encontrado en el DOM.");
+            }
+        }
+
     });
 
+function removeOldKanbanItemByOrderId(orderId) {
+    // Obtener todos los ítems del Kanban
+    let items = $("#kanban").jqxKanban("getItems");
 
+    items.forEach(function(item) {
+        // Normalizamos el id: removemos el prefijo "kanban_" si existe
+        let normalizedId = item.id;
+        if(normalizedId.indexOf("kanban_") === 0) {
+            normalizedId = normalizedId.replace("kanban_", "");
+        }
+
+        // Si el id normalizado es exactamente el orderId o empieza con orderId seguido de un guion bajo,
+        // se considera que este ítem corresponde a la orden.
+        if (normalizedId === orderId || normalizedId.indexOf(orderId + "_") === 0) {
+            console.log("📌 Eliminando ítem antiguo con id:", item.id);
+            $("#kanban").jqxKanban("removeItem", item.id);
+        }
+    });
+}
 /**
  * Genera la tarjeta de la orden en HTML.
  */

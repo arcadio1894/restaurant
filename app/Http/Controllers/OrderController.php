@@ -8,6 +8,8 @@ use App\Events\OrderStatusUpdated;
 use App\Mail\OrderStatusEmail;
 use App\Mail\OrderStatusEmailAnulled;
 use App\Models\Address;
+use App\Models\CashMovement;
+use App\Models\CashRegister;
 use App\Models\Order;
 use App\Models\ShippingDistrict;
 use Carbon\Carbon;
@@ -258,10 +260,28 @@ class OrderController extends Controller
 
     public function anularOrder($order_id)
     {
+        $id = $order_id;
+        // Verificar si el id comienza con "kanban_"
+        if (strpos($order_id, 'kanban_') === 0) {
+            // Remover el prefijo "kanban_"
+            $id = substr($order_id, strlen('kanban_'));
+            // Buscar la posición del segundo guion bajo (si existe)
+            $pos = strpos($id, '_');
+            if ($pos !== false) {
+                // Extraer solo la parte antes del segundo guion bajo
+                $id = substr($id, 0, $pos);
+            }
+        }
+
         DB::beginTransaction();
         try {
 
-            $order = Order::find($order_id);
+            $order = Order::find($id);
+
+            if (!$order) {
+                return response()->json(['message' => 'Orden no encontrada'], 422);
+            }
+
             $order->state_annulled = 1;
             $order->save();
 
@@ -278,8 +298,76 @@ class OrderController extends Controller
 
             Log::info('Emitiendo evento para la orden:', $order->toArray());
             broadcast(new OrderStatusUpdated($order));
-
+            broadcast(new OrderCreated($order, $order_id));
             /*Log::info('Emitiendo evento para la orden:', $order->toArray());*/
+
+            // Cambios en los movimientos
+            // Revertir los movimientos de caja asociados a la orden
+            $movements = CashMovement::where('order_id', $order->id)->get();
+            foreach ($movements as $movement) {
+                // Si es un movimiento de tipo "sale"
+                if ($movement->type === 'sale') {
+                    // Caso de pago POS (no pago directo)
+                    if ($movement->subtype === 'pos') {
+                        if ($movement->regularize == 0) {
+                            // No se regularizó: se elimina el movimiento
+                            $movement->delete();
+                        } elseif ($movement->regularize == 1) {
+                            // Si se regularizó, se crea un movimiento inverso de tipo "expense"
+                            CashMovement::create([
+                                'cash_register_id' => $movement->cash_register_id,
+                                'order_id'         => $order->id,
+                                'type'             => 'expense',
+                                'amount'           => $movement->amount,
+                                'description'      => 'Reversión de venta (POS regularizado) por anulación de orden',
+                                'subtype'          => $movement->subtype,
+                                'regularize'       => $movement->regularize
+                            ]);
+                            $cashRegister = CashRegister::find($movement->cash_register_id);
+                            $cashRegister->current_balance -= $movement->amount;
+                            $cashRegister->total_sales    -= $movement->amount;
+                            $cashRegister->total_incomes  -= $movement->amount;
+                            $cashRegister->total_expenses += $movement->amount;
+                            $cashRegister->save();
+                        }
+                    } else {
+                        // Para ventas normales, se revierte creando un movimiento de tipo "expense"
+                        CashMovement::create([
+                            'cash_register_id' => $movement->cash_register_id,
+                            'order_id'         => $order->id,
+                            'type'             => 'expense',
+                            'amount'           => $movement->amount,
+                            'description'      => 'Reversión de venta por anulación de orden',
+                            'subtype'          => $movement->subtype,
+                            'regularize'       => $movement->regularize
+                        ]);
+                        $cashRegister = CashRegister::find($movement->cash_register_id);
+                        $cashRegister->current_balance -= $movement->amount;
+                        $cashRegister->total_sales    -= $movement->amount;
+                        $cashRegister->total_incomes  -= $movement->amount;
+                        $cashRegister->total_expenses += $movement->amount;
+                        $cashRegister->save();
+                    }
+                }
+                // Si es un movimiento de tipo "expense" (por ejemplo, el vuelto)
+                elseif ($movement->type === 'expense') {
+                    // Se revierte creando un movimiento de tipo "income"
+                    CashMovement::create([
+                        'cash_register_id' => $movement->cash_register_id,
+                        'order_id'         => $order->id,
+                        'type'             => 'income',
+                        'amount'           => $movement->amount,
+                        'description'      => 'Reversión de gasto (vuelto) por anulación de orden',
+                        'subtype'          => $movement->subtype,
+                        'regularize'       => $movement->regularize
+                    ]);
+                    $cashRegister = CashRegister::find($movement->cash_register_id);
+                    $cashRegister->current_balance += $movement->amount;
+                    $cashRegister->total_incomes  += $movement->amount;
+                    $cashRegister->total_expenses -= $movement->amount;
+                    $cashRegister->save();
+                }
+            }
 
             DB::commit();
 
@@ -374,6 +462,18 @@ class OrderController extends Controller
 
     public function show($id)
     {
+        // Verificar si el id comienza con "kanban_"
+        if (strpos($id, 'kanban_') === 0) {
+            // Remover el prefijo "kanban_"
+            $id = substr($id, strlen('kanban_'));
+            // Buscar la posición del segundo guion bajo (si existe)
+            $pos = strpos($id, '_');
+            if ($pos !== false) {
+                // Extraer solo la parte antes del segundo guion bajo
+                $id = substr($id, 0, $pos);
+            }
+        }
+
         // Buscar la orden en la base de datos
         $order = Order::find($id);
 
@@ -388,19 +488,38 @@ class OrderController extends Controller
 
     public function updateTime(Request $request)
     {
+
         $request->validate([
-            'id' => 'required|exists:orders,id',
+            /*'id' => 'required|exists:orders,id',*/
             'estimated_time' => 'required|integer|min:1',
             'status' => 'required|string'
         ]);
 
-        $order = Order::findOrFail($request->id);
+        $id = $request->id;
+        // Verificar si el id comienza con "kanban_"
+        if (strpos($request->id, 'kanban_') === 0) {
+            // Remover el prefijo "kanban_"
+            $id = substr($request->id, strlen('kanban_'));
+            // Buscar la posición del segundo guion bajo (si existe)
+            $pos = strpos($id, '_');
+            if ($pos !== false) {
+                // Extraer solo la parte antes del segundo guion bajo
+                $id = substr($id, 0, $pos);
+            }
+        }
+
+        $order = Order::findOrFail($id);
+
+        if (!$order) {
+            return response()->json(['message' => 'Orden no encontrada'], 422);
+        }
+
         $order->estimated_time = $request->estimated_time; // Guardar el tiempo estimado
         $order->date_processing = Carbon::now('America/Lima');
         $order->status = $request->status; // Cambiar estado a "processing"
         $order->save();
 
-        $order2 = Order::find($request->id);
+        $order2 = Order::find($id);
 
         // Obtener el correo electrónico según la lógica.
         $email = $this->getEmailForOrder($order2);
@@ -415,25 +534,45 @@ class OrderController extends Controller
 
         Log::info('Emitiendo evento para la orden:', $order2->toArray());
         broadcast(new OrderStatusUpdated($order2));
+        broadcast(new OrderCreated($order2, $request->id));
 
         return response()->json([
             'message' => 'Tiempo estimado actualizado correctamente',
-            'order' => $order
+            'order' => $order,
+            'id_kanban' => $request->id
         ]);
     }
 
     public function updateStatus(Request $request)
     {
         $request->validate([
-            'id' => 'required|exists:orders,id',
+            /*'id' => 'required|exists:orders,id',*/
             'status' => 'required|string'
         ]);
 
-        $order = Order::findOrFail($request->id);
+        $id = "";
+        // Verificar si el id comienza con "kanban_"
+        if (strpos($request->id, 'kanban_') === 0) {
+            // Remover el prefijo "kanban_"
+            $id = substr($request->id, strlen('kanban_'));
+            // Buscar la posición del segundo guion bajo (si existe)
+            $pos = strpos($id, '_');
+            if ($pos !== false) {
+                // Extraer solo la parte antes del segundo guion bajo
+                $id = substr($id, 0, $pos);
+            }
+        }
+
+        $order = Order::findOrFail($id);
+
+        if (!$order) {
+            return response()->json(['message' => 'Orden no encontrada'], 422);
+        }
+
         $order->status = $request->status;
         $order->save();
 
-        $order2 = Order::find($request->id);
+        $order2 = Order::find($id);
 
         // Obtener el correo electrónico según la lógica.
         $email = $this->getEmailForOrder($order2);
@@ -458,17 +597,35 @@ class OrderController extends Controller
     public function updateDistributor(Request $request)
     {
         $request->validate([
-            'id' => 'required|exists:orders,id',
+            /*'id' => 'required|exists:orders,id',*/
             'status' => 'required|string|in:shipped',
             'distributor_id' => 'required|exists:distributors,id'
         ]);
 
-        $order = Order::findOrFail($request->id);
+        $id = $request->id;
+        // Verificar si el id comienza con "kanban_"
+        if (strpos($request->id, 'kanban_') === 0) {
+            // Remover el prefijo "kanban_"
+            $id = substr($request->id, strlen('kanban_'));
+            // Buscar la posición del segundo guion bajo (si existe)
+            $pos = strpos($id, '_');
+            if ($pos !== false) {
+                // Extraer solo la parte antes del segundo guion bajo
+                $id = substr($id, 0, $pos);
+            }
+        }
+
+        $order = Order::findOrFail($id);
+
+        if (!$order) {
+            return response()->json(['message' => 'Orden no encontrada'], 422);
+        }
+
         $order->status = $request->status;
         $order->distributor_id = $request->distributor_id;
         $order->save();
 
-        $order2 = Order::find($request->id);
+        $order2 = Order::find($id);
 
         // Obtener el correo electrónico según la lógica.
         $email = $this->getEmailForOrder($order2);
@@ -483,9 +640,61 @@ class OrderController extends Controller
 
         Log::info('Emitiendo evento para la orden:', $order2->toArray());
         broadcast(new OrderStatusUpdated($order2));
+        broadcast(new OrderCreated($order2, $request->id));
 
         // 🚀 Retornar la orden actualizada para su renderización
         return response()->json($order);
+    }
+
+    public function entregarOrder(Request $request)
+    {
+        $request->validate([
+            /*'id' => 'required|exists:orders,id',*/
+            'status' => 'required|string'
+        ]);
+        $id = $request->id;
+        // Verificar si el id comienza con "kanban_"
+        if (strpos($request->id, 'kanban_') === 0) {
+            // Remover el prefijo "kanban_"
+            $id = substr($request->id, strlen('kanban_'));
+            // Buscar la posición del segundo guion bajo (si existe)
+            $pos = strpos($id, '_');
+            if ($pos !== false) {
+                // Extraer solo la parte antes del segundo guion bajo
+                $id = substr($id, 0, $pos);
+            }
+        }
+
+        $order = Order::findOrFail($id);
+
+        if (!$order) {
+            return response()->json(['message' => 'Orden no encontrada'], 422);
+        }
+
+        $order->status = $request->status;
+        $order->save();
+
+        $order2 = Order::find($id);
+
+        // Obtener el correo electrónico según la lógica.
+        $email = $this->getEmailForOrder($order2);
+
+        if ($email) {
+            // Enviar correo al cliente con el estado de la orden.
+            Mail::to($email)->send(new OrderStatusEmail($order2));
+            Log::info('Correo enviado a: ' . $email . ' con el estado de la orden: ' . $order2->status);
+        } else {
+            Log::warning('No se encontró un correo electrónico para enviar el estado de la orden.');
+        }
+
+        Log::info('Emitiendo evento para la orden:', $order2->toArray());
+        broadcast(new OrderStatusUpdated($order2));
+        broadcast(new OrderCreated($order2, $request->id));
+
+        return response()->json([
+            'message' => 'Estado actualizado correctamente',
+            'order' => $order
+        ]);
     }
 
     public function edit(Order $order)
@@ -505,8 +714,10 @@ class OrderController extends Controller
 
     public function generarOrder()
     {
-        $orden = Order::find(3);
+        $orden = Order::find(90);
 
-        broadcast(new OrderCreated($orden));
+        broadcast(new OrderCreated($orden, 90));
+
+        return "Orden agregada";
     }
 }
