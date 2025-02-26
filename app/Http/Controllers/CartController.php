@@ -1382,7 +1382,7 @@ class CartController extends Controller
                     }
 
                     // Emitir el evento a Pusher
-                    broadcast(new OrderCreated($order));
+                    broadcast(new OrderCreated($order, $order->id));
 
                     return response()->json(['success' => true, 'message' => 'Orden creada. Pago en efectivo pendiente', 'redirect_url' => $routeToRedirect]);
 
@@ -1449,7 +1449,7 @@ class CartController extends Controller
                         }
 
                         // Emitir el evento a Pusher
-                        broadcast(new OrderCreated($order));
+                        broadcast(new OrderCreated($order, $order->id));
 
                         return response()->json(['success' => true, 'message' => 'Pago realizado con Yape/Plin', 'redirect_url' => $routeToRedirect]);
                     } else {
