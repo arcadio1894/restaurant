@@ -588,7 +588,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{route('reclamos.delete')}}" class="nav-link @yield('activeReclamosDelete')">
+                                <a href="{{route('reclamos.finalizados')}}" class="nav-link @yield('activeReclamosDelete')">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Reclamos finalizados</p>
                                 </a>

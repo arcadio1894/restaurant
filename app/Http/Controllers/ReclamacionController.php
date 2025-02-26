@@ -179,7 +179,7 @@ class ReclamacionController extends Controller
         $motivo = $request->input('motivo');
         $submotivo = $request->input('submotivo');
 
-        $query = Reclamacion::orderBy('created_at');
+        $query = Reclamacion::whereIn('estado', ['pendiente', 'revisado'])->orderBy('created_at');
 
         // Aplicar filtros si se proporcionan
         if ($codigo != "") {
@@ -272,4 +272,90 @@ class ReclamacionController extends Controller
             return response()->json(['errors' => ['error' => 'Ocurrió un error al guardar la respuesta.']], 500);
         }
     }
+
+    public function getDataReclamosFinalizados(Request $request, $pageNumber = 1)
+    {
+        $perPage = 10;
+        $codigo = $request->input('codigo');
+        $tipo_reclamo = $request->input('tipo_reclamo');
+        $documento = $request->input('documento');
+        $canal = $request->input('canal');
+        $motivo = $request->input('motivo');
+        $submotivo = $request->input('submotivo');
+
+        $query = Reclamacion::whereIn('estado', ['solucionado', 'anulado'])->orderBy('created_at');
+
+        // Aplicar filtros si se proporcionan
+        if ($codigo != "") {
+            $query->where('codigo', $codigo);
+        }
+
+        if ($tipo_reclamo != "") {
+            $query->where('tipo_reclamacion', $tipo_reclamo);
+        }
+
+        if ($documento != "") {
+            $query->where('numero_documento', $documento);
+        }
+
+        if ($canal != "") {
+            $query->where('canal', $canal);
+        }
+
+        if ($motivo != "") {
+            $query->where('motivo', $motivo);
+        }
+
+        if ($submotivo != "") {
+            $query->where('submotivo', $submotivo);
+        }
+
+        $totalFilteredRecords = $query->count();
+        $totalPages = ceil($totalFilteredRecords / $perPage);
+
+        $startRecord = ($pageNumber - 1) * $perPage + 1;
+        $endRecord = min($totalFilteredRecords, $pageNumber * $perPage);
+
+        $reclamos = $query->skip(($pageNumber - 1) * $perPage)
+            ->take($perPage)
+            ->get();
+
+        $array = [];
+
+        foreach ( $reclamos as $reclamo )
+        {
+            array_push($array, [
+                "id" => $reclamo->id,
+                "codigo" => $reclamo->codigo,
+                "fecha" => $reclamo->created_at->format('d/m/Y'),
+                "cliente" => $reclamo->nombre." ".$reclamo->apellido,
+                "estado" => $reclamo->status,
+                "solucion" => $reclamo->respuesta,
+            ]);
+        }
+
+        $pagination = [
+            'currentPage' => (int)$pageNumber,
+            'totalPages' => (int)$totalPages,
+            'startRecord' => $startRecord,
+            'endRecord' => $endRecord,
+            'totalRecords' => $totalFilteredRecords,
+            'totalFilteredRecords' => $totalFilteredRecords
+        ];
+
+        return ['data' => $array, 'pagination' => $pagination];
+    }
+
+    public function indexFinalizados()
+    {
+        $motivos = Motivo::all();
+        return view('reclamaciones.indexFinalizados', compact('motivos'));
+    }
+
+    public function showFinalizado($id)
+    {
+        $reclamo = Reclamacion::find($id);
+        return view('reclamaciones.showFinalizado', compact('reclamo'));
+    }
+
 }

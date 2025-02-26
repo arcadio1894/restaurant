@@ -248,11 +248,14 @@ Route::middleware('auth')->group(function (){
 
         // Rutas de reclamos
         Route::get('/reclamos/activos', [ReclamacionController::class, 'index'])->name('reclamos.index');
-        Route::get('/reclamos/finalizados', [ReclamacionController::class, 'delete'])->name('reclamos.delete');
+        Route::get('/reclamos/finalizados', [ReclamacionController::class, 'indexFinalizados'])->name('reclamos.finalizados');
         Route::get('/get/data/reclamos/{page}', [ReclamacionController::class, 'getDataReclamos']);
         Route::get('/reclamo/{id}/revisar', [ReclamacionController::class, 'show'])->name('reclamos.show');
 
+        Route::get('/get/data/reclamos/finalizados/{page}', [ReclamacionController::class, 'getDataReclamosFinalizados']);
+
         Route::post('/reclamos/respuesta', [ReclamacionController::class, 'guardarRespuesta'])->name('reclamos.guardarRespuesta');
+        Route::get('/reclamo/finalizado/{id}/revisar', [ReclamacionController::class, 'showFinalizado'])->name('reclamos.show');
 
         // Routes KANBAN
         Route::get('/kanban/ordenes', [OrderController::class, 'indexKanban'])->name('orders.kanban');

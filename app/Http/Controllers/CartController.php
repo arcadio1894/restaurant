@@ -1293,7 +1293,7 @@ class CartController extends Controller
                     }
 
                     // Emitir el evento a Pusher
-                    broadcast(new OrderCreated($order));
+                    broadcast(new OrderCreated($order, $order->id));
 
                     return response()->json(['success' => true, 'message' => 'Pago realizado con POS', 'redirect_url' => $routeToRedirect]);
 
