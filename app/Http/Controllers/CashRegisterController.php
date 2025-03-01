@@ -234,7 +234,7 @@ class CashRegisterController extends Controller
 
             return response()->json([
                 'message' => 'Ingreso registrado con éxito.',
-                'balance_total' => $cashRegister->current_balance
+                'balance_total' => round($cashRegister->current_balance, 2)
             ], 200);
 
         } catch ( \Throwable $e ) {
@@ -294,7 +294,7 @@ class CashRegisterController extends Controller
 
             return response()->json([
                 'message' => 'Egreso registrado con éxito.',
-                'balance_total' => $cashRegister->current_balance
+                'balance_total' => round($cashRegister->current_balance, 2)
             ], 200);
 
         } catch (\Throwable $e) {
