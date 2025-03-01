@@ -39,7 +39,7 @@ class CashRegisterController extends Controller
 
             if ( $cashRegister->status == 1 ) // abierta
             {
-                $balance_total = $cashRegister->current_balance;
+                $balance_total = round($cashRegister->current_balance, 2);
                 array_push($buttons, ['close']);
                 $state = '<div class="col-md-4 col-6">
                             <div class="small-box bg-success">
@@ -234,7 +234,7 @@ class CashRegisterController extends Controller
 
             return response()->json([
                 'message' => 'Ingreso registrado con éxito.',
-                'balance_total' => $cashRegister->current_balance
+                'balance_total' => round($cashRegister->current_balance, 2)
             ], 200);
 
         } catch ( \Throwable $e ) {
@@ -294,7 +294,7 @@ class CashRegisterController extends Controller
 
             return response()->json([
                 'message' => 'Egreso registrado con éxito.',
-                'balance_total' => $cashRegister->current_balance
+                'balance_total' => round($cashRegister->current_balance, 2)
             ], 200);
 
         } catch (\Throwable $e) {
