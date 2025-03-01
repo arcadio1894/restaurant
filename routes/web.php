@@ -19,6 +19,7 @@ use \App\Http\Controllers\FacturaController;
 use App\Http\Controllers\OrdersChartController;
 use \App\Http\Controllers\ReclamacionController;
 use Illuminate\Support\Facades\Cache;
+use \App\Http\Controllers\ShopController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -261,6 +262,24 @@ Route::middleware('auth')->group(function (){
         Route::get('/kanban/ordenes', [OrderController::class, 'indexKanban'])->name('orders.kanban');
         Route::get('/generar/orden', [OrderController::class, 'generarOrder'])->name('generarOrder');
 
+        // Routes SHOP
+        Route::get('/tiendas', [ShopController::class, 'index'])
+            ->name('shop.index');
+        Route::get('/get/data/shops/{page}', [ShopController::class, 'getDataShops']);
+        Route::get('/crear/tienda', [ShopController::class, 'create'])
+            ->name('shop.create');
+        Route::post('/shop/store', [ShopController::class, 'store'])
+            ->name('shop.store');
+        Route::get('/ver/tienda/{shop}', [ShopController::class, 'show'])
+            ->name('shop.show');
+        Route::get('/modificar/tienda/{shop}', [ShopController::class, 'edit'])
+            ->name('shop.edit');
+        Route::post('/shop/update/{shop}', [ShopController::class, 'update'])
+            ->name('shop.update');
+        Route::post('/shop/desactivar/{shop}', [ShopController::class, 'desactivar'])
+            ->name('shop.desactivar');
+        Route::post('/shop/activar/{shop}', [ShopController::class, 'activar'])
+            ->name('shop.activar');
 
     });
 });

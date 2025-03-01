@@ -101,7 +101,7 @@ class CategoryController extends Controller
         try {
 
             $request->validate([
-                'name' => 'required|string|unique:types,name',
+                'name' => 'required|string|unique:categories,name',
                 'description' => 'nullable|string',
             ]);
 
