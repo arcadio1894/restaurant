@@ -125,30 +125,25 @@ class ShopController extends Controller
         try {
 
             $request->validate([
-                'name' => 'required|string|unique:types,name',
+                'name' => 'required|string|unique:shops,name',
                 'phone' => 'required|string',
                 'email' => 'required|string',
                 'address' => 'required|string',
-                'departamento' => 'required|string',
-                'provincoa' => 'required|string',
-                'distrito' => 'nullable|string',
+                'department' => 'required|string',
+                'province' => 'required|string',
+                'district' => 'nullable|string',
             ]);
 
             // Procesar el estado de visibilidad
             $userAdmin = User::where('is_admin', 1)->first();
 
-            $departamento = $request->input('departamento');
-            $provincia = $request->input('provincia');
-            $distrito = $request->input('distrito');
+            $departamento = $request->input('department');
+            $provincia = $request->input('province');
+            $distrito = $request->input('district');
 
-            $department = Department::where('name', 'LIKE', '%'.$departamento.'%')
-                ->first();
-            $province = Province::where('name', 'LIKE', '%'.$provincia.'%')
-                ->where('department_id', $department->id)
-                ->first();
-            $district = District::where('name', 'LIKE', '%'.$distrito.'%')
-                ->where('province_id', $province->id)
-                ->first();
+            $department = Department::find($departamento);
+            $province = Province::find($provincia);
+            $district = District::find($distrito);
 
             if ( !isset($department) || !isset($province) || !isset($district)) {
                 return response()->json(['message' => 'Error en la ubicación geográfica.'], 422);
@@ -159,7 +154,7 @@ class ShopController extends Controller
             $shop = new Shop();
             $shop->name = $request->input('name');
             $shop->slug = $slug;
-            $shop->owner_id = ($request->input('owner') == null || $request->input('name') == "") ? $userAdmin : $request->input('name');
+            $shop->owner_id = ($request->input('owner') == null || $request->input('owner') == "") ? $userAdmin->id : $request->input('owner');
             $shop->phone = $request->input('phone');
             $shop->email = $request->input('email');
             $shop->address = $request->input('address');
@@ -169,7 +164,7 @@ class ShopController extends Controller
             $shop->province_id = $province->id;
             $shop->district_id = $district->id;
             $shop->type = $request->get('type') === 'on' ? 'principal' : 'sucursal';
-            $shop->active = $request->get('active') === 'on' ? 'active' : 'inactive';
+            $shop->status = $request->get('active') === 'on' ? 'active' : 'inactive';
             $shop->save();
 
             DB::commit();
@@ -188,7 +183,9 @@ class ShopController extends Controller
 
     public function edit(Shop $shop)
     {
-        return view('shop.edit', compact('shop'));
+        $departments = Department::all();
+        $users = User::where('is_admin', 1)->get();
+        return view('shop.edit', compact('shop', 'departments', 'users'));
     }
 
     public function update(Request $request, Shop $shop)
@@ -202,33 +199,41 @@ class ShopController extends Controller
                 'address' => 'required|string',
                 'department' => 'required|string',
                 'province' => 'required|string',
-                'district' => 'required|string',
+                'district' => 'nullable|string',
             ]);
 
             // Procesar el estado de visibilidad
-            $isActive = $request->has('active') ? 1 : 0; // Si 'active' no está presente, será 0
+            $userAdmin = User::where('is_admin', 1)->first();
 
-            $department = Department::find($request->input('department_id'));
-            $province = Province::find($request->input('province_id'));
-            $district = District::find($request->input('district_id'));
+            $departamento = $request->input('department');
+            $provincia = $request->input('province');
+            $distrito = $request->input('district');
+
+            $department = Department::find($departamento);
+            $province = Province::find($provincia);
+            $district = District::find($distrito);
+
+            if ( !isset($department) || !isset($province) || !isset($district)) {
+                return response()->json(['message' => 'Error en la ubicación geográfica.'], 422);
+            }
 
             $slug = "fuego-y-masa-".$department->name."-".$province->name."-".$district->name;
 
             // Crear la categoría
             /*$shop = Shop::find($shop->id);*/
             $shop->name = $request->input('name');
-            $shop->name = $request->input('name');
             $shop->slug = $slug;
-            /*$shop->owner_id = $userAdmin;*/
+            $shop->owner_id = ($request->input('owner') == null || $request->input('owner') == "") ? $userAdmin->id : $request->input('owner');
             $shop->phone = $request->input('phone');
             $shop->email = $request->input('email');
             $shop->address = $request->input('address');
             $shop->latitude = $request->input('latitude');
             $shop->longitude = $request->input('longitude');
-            $shop->department_id = $request->input('department_id');
-            $shop->province_id = $request->input('province_id');
-            $shop->district_id = $request->input('district_id');
-            $shop->status = $isActive;
+            $shop->department_id = $department->id;
+            $shop->province_id = $province->id;
+            $shop->district_id = $district->id;
+            $shop->type = $request->get('type') === 'on' ? 'principal' : 'sucursal';
+            $shop->status = $request->get('active') === 'on' ? 'active' : 'inactive';
             $shop->save();
 
             DB::commit();
@@ -240,35 +245,14 @@ class ShopController extends Controller
         return response()->json(['message' => 'Cambios guardados con éxito.'], 200);
     }
 
-    public function desactivar(Shop $shop)
+    public function changeState(Request $request, $id)
     {
-        DB::beginTransaction();
-        try {
-            $shop->status = 'inactive';
-            $shop->save();
+        $shop = Shop::findOrFail($id);
+        $shop->state = $request->state;
+        $shop->save();
 
-            DB::commit();
-        } catch ( \Throwable $e ) {
-            DB::rollBack();
-            return response()->json(['message' => $e->getMessage()], 422);
-        }
-
-        return response()->json(['message' => 'Tienda inactivada con éxito.'], 200);
-    }
-
-    public function activar(Shop $shop)
-    {
-        DB::beginTransaction();
-        try {
-            $shop->status = 'active';
-            $shop->save();
-
-            DB::commit();
-        } catch ( \Throwable $e ) {
-            DB::rollBack();
-            return response()->json(['message' => $e->getMessage()], 422);
-        }
-
-        return response()->json(['message' => 'Tienda activada con éxito.'], 200);
+        return response()->json([
+            'message' => 'El estado de la tienda ha sido actualizado correctamente.'
+        ]);
     }
 }

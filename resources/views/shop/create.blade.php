@@ -262,7 +262,7 @@
             // Evento para el botón "Seleccionar esta dirección"
             $("#selectAddress").on("click", function() {
                 // Obtener la dirección y las coordenadas del marcador
-                const address = $("#searchInput").val();
+                let address = $("#searchInput").val();
                 const latLng = marker.getPosition();
                 const latitude = latLng.lat();
                 const longitude = latLng.lng();
@@ -271,6 +271,9 @@
                 $("#address").val(address);      // Dirección en el campo de texto
                 $("#latitude").val(latitude);    // Latitud en el campo oculto
                 $("#longitude").val(longitude);  // Longitud en el campo oculto
+
+                // Extraer el departamento, provincia y distrito de la dirección
+                getAddressDetails(latLng);
 
                 $("#addressModal").modal("hide");
             });
@@ -281,7 +284,7 @@
             const geocoder = new google.maps.Geocoder();
             geocoder.geocode({ location: latLng }, function(results, status) {
                 if (status === "OK" && results[0]) {
-                    const address = results[0].formatted_address;
+                    let address = results[0].formatted_address;
 
                     // Extraer departamento, provincia y distrito
                     let department = "";
@@ -303,6 +306,7 @@
                     });
 
                     // Colocar los valores en los inputs
+                    $("#searchInput").val(address);
                     $("#address").val(address);
                     $("#latitude").val(latLng.lat());
                     $("#longitude").val(latLng.lng());
@@ -326,6 +330,106 @@
 
         // Inicializar el mapa y la funcionalidad de autocomplete al cargar el script
         window.initAutocomplete = initAutocomplete;
+
+        function getAddressDetails(latLng) {
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ location: latLng }, function(results, status) {
+                if (status === "OK" && results[0]) {
+                    let departmentName = "";
+                    let provinceName = "";
+                    let districtName = "";
+
+                    // Buscar en los componentes de la dirección los datos de ubicación
+                    results[0].address_components.forEach(component => {
+                        if (component.types.includes("administrative_area_level_1")) {
+                            departmentName = component.long_name; // Departamento
+                        }
+                        if (component.types.includes("administrative_area_level_2")) {
+                            provinceName = component.long_name; // Provincia
+                        }
+                        if (component.types.includes("administrative_area_level_3") ||
+                            component.types.includes("locality") ||
+                            component.types.includes("sublocality")) {
+                            districtName = component.long_name; // Distrito
+                        }
+                    });
+
+                    console.log("📍 Departamento:", departmentName);
+                    console.log("🏛 Provincia:", provinceName);
+                    console.log("📌 Distrito:", districtName);
+
+                    // Llamar a la función para actualizar los selects en la base de datos
+                    updateLocationSelectors(departmentName, provinceName, districtName);
+                }
+            });
+        }
+
+        function updateLocationSelectors(departmentName, provinceName, districtName) {
+            console.log(departmentName);
+            console.log(provinceName);
+            console.log(districtName);
+            // 1️⃣ Buscar el departamento en la BD
+            $.ajax({
+                url: `/buscar-departamento?nombre=${encodeURIComponent(departmentName)}`,
+                type: "GET",
+                dataType: "json",
+                success: function(department) {
+                    if (department) {
+                        console.log("✅ Departamento encontrado:", department);
+                        $("#department").val(department.id).trigger("change"); // Seleccionar departamento y disparar cambio
+
+                        // 2️⃣ Esperar a que se carguen las provincias antes de continuar
+                        setTimeout(() => {
+                            $.ajax({
+                                url: `/provincias/${department.id}`,
+                                type: "GET",
+                                dataType: "json",
+                                success: function(provinces) {
+                                    $("#province").empty().append('<option value="">Seleccionar</option>');
+                                    $("#district").empty().append('<option value="">Seleccionar</option>');
+
+                                    $.each(provinces, function(index, province) {
+                                        $("#province").append(`<option value="${province.id}">${province.name}</option>`);
+                                    });
+
+                                    // 3️⃣ Seleccionar la provincia correcta
+                                    let selectedProvince = provinces.find(p => p.name.trim().toLowerCase() === provinceName.trim().toLowerCase());
+
+                                    console.log(provinces);
+                                    if (selectedProvince) {
+                                        console.log("✅ Provincia encontrada:", selectedProvince);
+                                        $("#province").val(selectedProvince.id).trigger("change"); // Seleccionar provincia y disparar cambio
+
+                                        // 4️⃣ Esperar a que se carguen los distritos antes de continuar
+                                        setTimeout(() => {
+                                            $.ajax({
+                                                url: `/distritos/${selectedProvince.id}`,
+                                                type: "GET",
+                                                dataType: "json",
+                                                success: function(districts) {
+                                                    $("#district").empty().append('<option value="">Seleccionar</option>');
+
+                                                    $.each(districts, function(index, district) {
+                                                        $("#district").append(`<option value="${district.id}">${district.name}</option>`);
+                                                    });
+
+                                                    // 5️⃣ Seleccionar el distrito correcto
+                                                    let selectedDistrict = districts.find(d => d.name.toLowerCase() === districtName.toLowerCase());
+                                                    if (selectedDistrict) {
+                                                        console.log("✅ Distrito encontrado:", selectedDistrict);
+                                                        $("#district").val(selectedDistrict.id);
+                                                    }
+                                                }
+                                            });
+                                        }, 500); // ⏳ Pequeña espera para asegurar que las provincias ya cargaron
+                                    }
+                                }
+                            });
+                        }, 500); // ⏳ Espera para evitar que la petición de provincias ocurra antes de la selección del departamento
+                    }
+                }
+            });
+        }
     </script>
     {{--<script>
         let map, marker, infowindow, autocomplete;

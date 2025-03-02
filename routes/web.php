@@ -20,6 +20,7 @@ use App\Http\Controllers\OrdersChartController;
 use \App\Http\Controllers\ReclamacionController;
 use Illuminate\Support\Facades\Cache;
 use \App\Http\Controllers\ShopController;
+use Illuminate\Http\Request;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -110,6 +111,11 @@ Route::get('/api/usuarios-activos', function () {
 
 Route::get('/api/usuarios-registrados', [WelcomeController::class, 'getRegisteredUsers']);
 Route::get('/api/top-clientes', [WelcomeController::class, 'getTopClients']);
+
+Route::get('/buscar-departamento', function (Request $request) {
+    $department = \App\Models\Department::where('name', 'LIKE', "%{$request->nombre}%")->first();
+    return response()->json($department);
+});
 
 Route::middleware('auth')->group(function (){
     Route::post('/broadcasting/auth', function () {
@@ -276,11 +282,7 @@ Route::middleware('auth')->group(function (){
             ->name('shop.edit');
         Route::post('/shop/update/{shop}', [ShopController::class, 'update'])
             ->name('shop.update');
-        Route::post('/shop/desactivar/{shop}', [ShopController::class, 'desactivar'])
-            ->name('shop.desactivar');
-        Route::post('/shop/activar/{shop}', [ShopController::class, 'activar'])
-            ->name('shop.activar');
-
+        Route::post('/shop/{id}/cambiar-estado', [ShopController::class, 'changeState']);
     });
 });
 

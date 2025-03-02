@@ -105,12 +105,72 @@ $(document).ready(function () {
             $('#district').empty().append('<option value="">Seleccionar</option>');
         }
     });
+
+    $('[data-deshabilitar]').on('click', function () {
+        let id = $(this).data('id');
+        let description = $(this).data('description');
+        let state = $(this).data('state');
+
+        let newState = state === 'active' ? 'inactive' : 'active';
+        let actionText = state === 'active' ? 'inactivar' : 'activar';
+
+        $.confirm({
+            title: 'Confirmación',
+            content: `¿Está seguro de ${actionText} la tienda <b>${description}</b>?`,
+            type: 'orange',
+            buttons: {
+                confirmar: {
+                    text: 'Sí, confirmar',
+                    btnClass: 'btn-orange',
+                    action: function () {
+                        changeShopState(id, newState);
+                    }
+                },
+                cancelar: {
+                    text: 'Cancelar',
+                    action: function () {
+                        // No hacer nada
+                    }
+                }
+            }
+        });
+    });
 });
 
 var $formDelete;
 var $modalDelete;
 var $modalImage;
 var $permissions;
+
+function changeShopState(id, newState) {
+    $.ajax({
+        url: `/tiendas/${id}/cambiar-estado`,
+        type: 'POST',
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            state: newState
+        },
+        success: function (response) {
+            $.alert({
+                title: 'Éxito',
+                content: response.message,
+                type: 'green',
+                buttons: {
+                    ok: function () {
+                        location.reload(); // Recargar la página para actualizar la lista
+                    }
+                }
+            });
+        },
+        error: function () {
+            $.alert({
+                title: 'Error',
+                content: 'Ocurrió un error, intente nuevamente.',
+                type: 'red'
+            });
+        }
+    });
+}
 
 function showDataSearch() {
     getDataShops(1);
