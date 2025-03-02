@@ -661,6 +661,7 @@
                                                     {{-- Según el tipo de la opción, generar dinámicamente los inputs --}}
                                                     @if ($option->type == 'radio')
                                                         @foreach ($option->selections as $selection)
+                                                            @if ($selection->product->enable_status == 1)
                                                             <div class="form-check mb-2 custom-radio-checkbox">
                                                                 <input class="form-check-input option-input"
                                                                        type="radio"
@@ -681,6 +682,7 @@
                                                                     @endif
                                                                 </label>
                                                             </div>
+                                                            @endif
                                                         @endforeach
                                                     @elseif ($option->type == 'checkbox')
                                                         @foreach ($option->selections as $selection)
