@@ -105,8 +105,8 @@ $(document).ready(function () {
             $('#district').empty().append('<option value="">Seleccionar</option>');
         }
     });
+    $(document).on('click', '[data-deshabilitar]', function () {
 
-    $('[data-deshabilitar]').on('click', function () {
         let id = $(this).data('id');
         let description = $(this).data('description');
         let state = $(this).data('state');
@@ -144,7 +144,7 @@ var $permissions;
 
 function changeShopState(id, newState) {
     $.ajax({
-        url: `/tiendas/${id}/cambiar-estado`,
+        url: `/dashboard/shop/${id}/cambiar-estado`,
         type: 'POST',
         data: {
             _token: $('meta[name="csrf-token"]').attr('content'),

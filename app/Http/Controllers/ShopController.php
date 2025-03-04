@@ -248,11 +248,17 @@ class ShopController extends Controller
     public function changeState(Request $request, $id)
     {
         $shop = Shop::findOrFail($id);
-        $shop->state = $request->state;
+        $shop->status = $request->state;
         $shop->save();
 
         return response()->json([
             'message' => 'El estado de la tienda ha sido actualizado correctamente.'
         ]);
+    }
+
+    public function showShop($id)
+    {
+        $shop = Shop::findOrFail($id);
+        return response()->json($shop);
     }
 }

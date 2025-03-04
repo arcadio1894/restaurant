@@ -20,6 +20,7 @@ use App\Http\Controllers\OrdersChartController;
 use \App\Http\Controllers\ReclamacionController;
 use Illuminate\Support\Facades\Cache;
 use \App\Http\Controllers\ShopController;
+use \App\Http\Controllers\ZoneController;
 use Illuminate\Http\Request;
 /*
 |--------------------------------------------------------------------------
@@ -283,6 +284,23 @@ Route::middleware('auth')->group(function (){
         Route::post('/shop/update/{shop}', [ShopController::class, 'update'])
             ->name('shop.update');
         Route::post('/shop/{id}/cambiar-estado', [ShopController::class, 'changeState']);
+
+        // Routes ZONE
+        //Route::resource('zones', ZoneController::class);
+        Route::get('/zonas', [ZoneController::class, 'index'])
+            ->name('zones.index');
+        Route::get('/get/data/zones/{page}', [ZoneController::class, 'getDataShops']);
+        Route::get('/crear/zonas', [ZoneController::class, 'create'])
+            ->name('zones.create');
+        Route::post('/zones/store', [ZoneController::class, 'store'])
+            ->name('zones.store');
+        Route::post('/zones/{zone}/toggle-status', [ZoneController::class, 'toggleStatus']);
+        Route::delete('/zones/{zone}', [ZoneController::class, 'destroy']);
+
+
+        Route::get('/shops/{id}', [ShopController::class, 'showShop']); // Obtener datos de una tienda
+        Route::get('/shops/{id}/zones', [ZoneController::class, 'getZones']); // Obtener zonas de una tienda
+        Route::post('/shops/{id}/zones/save', [ZoneController::class, 'store']); // Guardar zonas
     });
 });
 

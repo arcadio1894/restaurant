@@ -444,12 +444,12 @@
                         </ul>
                     </li>
 
-                    <li class="nav-header">LOCALES</li>
+                    <li class="nav-header">MODULO DE LOCALES</li>
                     <li class="nav-item has-treeview @yield('openShop')">
                         <a href="#" class="nav-link @yield('activeShop')">
                             <i class="nav-icon fas fa-store"></i>
                             <p>
-                                MODULO DE LOCALES
+                                LOCALES
                                 <i class="right fas fa-angle-left"></i>
                             </p>
                         </a>
@@ -469,6 +469,31 @@
                             </li>
                         </ul>
                     </li>
+                    <li class="nav-item has-treeview @yield('openZone')">
+                        <a href="#" class="nav-link @yield('activeZone')">
+                            <i class="nav-icon fas fa-store"></i>
+                            <p>
+                                ZONAS
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+
+                            <li class="nav-item">
+                                <a href="{{ route('zones.index') }}" class="nav-link @yield('activeListShop')">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Listado de zonas</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('zones.create') }}" class="nav-link @yield('activeCreateShop')">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Crear Zona</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
 
                     <li class="nav-header">MANTENEDORES</li>
 
