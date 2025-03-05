@@ -91,52 +91,113 @@ function loadZones(shopId) {
         success: function (zones) {
             zones.forEach(zone => {
                 //drawPolygon(zone.coordinates); // Ahora recibe un array de coordenadas
-
+                let polygon = drawPolygon(zone.coordinates, zone.id, zone.status);
+                polygon.zoneId = zone.id; // Guardamos el ID en el polígono
+                polygon.status = zone.status; // Guardamos el status
             });
         }
     });
 }
 
-function drawPolygon(coordinates, zoneId = null) {
+function drawPolygon(coordinates, zoneId = null, status) {
+    let color = (status == 'active') ? "#FF0000" : "#808080"; // Rojo si está activa, gris si está inactiva
+
     let polygon = new google.maps.Polygon({
         paths: coordinates.map(coord => ({ lat: coord[1], lng: coord[0] })), // [lat, lng]
-        strokeColor: "#FF0000",
+        strokeColor: color,
         strokeOpacity: 0.8,
         strokeWeight: 2,
-        fillColor: "#FF0000",
+        fillColor: color,
         fillOpacity: 0.35,
     });
 
     polygon.setMap(map);
     polygons.push(polygon);
 
-    // 🛑 Agregar evento para eliminar con clic derecho
+    // Guardamos el ID y status dentro del polígono
+    polygon.zoneId = zoneId;
+    polygon.status = status;
+
+    // 🛑 Agregar evento para eliminar o deshabilitar con clic derecho
     polygon.addListener("rightclick", function () {
+        let zoneId = this.zoneId;
+        let zoneStatus = this.status;
+        let currentPolygon = this;
+
+        if (!zoneId) {
+            console.error("No se encontró el ID de la zona.");
+            return;
+        }
+
         $.confirm({
-            title: 'Eliminar zona',
-            content: '¿Deseas eliminar esta zona?',
-            type: 'red',
-            icon: 'fa fa-exclamation-triangle',
+            title: 'Gestionar Zona',
+            content: '¿Qué acción deseas realizar?',
+            type: 'orange',
             buttons: {
-                cancelar: {
-                    text: 'Cancelar',
+                deshabilitar: {
+                    text: (zoneStatus == 'inactive') ? 'Habilitar':'Deshabilitar',
+                    btnClass: (zoneStatus == 'inactive') ? 'btn-success':'btn-warning',
                     action: function () {
-                        // No hacer nada
+                        changeZoneStatus(zoneId, currentPolygon);
                     }
                 },
                 eliminar: {
                     text: 'Eliminar',
                     btnClass: 'btn-red',
                     action: function () {
-                        polygon.setMap(null); // Ocultar en el mapa
-                        polygons = polygons.filter(p => p !== polygon); // Eliminar de la lista
-                        if (zoneId) {
-                            deleteZone(zoneId); // Eliminar de la base de datos
-                        }
+                        deleteZone(zoneId, currentPolygon);
                     }
+                },
+                cancelar: {
+                    text: 'Cancelar'
                 }
             }
         });
+    });
+
+    return polygon;
+}
+
+function changeZoneStatus(zoneId, polygon) {
+    $.ajax({
+        url: `/dashboard/zones/${zoneId}/status`,
+        method: "POST",
+        data: {
+            _token: $("meta[name='csrf-token']").attr("content"),
+        },
+        success: function (response) {
+            if (response.success) {
+                console.log("Zona deshabilitada correctamente.");
+                polygon.setMap(null); // Quitar del mapa
+                let updatedPolygon = drawPolygon(response.coordinates, zoneId, response.status); // Repintar en gris
+                updatedPolygon.zoneId = zoneId;
+            } else {
+                console.error("Error al cambiar el estado:", response.error);
+            }
+        },
+        error: function (xhr) {
+            console.error("Error en la petición AJAX:", xhr.responseText);
+        }
+    });
+}
+
+function deleteZone(zoneId, polygon) {
+    $.ajax({
+        url: `/dashboard/zones/${zoneId}/delete`,
+        method: "POST",
+        data: { _token: $("meta[name='csrf-token']").attr("content") },
+        success: function (response) {
+            if (response.success) {
+                console.log("Zona eliminada correctamente.");
+                polygon.setMap(null); // Eliminar visualmente
+                polygons = polygons.filter(p => p !== polygon); // Remover de la lista
+            } else {
+                console.error("Error al eliminar la zona:", response.error);
+            }
+        },
+        error: function (xhr) {
+            console.error("Error en la petición AJAX:", xhr.responseText);
+        }
     });
 }
 

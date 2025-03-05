@@ -480,13 +480,13 @@
                         <ul class="nav nav-treeview">
 
                             <li class="nav-item">
-                                <a href="{{ route('zones.index') }}" class="nav-link @yield('activeListShop')">
+                                <a href="{{ route('zones.index') }}" class="nav-link @yield('activeListZone')">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Listado de zonas</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('zones.create') }}" class="nav-link @yield('activeCreateShop')">
+                                <a href="{{ route('zones.create') }}" class="nav-link @yield('activeCreateZone')">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Crear Zona</p>
                                 </a>

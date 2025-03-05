@@ -294,8 +294,11 @@ Route::middleware('auth')->group(function (){
             ->name('zones.create');
         Route::post('/zones/store', [ZoneController::class, 'store'])
             ->name('zones.store');
-        Route::post('/zones/{zone}/toggle-status', [ZoneController::class, 'toggleStatus']);
-        Route::delete('/zones/{zone}', [ZoneController::class, 'destroy']);
+        Route::post('/zones/{zone}/status', [ZoneController::class, 'changeStatus']);
+        Route::post('/zones/{zone}/delete', [ZoneController::class, 'deleteZone']);
+        Route::post('/zones/{zone}/update-price', [ZoneController::class, 'updatePrice']);
+
+        Route::get('/zones/show/{zone}', [ZoneController::class, 'show']);
 
 
         Route::get('/shops/{id}', [ShopController::class, 'showShop']); // Obtener datos de una tienda

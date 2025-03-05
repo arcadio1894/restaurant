@@ -11,8 +11,8 @@ class ZoneController extends Controller
 {
     public function index()
     {
-        $zones = Zone::with('shop')->get();
-        return view('zone.index', compact('zones'));
+        $shops = Shop::all();
+        return view('zone.index', compact('shops'));
     }
 
     public function create()
@@ -20,19 +20,6 @@ class ZoneController extends Controller
         $shops = Shop::all();
         return view('zone.create', compact('shops'));
     }
-
-    /*public function store(Request $request)
-    {
-        $request->validate([
-            'shop_id' => 'required|exists:shops,id',
-            'name' => 'required|string|max:255',
-            'coordinates' => 'required|json',
-        ]);
-
-        Zone::create($request->all());
-
-        return redirect()->route('zones.index')->with('success', 'Zona creada correctamente.');
-    }*/
 
     public function edit(Zone $zone)
     {
@@ -73,6 +60,7 @@ class ZoneController extends Controller
                 'id' => $zone->id,
                 'name' => $zone->name,
                 'status' => $zone->status,
+                'price' => $zone->price,
                 'coordinates' => $this->convertPolygonToArray($zone->coordinates), // Convertir POLYGON a array
             ];
         });
@@ -115,6 +103,31 @@ class ZoneController extends Controller
         DB::beginTransaction();
         try {
             $shopId = $request->shop_id;
+            $shop = Shop::findOrFail($request->shop_id);
+            $baseName = $shop->name; // Nombre base de la tienda
+
+            // Obtener todas las zonas existentes con el mismo nombre base y extraer los números
+            $existingZones = Zone::where('shop_id', $shop->id)
+                ->where('name', 'LIKE', "$baseName%")
+                ->pluck('name')
+                ->map(function ($name) use ($baseName) {
+                    return (int) str_replace($baseName . ' ', '', $name);
+                })
+                ->filter()
+                ->sort()
+                ->values();
+
+            // Buscar el primer número disponible
+            $newNumber = 1;
+            foreach ($existingZones as $number) {
+                if ($number != $newNumber) {
+                    break;
+                }
+                $newNumber++;
+            }
+
+            // Generar el nuevo nombre con el primer número disponible
+            $zoneName = $baseName . ' ' . $newNumber;
 
             // 🔍 Obtener las zonas actuales de la tienda con sus coordenadas
             $existingZones = Zone::where('shop_id', $shopId)->get()->keyBy('id');
@@ -165,7 +178,7 @@ class ZoneController extends Controller
                     if (!$updated) {
                         $newZone = Zone::create([
                             'shop_id' => $shopId,
-                            'name' => 'Fuego y Masa Trujillo ' . $shopId,
+                            'name' => $zoneName,
                             'coordinates' => DB::raw("ST_PolygonFromText('$wktPolygon')"),
                         ]);
                         $zonesToKeep[] = $newZone->id;
@@ -186,13 +199,48 @@ class ZoneController extends Controller
         }
     }
 
-    public function toggleStatus(Zone $zone)
+    public function changeStatus($id)
     {
-        $zone->status = $zone->status === 'active' ? 'inactive' : 'active';
+        $zone = Zone::findOrFail($id);
+        $zone->status = ($zone->status == 'active') ? 'inactive' : 'active'; // Cambiar de activo a inactivo o viceversa
         $zone->save();
 
-        return response()->json(['success' => true, 'message' => 'Estado cambiado']);
+        return response()->json([
+            'success' => true,
+            'message' => 'Estado actualizado correctamente.',
+            'coordinates' => $this->convertPolygonToArray($zone->coordinates),
+            'status' => $zone->status,
+        ]);
     }
 
+    public function deleteZone($id)
+    {
+        $zone = Zone::findOrFail($id);
+        $zone->delete();
 
+        return response()->json(['success' => true, 'message' => 'Zona eliminada correctamente.']);
+    }
+
+    public function updatePrice(Request $request, Zone $zone)
+    {
+        $request->validate([
+            'price' => 'required|numeric|min:0'
+        ]);
+
+        $zone->update(['price' => $request->price]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function show(Zone $zone)
+    {
+        return response()->json([
+            'id' => $zone->id,
+            'name' => $zone->name,
+            'price' => $zone->price,
+            'coordinates' => $this->convertPolygonToArray($zone->coordinates), // Convierte el POLYGON en array
+            'shop_latitude' => $zone->shop->latitude, // Latitud de la tienda
+            'shop_longitude' => $zone->shop->longitude // Longitud de la tienda
+        ]);
+    }
 }
