@@ -117,10 +117,21 @@ $(document).ready(function() {
                                 text: 'Ir igualmente',
                                 action: function () {
                                     // Acción al cerrar el pop-up
-                                    if (href) {
+                                    /*if (href) {
                                         window.location.href = href;
                                     } else {
                                         console.error("El atributo data-href no está definido en el botón.");
+                                    }*/
+                                    // Verificar la tienda seleccionada antes de redirigir
+                                    const tiendaSeleccionada = localStorage.getItem('tiendaSeleccionada');
+                                    if (tiendaSeleccionada && tiendaSeleccionada.trim() !== '') {
+                                        if (href) {
+                                            window.location.href = href;
+                                        } else {
+                                            console.error("El atributo data-href no está definido en el botón.");
+                                        }
+                                    } else {
+                                        window.location.href = '/seleccionar/local';
                                     }
                                 }
                             }
@@ -128,10 +139,21 @@ $(document).ready(function() {
                     });
                 } else {
                     // Redirigir al enlace en data-href
-                    if (href) {
+                    /*if (href) {
                         window.location.href = href;
                     } else {
                         console.error("El atributo data-href no está definido en el botón.");
+                    }*/
+                    // Verificar la tienda seleccionada antes de redirigir
+                    const tiendaSeleccionada = localStorage.getItem('tiendaSeleccionada');
+                    if (tiendaSeleccionada && tiendaSeleccionada.trim() !== '') {
+                        if (href) {
+                            window.location.href = href;
+                        } else {
+                            console.error("El atributo data-href no está definido en el botón.");
+                        }
+                    } else {
+                        window.location.href = '/seleccionar/local';
                     }
                 }
             },

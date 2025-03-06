@@ -16,6 +16,48 @@
         .pac-container {
             z-index: 1051 !important; /* Mayor que el z-index del modal */
         }
+
+        .buttonGoToCheckout {
+            display: inline-block;
+            padding: 8px 30px;
+            background-color: #ffbe33;
+            color: #ffffff;
+            border-radius: 45px;
+            -webkit-transition: all 0.3s;
+            transition: all 0.3s;
+            border: none;
+        }
+
+        .buttonGoToCheckout:hover, .buttonGoToCheckout:focus {
+            text-decoration: none;
+            color: #ffffff;
+            background-color: #e6a92e;
+        }
+
+        /* Esconder el botón original en dispositivos móviles */
+        @media (max-width: 992px) {
+            .d-lg-flex {
+                display: none !important;
+            }
+        }
+
+        /* Div fijo para móviles */
+        .mobile-fixed-cart {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1050;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            padding: 10px 15px;
+            border-top: 1px solid #ddd;
+        }
+
+        .mobile-fixed-cart .btn {
+            width: 100%;
+            margin: 0;
+        }
     </style>
 @endsection
 
@@ -49,13 +91,18 @@
 
             </div>
             <div class="row d-flex justify-content-center mt-5">
-                <a href="{{ route('cart.checkout') }}" class="btn btn-primary mb-3">Ir a pagar</a>
+                <a href="#" id="btn-go_to_checkout" data-href="{{ route('cart.checkout') }}" class="mb-3 buttonGoToCheckout d-lg-flex d-none">Ir a pagar</a>
             </div>
 
 
         </div>
     </section>
 
+    <div class="mobile-fixed-cart d-lg-none">
+        <button data-href="{{ route('cart.checkout') }}" class="btn btn-danger btn-block py-3" id="go-to-checkout-btn-mobile">
+            Ir a Pagar
+        </button>
+    </div>
 @endsection
 
 @section('scripts')

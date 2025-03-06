@@ -534,7 +534,7 @@
     <i class="fab fa-whatsapp"></i>
 </a>
 
-@if (!request()->routeIs('cart.show') && !request()->routeIs('cart.checkout') && !request()->routeIs('product.custom') && !request()->routeIs('reclamaciones'))
+@if (!request()->routeIs('cart.show') && !request()->routeIs('cart.checkout') && !request()->routeIs('product.custom') && !request()->routeIs('reclamaciones') && !request()->routeIs('showlocals'))
     {{-- Botón flotante --}}
     <a href="{{ route('cart.show') }}" id="cartButton" class="floating-cart d-sm-none">
         <i class="fas fa-shopping-cart"></i>
