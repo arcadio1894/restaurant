@@ -504,7 +504,7 @@
                     Sábados y Domingos
                 </p>
                 <p>
-                    6:30 PM - 11:30 PM
+                    4:00 PM - 11:30 PM
                 </p>
             </div>
         </div>
