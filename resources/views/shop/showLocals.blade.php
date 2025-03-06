@@ -30,8 +30,8 @@
                         {{--p>Ten en cuenta el <b>horario de los locales.</b> Tomamos pedidos hasta 30 min antes de su hora de cierre</p>--}}
                         <p>¡Te llevamos la pizza hasta tu puerta! Ingresa tu dirección o búscala en el mapa para que podamos entregarte tu pedido lo más rápido posible.</p>
                         <input type="text" id="searchInput" class="form-control mb-3" placeholder="Escribe tu dirección...">
-                        <button type="button" class="btn btn-primary mb-3" id="selectAddress">Seleccionar esta dirección</button>
-                    </div>
+                        {{--<button type="button" class="btn btn-primary mb-3" id="selectAddress">Seleccionar esta dirección</button>
+                    --}}</div>
                     <input type="hidden" name="address" id="address">
                     <input type="hidden" name="latitude" id="latitude">
                     <input type="hidden" name="longitude" id="longitude">

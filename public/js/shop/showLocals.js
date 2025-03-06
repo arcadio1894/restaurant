@@ -5,7 +5,7 @@ $(document).ready(function () {
 });
 
 // Función para inicializar el mapa
-function initAutocomplete() {
+/*function initAutocomplete() {
     console.log("Google Maps API cargada correctamente.");
 
     // Inicializamos el mapa en la Plaza de Armas de Trujillo, Perú
@@ -90,6 +90,103 @@ function initAutocomplete() {
 
     });
 
+}*/
+// Función para inicializar el mapa
+function initAutocomplete() {
+    console.log("Google Maps API cargada correctamente.");
+
+    const trujilloLatLng = { lat: -8.1132, lng: -79.0290 };
+    map = new google.maps.Map(document.getElementById("map"), {
+        center: trujilloLatLng,
+        zoom: 14,
+    });
+
+    marker = new google.maps.Marker({
+        position: trujilloLatLng,
+        map: map,
+        draggable: true,
+        title: "Arrastra el marcador para cambiar la dirección"
+    });
+
+    infowindow = new google.maps.InfoWindow();
+
+    // Evento cuando se arrastra el marcador
+    google.maps.event.addListener(marker, "dragend", function() {
+        updateMarkerPosition(marker.getPosition(), true);
+    });
+
+    // Evento cuando se hace clic en el mapa
+    map.addListener("click", function(event) {
+        marker.setPosition(event.latLng);
+        updateMarkerPosition(event.latLng, true);
+    });
+
+    // Inicializar el Autocomplete
+    const input = $("#searchInput")[0];
+    autocomplete = new google.maps.places.Autocomplete(input);
+    autocomplete.bindTo("bounds", map);
+
+    // Evento cuando se selecciona una dirección en Google Autocomplete
+    autocomplete.addListener("place_changed", function() {
+        const place = autocomplete.getPlace();
+        if (!place.geometry) {
+            alert("No se encontró información para esta dirección.");
+            return;
+        }
+
+        // Colocar marcador y actualizar la dirección
+        marker.setPosition(place.geometry.location);
+        map.setCenter(place.geometry.location);
+        updateMarkerPosition(place.geometry.location, true);
+    });
+}
+
+function updateMarkerPosition(latLng, fetchStores = false) {
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ location: latLng }, function(results, status) {
+        if (status === "OK" && results[0]) {
+            const address = results[0].formatted_address;
+
+            $("#searchInput").val(address);
+            $("#address").val(address);
+            $("#latitude").val(latLng.lat());
+            $("#longitude").val(latLng.lng());
+
+            // Mostrar la dirección en el infowindow
+            infowindow.setContent(`<div style="font-family: Arial, sans-serif;">
+                <div style="font-size: 14px; font-weight: bold; color: #000;">Dirección:</div>
+                <div style="font-size: 16px; font-weight: bold; color: #007BFF;">${address}</div>
+            </div>`);
+            infowindow.open(map, marker);
+
+            if (fetchStores) {
+                fetchShops(latLng.lat(), latLng.lng(), address);
+            }
+        }
+    });
+}
+
+function fetchShops(latitude, longitude, address) {
+    $.ajax({
+        url: "/buscar-tiendas",
+        method: "POST",
+        data: {
+            latitude: latitude,
+            longitude: longitude,
+            address: address,
+            _token: $('meta[name="csrf-token"]').attr("content")
+        },
+        success: function(response) {
+            if (response.success) {
+                mostrarTiendas(response.tiendas);
+            } else {
+                $("#body-locals").html(`<div class="alert alert-danger">${response.message}</div>`);
+            }
+        },
+        error: function() {
+            $("#body-locals").html(`<div class="alert alert-danger">Error al buscar tiendas.</div>`);
+        }
+    });
 }
 
 function mostrarTiendas(tiendas) {
@@ -170,7 +267,7 @@ function verMapa(lat, lng) {
 }
 
 // Actualiza el valor del input y muestra la dirección en el infowindow
-function updateMarkerPosition(latLng) {
+/*function updateMarkerPosition(latLng) {
     // Usamos geocoding para obtener la dirección a partir de las coordenadas
     const geocoder = new google.maps.Geocoder();
     geocoder.geocode({ location: latLng }, function(results, status) {
@@ -206,7 +303,7 @@ function updateMarkerPosition(latLng) {
             });
         }
     });
-}
+}*/
 
 // Inicializar el mapa y la funcionalidad de autocomplete al cargar el script
 window.initAutocomplete = initAutocomplete;
