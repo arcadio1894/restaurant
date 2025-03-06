@@ -100,13 +100,14 @@ class ZoneController extends Controller
             'zones.*.coordinates' => 'required|array|min:3',
         ]);
 
-        DB::beginTransaction();
         try {
+            DB::beginTransaction(); // Aseguramos que la transacción inicia
+
             $shopId = $request->shop_id;
-            $shop = Shop::findOrFail($request->shop_id);
+            $shop = Shop::findOrFail($shopId);
             $baseName = $shop->name; // Nombre base de la tienda
 
-            // Obtener todas las zonas existentes con el mismo nombre base y extraer los números
+            // 🔍 Obtener las zonas existentes de la tienda y extraer números
             $existingZones = Zone::where('shop_id', $shop->id)
                 ->where('name', 'LIKE', "$baseName%")
                 ->pluck('name')
@@ -117,23 +118,9 @@ class ZoneController extends Controller
                 ->sort()
                 ->values();
 
-            // Buscar el primer número disponible
-            $newNumber = 1;
-            foreach ($existingZones as $number) {
-                if ($number != $newNumber) {
-                    break;
-                }
-                $newNumber++;
-            }
-
-            // Generar el nuevo nombre con el primer número disponible
-            $zoneName = $baseName . ' ' . $newNumber;
-
-            // 🔍 Obtener las zonas actuales de la tienda con sus coordenadas
-            $existingZones = Zone::where('shop_id', $shopId)->get()->keyBy('id');
-
             // 🔄 Lista de IDs de zonas que se mantendrán
             $zonesToKeep = [];
+            $usedNumbers = $existingZones->toArray(); // Guardamos los números usados
 
             foreach ($request->zones as $zoneData) {
                 $coordinates = $zoneData['coordinates'];
@@ -146,47 +133,34 @@ class ZoneController extends Controller
                 $wktPolygon = rtrim($wktPolygon, ',') . "))";
 
                 // 🚀 Buscar si existe una zona con las mismas coordenadas
-                $matchedZone = null;
-                foreach ($existingZones as $zone) {
-                    $dbCoordinates = DB::selectOne("SELECT ST_AsText(coordinates) as coords FROM zones WHERE id = ?", [$zone->id]);
-
-                    if ($dbCoordinates && trim($dbCoordinates->coords) === trim($wktPolygon)) {
-                        $matchedZone = $zone;
-                        break;
-                    }
-                }
+                $matchedZone = Zone::where('shop_id', $shopId)
+                    ->whereRaw("ST_AsText(coordinates) = ?", [$wktPolygon])
+                    ->first();
 
                 if ($matchedZone) {
                     // ✅ La zona ya existe con las mismas coordenadas, la mantenemos
                     $zonesToKeep[] = $matchedZone->id;
-                } else {
-                    // 🚀 Verificar si la zona existe con coordenadas diferentes (actualización)
-                    $updated = false;
-                    foreach ($existingZones as $zone) {
-                        if (!in_array($zone->id, $zonesToKeep)) {
-                            // 🔄 Si encontramos una zona sin usar, la actualizamos con las nuevas coordenadas
-                            $zone->update([
-                                'coordinates' => DB::raw("ST_PolygonFromText('$wktPolygon')")
-                            ]);
-                            $zonesToKeep[] = $zone->id;
-                            $updated = true;
-                            break;
-                        }
-                    }
-
-                    // 🆕 Si no se pudo actualizar, creamos una nueva zona
-                    if (!$updated) {
-                        $newZone = Zone::create([
-                            'shop_id' => $shopId,
-                            'name' => $zoneName,
-                            'coordinates' => DB::raw("ST_PolygonFromText('$wktPolygon')"),
-                        ]);
-                        $zonesToKeep[] = $newZone->id;
-                    }
+                    continue;
                 }
+
+                // 🔢 Generar número correlativo único
+                $newNumber = 1;
+                while (in_array($newNumber, $usedNumbers)) {
+                    $newNumber++;
+                }
+                $usedNumbers[] = $newNumber; // Marcar número como usado
+                $zoneName = $baseName . ' ' . $newNumber;
+
+                // 🆕 Crear nueva zona con nombre único
+                $newZone = Zone::create([
+                    'shop_id' => $shopId,
+                    'name' => $zoneName,
+                    'coordinates' => DB::raw("ST_PolygonFromText('$wktPolygon')"),
+                ]);
+                $zonesToKeep[] = $newZone->id;
             }
 
-            // ❌ Eliminar solo las zonas que ya no están en la lista enviada
+            // ❌ Eliminar zonas que ya no están en la lista enviada
             Zone::where('shop_id', $shopId)
                 ->whereNotIn('id', $zonesToKeep)
                 ->delete();
@@ -197,6 +171,7 @@ class ZoneController extends Controller
             DB::rollBack();
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
+
     }
 
     public function changeStatus($id)

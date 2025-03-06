@@ -8,7 +8,7 @@
     active
 @endsection
 
-@section('activeCreateShops')
+@section('activeCreateShop')
     active
 @endsection
 

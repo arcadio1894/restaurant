@@ -307,7 +307,8 @@ Route::middleware('auth')->group(function (){
     });
 });
 
-
+Route::get('/seleccionar/local', [ShopController::class, 'showLocals']);
+Route::post('/buscar-tiendas', [ShopController::class, 'buscarTiendas']);
 
 Route::get('/telegram/send', [TelegramController::class, 'sendMessage']);
 

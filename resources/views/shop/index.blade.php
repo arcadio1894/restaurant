@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('openShop')
+@section('openShops')
     menu-open
 @endsection
 

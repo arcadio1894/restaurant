@@ -7,6 +7,7 @@ use App\Models\District;
 use App\Models\Province;
 use App\Models\Shop;
 use App\Models\User;
+use App\Models\Zone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -261,4 +262,40 @@ class ShopController extends Controller
         $shop = Shop::findOrFail($id);
         return response()->json($shop);
     }
+
+    public function showLocals()
+    {
+        return view('shop.showLocals');
+    }
+
+    public function buscarTiendas(Request $request)
+    {
+        $latitude = $request->latitude;
+        $longitude = $request->longitude;
+
+        // Verificar si la dirección está dentro de alguna zona de reparto
+        $zones = Zone::select("zones.*")
+            ->whereRaw("ST_Contains(zones.coordinates, ST_GeomFromText('POINT($longitude $latitude)'))")
+            ->get();
+
+        if ($zones->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lo sentimos, tu dirección no está dentro de nuestras zonas de reparto.'
+            ]);
+        }
+
+        // Obtener las tiendas de esas zonas y el precio del envío
+        $tiendas = Shop::join('zones', 'shops.id', '=', 'zones.shop_id')
+            ->whereIn('zones.id', $zones->pluck('id'))
+            ->select('shops.id', 'shops.name', 'shops.latitude', 'shops.longitude', 'zones.price')
+            ->orderBy('zones.price', 'asc') // Ordenar por precio (de menor a mayor)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'tiendas' => $tiendas
+        ]);
+    }
+
 }
