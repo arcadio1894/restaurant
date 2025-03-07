@@ -774,10 +774,10 @@ class OrderController extends Controller
                 elseif (in_array($categoryId, [3, 7])) {
                     foreach ($detail->options as $option) {
                         $optionCategoryId = $option->product->category_id ?? null;
-                        $optionTypeId = $option->product_type_id; // Directamente desde OrderDetailOption
+                        //$optionTypeId = $option->product_type_id; // Directamente desde OrderDetailOption
 
-                        if (in_array($optionCategoryId, [1, 2, 8]) && $optionTypeId) {
-                            $this->sumarCantidad($semanas[$semanaKey], $optionTypeId, $detail->quantity);
+                        if (in_array($optionCategoryId, [1, 2, 8]) && $productTypeId) {
+                            $this->sumarCantidad($semanas[$semanaKey], $productTypeId, $detail->quantity);
                         }
                     }
                 } else {
