@@ -764,8 +764,8 @@ class OrderController extends Controller
                 $productTypeId = $detail->product_type_id; // Directamente desde OrderDetail
                 $categoryId = $detail->product->category_id ?? null; // Categoría del producto
                 $category = Category::find($categoryId);
-                dump("Categoria". $category->name);
-                dump("ProductTypeId". $productTypeId);
+                dump("Categoria: ". $category->name);
+                dump("ProductTypeId: ". $productTypeId);
                 // Si el producto es una pizza clásica, especial o personalizada, se cuenta directamente
                 if (in_array($categoryId, [1, 2, 8]) && $productTypeId) {
                     $this->sumarCantidad($semanas[$semanaKey], $productTypeId, $detail->quantity);
@@ -780,6 +780,8 @@ class OrderController extends Controller
                             $this->sumarCantidad($semanas[$semanaKey], $optionTypeId, $detail->quantity);
                         }
                     }
+                } else {
+                    dump("No pertenece a las categorias");
                 }
             }
         }
