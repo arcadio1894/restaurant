@@ -726,9 +726,9 @@ class OrderController extends Controller
 
     public function reportePizzasFinde()
     {
-        $startDate = Carbon::create(2025, 1, 1); // Desde el 1 de enero de 2025
-        $endDate = Carbon::now(); // Hasta hoy
-        //$endDate = Carbon::create(2025, 3, 2);
+        $startDate = Carbon::create(2025, 2, 21); // Desde el 1 de enero de 2025
+        //$endDate = Carbon::now(); // Hasta hoy
+        $endDate = Carbon::create(2025, 2, 23);
         // Obtiene las órdenes creadas en fines de semana (sábados y domingos) dentro del rango de fechas
         $orders = Order::whereDate('created_at', '>=',$startDate)
             ->whereDate('created_at', '<=',$endDate)
