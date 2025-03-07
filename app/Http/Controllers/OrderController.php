@@ -758,8 +758,8 @@ class OrderController extends Controller
                 ];
             }
 
-            foreach ($order->details as $detail) {
-                dump("Detalle: ");
+            foreach ($order->details as $index => $detail) {
+                dump("Detalle: ". $index+1);
                 dump($detail);
                 $productTypeId = $detail->product_type_id; // Directamente desde OrderDetail
                 $categoryId = $detail->product->category_id ?? null; // Categoría del producto
