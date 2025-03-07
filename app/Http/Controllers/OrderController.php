@@ -732,6 +732,8 @@ class OrderController extends Controller
             ->with(['details.options']) // Solo cargamos opciones porque usaremos directamente product_type_id
             ->get();
 
+        dump($orders);
+
         $semanas = [];
 
         foreach ($orders as $order) {
