@@ -732,6 +732,7 @@ class OrderController extends Controller
             ->whereDate('created_at', '<=',$endDate)
             ->whereRaw('WEEKDAY(created_at) IN (4,5,6)') // Solo viernes (4), sábado (5) y domingo (6)
             ->with(['details.options']) // Solo cargamos opciones porque usaremos directamente product_type_id
+            ->where('state_annulled', 0)
             ->get();
 
         dump($orders);
