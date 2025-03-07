@@ -757,7 +757,7 @@ class OrderController extends Controller
                     'cantPersonal' => 0,
                 ];
             }
-            //dump("Orden: ". ($index2+1));
+            dump("Orden: ". ($index2+1));
             foreach ($order->details as $index => $detail) {
                 dump("Detalle: ". ($index+1));
                 dump($detail->product->full_name);
