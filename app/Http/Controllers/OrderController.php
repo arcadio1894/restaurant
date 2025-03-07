@@ -812,8 +812,8 @@ class OrderController extends Controller
     {
         $productType = ProductType::find($typeId);
         $type = Type::find($productType->type_id);
-        dump("Tipo: ".$type->name);
-        dump("Cantidad: ".$cantidad);
+        //dump("Tipo: ".$type->name);
+        //dump("Cantidad: ".$cantidad);
         if ( isset($productType) )
         {
             $type = $productType->type_id;
