@@ -729,7 +729,7 @@ class OrderController extends Controller
 
         // Obtiene las órdenes creadas en fines de semana (sábados y domingos) dentro del rango de fechas
         $orders = Order::whereBetween('created_at', [$startDate, $endDate])
-            ->whereRaw('WEEKDAY(created_at) IN (5,6)') // Solo sábados (5) y domingos (6)
+            ->whereRaw('WEEKDAY(created_at) IN (4,5,6)') // Solo viernes (4), sábado (5) y domingo (6)
             ->with(['details.options']) // Solo cargamos opciones porque usaremos directamente product_type_id
             ->get();
 
