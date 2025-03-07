@@ -741,7 +741,7 @@ class OrderController extends Controller
 
         $semanas = [];
 
-        foreach ($orders as $order) {
+        foreach ($orders as $index2 => $order) {
             // Determina el inicio (sábado) y fin (domingo) de la semana de la orden
             $weekStart = Carbon::parse($order->created_at)->startOfWeek(Carbon::FRIDAY);
             $weekEnd = $weekStart->copy()->addDays(2); // Sábado + Domingo
@@ -757,9 +757,9 @@ class OrderController extends Controller
                     'cantPersonal' => 0,
                 ];
             }
-
+            dump("Orden: ". ($index2+1));
             foreach ($order->details as $index => $detail) {
-                dump("Detalle: ". $index+1);
+                dump("Detalle: ". ($index+1));
                 dump($detail);
                 $productTypeId = $detail->product_type_id; // Directamente desde OrderDetail
                 $categoryId = $detail->product->category_id ?? null; // Categoría del producto
