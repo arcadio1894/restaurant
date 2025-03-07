@@ -732,7 +732,7 @@ class OrderController extends Controller
             ->with(['details.options']) // Solo cargamos opciones porque usaremos directamente product_type_id
             ->get();
 
-        dump($orders);
+        //dump($orders);
 
         $semanas = [];
 
@@ -756,7 +756,8 @@ class OrderController extends Controller
             foreach ($order->details as $detail) {
                 $productTypeId = $detail->product_type_id; // Directamente desde OrderDetail
                 $categoryId = $detail->product->category_id ?? null; // Categoría del producto
-
+                dump($categoryId);
+                dump($productTypeId);
                 // Si el producto es una pizza clásica, especial o personalizada, se cuenta directamente
                 if (in_array($categoryId, [1, 2, 8]) && $productTypeId) {
                     $this->sumarCantidad($semanas[$semanaKey], $productTypeId, $detail->quantity);
