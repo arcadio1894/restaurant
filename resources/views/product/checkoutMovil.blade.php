@@ -317,7 +317,7 @@
                         </div>
                     </div>
 
-                    <div class="mb-3">
+                    {{--<div class="mb-3">
                         <label for="district">Seleccione su Distrito</label>
                         <select class="form-control" name="district" id="district" required>
                             <option value="" selected>Ninguno</option>
@@ -328,20 +328,27 @@
                         <div class="invalid-feedback" style="width: 100%;">
                             Su distrito es obligatorio.
                         </div>
-                    </div>
+                    </div>--}}
 
                     <div class="mb-3">
                         <label for="address">Dirección</label>
+                        {{--<input type="text" class="form-control" id="address" name="address" placeholder=""
+                               required value="{{ $defaultAddress ? $defaultAddress->address_line : '' }}">--}}
                         <input type="text" class="form-control" id="address" name="address" placeholder=""
-                               required value="{{ $defaultAddress ? $defaultAddress->address_line : '' }}">
-                        <button type="button" class="btn btn-link" id="btn-selectAddress">
+                               required value="" readonly>
+                        {{--<button type="button" class="btn btn-link" id="btn-selectAddress">
                             Encuentra tu dirección
-                        </button>
+                        </button>--}}
+                        <a href="{{ route('showlocals') }}" class="btn btn-link">
+                            Cambia tu dirección
+                        </a>
                         <div class="invalid-feedback">
                             Por favor ingrese su dirección de envío.
                         </div>
                         <input type="hidden" id="latitude" name="latitude">
                         <input type="hidden" id="longitude" name="longitude">
+                        <input type="hidden" id="costShipping" name="costShipping">
+                        <input type="hidden" id="shopId" name="shopId">
                     </div>
 
                     <div class="mb-3">

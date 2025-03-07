@@ -42,6 +42,25 @@ const cardForm = mp.cardForm({
 });*/
 
 $(document).ready(function() {
+    // Obtener los datos de la tienda seleccionada desde localStorage
+    const tiendaSeleccionada = localStorage.getItem('tiendaSeleccionada');
+
+    if (tiendaSeleccionada) {
+        const tienda = JSON.parse(tiendaSeleccionada);
+
+        // Rellenar los campos con los valores obtenidos
+        $('#address').val(tienda.direccionCliente);
+        $('#latitude').val(tienda.latitudCliente);
+        $('#longitude').val(tienda.longitudCliente);
+        $('#costShipping').val(tienda.precioEnvio);
+        $('#shopId').val(tienda.tiendaId);
+
+        // Actualizar el costo de envío en la vista
+        if (tienda.precioEnvio) {
+            $('#amount_shipping').text(`+$${tienda.precioEnvio}`);
+            $('#info_shipping').removeClass('hidden'); // Mostrar el elemento si estaba oculto
+        }
+    }
 
     loadCheckout();
 
@@ -171,6 +190,7 @@ $(document).ready(function() {
         }
 
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let tiendaSeleccionada = JSON.parse(localStorage.getItem('tiendaSeleccionada')) || [];
         $('#info_code').addClass('hidden'); // Ocultar
         $('#coupon_name').val(""); // Limpiar el campo del nombre del cupón
         const promoCode = $('#promo_code').val();
@@ -182,7 +202,8 @@ $(document).ready(function() {
             code: promoCode,
             cart: JSON.stringify(cart), // Serializar el objeto cart
             district: district,
-            phone: phone
+            phone: phone,
+            tienda: JSON.stringify(tiendaSeleccionada)
         }, function (response) {
             if (response.success) {
                 // Si el código es válido, actualizamos los elementos
@@ -541,6 +562,18 @@ async function loadCheckout() {
         $('#body-items').append(clone);
     });
 
+    // Obtener el costo de envío desde localStorage
+    let shippingCost = 0;
+    const tiendaSeleccionada = localStorage.getItem('tiendaSeleccionada');
+
+    if (tiendaSeleccionada) {
+        const tienda = JSON.parse(tiendaSeleccionada);
+        shippingCost = parseFloat(tienda.precioEnvio) || 0;
+    }
+
+    // Sumar el costo de envío al total
+    total += shippingCost;
+
     // Calculamos y renderizamos el resumen
     const taxesCart = total - (total / (1 + TAX_RATE));
     const subtotalCart = total - taxesCart;
@@ -829,6 +862,8 @@ function submitFormAjax(extraData = {}) {
     let cart = localStorage.getItem('cart'); // Asume que está guardado con la clave 'cart'
     let observations = localStorage.getItem('observations');
 
+    let tienda = localStorage.getItem('tienda');
+
     if (cart) {
         try {
             // Parsear el carrito
@@ -849,6 +884,9 @@ function submitFormAjax(extraData = {}) {
             // Agregar los datos al objeto de datos
             dataObj.cart = cart;
             dataObj.observations = observations;
+
+            dataObj.tienda = tienda;
+
         } catch (error) {
             console.error("Error al parsear el carrito desde localStorage:", error);
             toastr.error('Error con el carrito. Por favor, verifica tu compra.', 'Error');

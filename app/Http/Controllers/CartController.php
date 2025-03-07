@@ -1005,13 +1005,16 @@ class CartController extends Controller
 
             // Manejar el distrito y el costo de envío
             $districtId = $request->input('district');
-            if (!$districtId) {
+            /*if (!$districtId) {
                 DB::rollBack();
                 return response()->json(['success' => false, 'message' => 'Debe seleccionar un distrito para el envío.']);
-            }
+            }*/
 
-            $district = ShippingDistrict::findOrFail($districtId);
-            $shippingCost = $district->shipping_cost;
+            //$district = ShippingDistrict::findOrFail($districtId);
+            //$shippingCost = $district->shipping_cost;
+
+            $tienda = $request->input('tienda');
+            $shippingCost = isset($tienda['precioEnvio']) ? $tienda['precioEnvio'] : 0;
             $total = $this->getTotalCart($cart);
             $totalWithShipping = $total + $shippingCost;
 
@@ -2259,6 +2262,9 @@ class CartController extends Controller
     public function applyCoupon(Request $request)
     {
         $cart = json_decode($request->input('cart'), true);
+
+        $tienda = json_decode($request->input('tienda'), true);
+
         $districtId = $request->input('district');
         $code = $request->input('code');
         $phone = $request->input('phone');
@@ -2268,12 +2274,15 @@ class CartController extends Controller
         }
 
         $shippingCost = 0;
-        if ($districtId) {
+        if ($tienda) {
+            $shippingCost = isset($tienda['precioEnvio']) ? $tienda['precioEnvio'] : 0;
+        }
+        /*if ($districtId) {
             $district = ShippingDistrict::find($districtId);
             if ($district) {
                 $shippingCost = $district->shipping_cost;
             }
-        }
+        }*/
 
         $total = $this->getTotalCart($cart);
         $totalWithShipping = $total + $shippingCost;

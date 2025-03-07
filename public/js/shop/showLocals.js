@@ -2,6 +2,84 @@ let map, marker, infowindow, autocomplete;
 let shopMarker = null;
 $(document).ready(function () {
     console.log("Documento listo");
+
+    $(document).on('click', '#go-to-checkout, #go-to-checkout-btn-mobile', function (e) {
+        e.preventDefault(); // Prevenir el comportamiento predeterminado
+
+        // Obtener las observaciones
+        const observations = $('#observations').val();
+
+        // Guardar las observaciones en el localStorage
+        localStorage.setItem('observations', observations);
+
+        const href = $(this).data('href');
+
+        $.ajax({
+            url: '/api/business-hours', // Cambia la ruta si es necesario
+            method: 'GET',
+            success: function (response) {
+                if (!response.is_open) {
+                    $.confirm({
+                        title: '¡Aún no estamos atendiendo!',
+                        content: `
+                    <img src="/images/checkout/cerrado.png" style="display:block; margin: 0 auto; padding-bottom: 15px; width: 100px; height: auto;" />
+                    <p class="text-center"><strong>Estamos fuera de horario. Te esperamos en nuestro próximo turno.</strong></p>
+                    <p class="text-center">En este momento no podemos atenderte, pues nos encontramos fuera del horario de servicio de atención al cliente.</p>
+                  
+                    <p class="mb-2 text-center"><strong >Estos son nuestros horarios:</strong></p>
+                    <p class="mb-0 text-center">Lunes a Domingos: 6:30pm - 11:30pm</p>
+                `,
+                        buttons: {
+                            close: {
+                                text: 'Ir igualmente',
+                                action: function () {
+                                    // Acción al cerrar el pop-up
+                                    /*if (href) {
+                                        window.location.href = href;
+                                    } else {
+                                        console.error("El atributo data-href no está definido en el botón.");
+                                    }*/
+                                    // Verificar la tienda seleccionada antes de redirigir
+                                    const tiendaSeleccionada = localStorage.getItem('tiendaSeleccionada');
+                                    if (tiendaSeleccionada && tiendaSeleccionada.trim() !== '') {
+                                        if (href) {
+                                            window.location.href = href;
+                                        } else {
+                                            console.error("El atributo data-href no está definido en el botón.");
+                                        }
+                                    } else {
+                                        window.location.href = '/seleccionar/local';
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    // Redirigir al enlace en data-href
+                    /*if (href) {
+                        window.location.href = href;
+                    } else {
+                        console.error("El atributo data-href no está definido en el botón.");
+                    }*/
+                    // Verificar la tienda seleccionada antes de redirigir
+                    const tiendaSeleccionada = localStorage.getItem('tiendaSeleccionada');
+                    if (tiendaSeleccionada && tiendaSeleccionada.trim() !== '') {
+                        if (href) {
+                            window.location.href = href;
+                        } else {
+                            console.error("El atributo data-href no está definido en el botón.");
+                        }
+                    } else {
+                        window.location.href = '/seleccionar/local';
+                    }
+                }
+            },
+            error: function () {
+                console.error('No se pudo verificar el horario de atención.');
+            }
+        });
+
+    });
 });
 
 // Función para inicializar el mapa

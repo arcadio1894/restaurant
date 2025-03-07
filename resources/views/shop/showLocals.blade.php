@@ -91,7 +91,7 @@
 
             </div>
             <div class="row d-flex justify-content-center mt-5">
-                <a href="#" id="btn-go_to_checkout" data-href="{{ route('cart.checkout') }}" class="mb-3 buttonGoToCheckout d-lg-flex d-none">Ir a pagar</a>
+                <a href="#" id="go-to-checkout" data-href="{{ route('cart.checkout') }}" class="mb-3 buttonGoToCheckout d-lg-flex d-none">Ir a pagar</a>
             </div>
 
 
