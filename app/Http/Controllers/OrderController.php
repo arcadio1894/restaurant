@@ -760,7 +760,7 @@ class OrderController extends Controller
             dump("Orden: ". ($index2+1));
             foreach ($order->details as $index => $detail) {
                 dump("Detalle: ". ($index+1));
-                dump($detail);
+                dump($detail->product->full_name);
                 $productTypeId = $detail->product_type_id; // Directamente desde OrderDetail
                 $categoryId = $detail->product->category_id ?? null; // Categoría del producto
                 $category = Category::find($categoryId);
