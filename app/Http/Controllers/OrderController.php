@@ -726,18 +726,21 @@ class OrderController extends Controller
         $startDate = Carbon::create(2025, 1, 1); // Desde el 1 de enero de 2025
         $endDate = Carbon::now(); // Hasta hoy
 
+        // Obtiene las órdenes creadas en fines de semana (sábados y domingos) dentro del rango de fechas
         $orders = Order::whereBetween('created_at', [$startDate, $endDate])
-            ->whereRaw('WEEKDAY(created_at) IN (5,6)') // Solo sábados y domingos
-            ->with(['details.product.productTypes', 'details.options.product.productTypes'])
+            ->whereRaw('WEEKDAY(created_at) IN (5,6)') // Solo sábados (5) y domingos (6)
+            ->with(['details.options']) // Solo cargamos opciones porque usaremos directamente product_type_id
             ->get();
 
         $semanas = [];
 
         foreach ($orders as $order) {
+            // Determina el inicio (sábado) y fin (domingo) de la semana de la orden
             $weekStart = Carbon::parse($order->created_at)->startOfWeek(Carbon::SATURDAY);
             $weekEnd = $weekStart->copy()->addDays(1); // Domingo
             $semanaKey = $weekStart->toDateString() . ' al ' . $weekEnd->toDateString();
 
+            // Inicializa la estructura para la semana si no existe
             if (!isset($semanas[$semanaKey])) {
                 $semanas[$semanaKey] = [
                     'id' => count($semanas) + 1,
@@ -749,26 +752,34 @@ class OrderController extends Controller
             }
 
             foreach ($order->details as $detail) {
-                $productTypeId = optional($detail->product->productType)->id;
+                $productTypeId = $detail->product_type_id; // Directamente desde OrderDetail
+                $categoryId = $detail->product->category_id ?? null; // Categoría del producto
 
-                if (in_array($productTypeId, [1, 2, 8])) { // Clásicas, Especiales y Personalizadas
-                    $this->sumarCantidad($semanas[$semanaKey], $detail->product->type, $detail->quantity);
-                } elseif (in_array($productTypeId, [3, 7])) { // Combos y Promos
-                    foreach ($detail->orderDetailOptions as $option) {
-                        $optionTypeId = optional($option->product->productType)->id;
-                        if (in_array($optionTypeId, [1, 2, 8])) {
-                            $this->sumarCantidad($semanas[$semanaKey], $option->product->type, 1);
+                // Si el producto es una pizza clásica, especial o personalizada, se cuenta directamente
+                if (in_array($categoryId, [1, 2, 8]) && $productTypeId) {
+                    $this->sumarCantidad($semanas[$semanaKey], $productTypeId, $detail->quantity);
+                }
+                // Si el producto es un combo o promoción, se revisan sus opciones
+                elseif (in_array($categoryId, [3, 7])) {
+                    foreach ($detail->options as $option) {
+                        $optionCategoryId = $option->product->category_id ?? null;
+                        $optionTypeId = $option->product_type_id; // Directamente desde OrderDetailOption
+
+                        if (in_array($optionCategoryId, [1, 2, 8]) && $optionTypeId) {
+                            $this->sumarCantidad($semanas[$semanaKey], $optionTypeId, $detail->quantity);
                         }
                     }
                 }
             }
         }
 
+        // Calcula los totales de cada tipo de pizza en todas las semanas
         $totalFamiliar = array_sum(array_column($semanas, 'cantFamiliar'));
         $totalGrande = array_sum(array_column($semanas, 'cantGrande'));
         $totalPersonal = array_sum(array_column($semanas, 'cantPersonal'));
         $numSemanas = count($semanas);
 
+        // Calcula el promedio de pizzas vendidas por semana
         $resumen = [
             'totalFamiliar' => $totalFamiliar,
             'totalGrande' => $totalGrande,
@@ -783,6 +794,7 @@ class OrderController extends Controller
 
     private function sumarCantidad(&$semana, $typeId, $cantidad)
     {
+        //dump($typeId);
         switch ($typeId) {
             case 1:
                 $semana['cantFamiliar'] += $cantidad;
