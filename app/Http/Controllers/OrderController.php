@@ -11,6 +11,7 @@ use App\Models\Address;
 use App\Models\CashMovement;
 use App\Models\CashRegister;
 use App\Models\Order;
+use App\Models\ProductType;
 use App\Models\ShippingDistrict;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -756,8 +757,8 @@ class OrderController extends Controller
             foreach ($order->details as $detail) {
                 $productTypeId = $detail->product_type_id; // Directamente desde OrderDetail
                 $categoryId = $detail->product->category_id ?? null; // Categoría del producto
-                dump($categoryId);
-                dump($productTypeId);
+                //dump($categoryId);
+                //dump($productTypeId);
                 // Si el producto es una pizza clásica, especial o personalizada, se cuenta directamente
                 if (in_array($categoryId, [1, 2, 8]) && $productTypeId) {
                     $this->sumarCantidad($semanas[$semanaKey], $productTypeId, $detail->quantity);
@@ -797,17 +798,23 @@ class OrderController extends Controller
 
     private function sumarCantidad(&$semana, $typeId, $cantidad)
     {
-        //dump($typeId);
-        switch ($typeId) {
-            case 1:
-                $semana['cantFamiliar'] += $cantidad;
-                break;
-            case 2:
-                $semana['cantGrande'] += $cantidad;
-                break;
-            case 3:
-                $semana['cantPersonal'] += $cantidad;
-                break;
+        $productType = ProductType::find($typeId);
+        if ( isset($productType) )
+        {
+            $type = $productType->type_id;
+            //dump($typeId);
+            switch ($type) {
+                case 1:
+                    $semana['cantFamiliar'] += $cantidad;
+                    break;
+                case 2:
+                    $semana['cantGrande'] += $cantidad;
+                    break;
+                case 3:
+                    $semana['cantPersonal'] += $cantidad;
+                    break;
+            }
         }
+
     }
 }
