@@ -10,9 +10,11 @@ use App\Mail\OrderStatusEmailAnulled;
 use App\Models\Address;
 use App\Models\CashMovement;
 use App\Models\CashRegister;
+use App\Models\Category;
 use App\Models\Order;
 use App\Models\ProductType;
 use App\Models\ShippingDistrict;
+use App\Models\Type;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -735,7 +737,7 @@ class OrderController extends Controller
             ->where('state_annulled', 0)
             ->get();
 
-        dump($orders);
+        dump(count($orders));
 
         $semanas = [];
 
@@ -757,10 +759,13 @@ class OrderController extends Controller
             }
 
             foreach ($order->details as $detail) {
+                dump("Detalle: ");
+                dump($detail);
                 $productTypeId = $detail->product_type_id; // Directamente desde OrderDetail
                 $categoryId = $detail->product->category_id ?? null; // Categoría del producto
-                //dump($categoryId);
-                //dump($productTypeId);
+                $category = Category::find($categoryId);
+                dump("Categoria". $category->name);
+                dump("ProductTypeId". $productTypeId);
                 // Si el producto es una pizza clásica, especial o personalizada, se cuenta directamente
                 if (in_array($categoryId, [1, 2, 8]) && $productTypeId) {
                     $this->sumarCantidad($semanas[$semanaKey], $productTypeId, $detail->quantity);
@@ -795,12 +800,18 @@ class OrderController extends Controller
             'promedioPersonal' => $numSemanas ? round($totalPersonal / $numSemanas, 2) : 0,
         ];
 
-        return response()->json(['semanas' => array_values($semanas), 'resumen' => $resumen]);
+        dump(array_values($semanas));
+        dump($resumen);
+
+        //return response()->json(['semanas' => array_values($semanas), 'resumen' => $resumen]);
     }
 
     private function sumarCantidad(&$semana, $typeId, $cantidad)
     {
         $productType = ProductType::find($typeId);
+        $type = Type::find($productType->type_id);
+        dump("Tipo: ".$type->name);
+        dump("Cantidad: ".$cantidad);
         if ( isset($productType) )
         {
             $type = $productType->type_id;
