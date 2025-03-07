@@ -739,8 +739,8 @@ class OrderController extends Controller
 
         foreach ($orders as $order) {
             // Determina el inicio (sábado) y fin (domingo) de la semana de la orden
-            $weekStart = Carbon::parse($order->created_at)->startOfWeek(Carbon::SATURDAY);
-            $weekEnd = $weekStart->copy()->addDays(1); // Domingo
+            $weekStart = Carbon::parse($order->created_at)->startOfWeek(Carbon::FRIDAY);
+            $weekEnd = $weekStart->copy()->addDays(2); // Sábado + Domingo
             $semanaKey = $weekStart->toDateString() . ' al ' . $weekEnd->toDateString();
 
             // Inicializa la estructura para la semana si no existe
