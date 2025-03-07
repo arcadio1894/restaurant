@@ -737,7 +737,7 @@ class OrderController extends Controller
             ->where('state_annulled', 0)
             ->get();
 
-        //dump(count($orders));
+        dump(count($orders));
 
         $semanas = [];
 
@@ -759,13 +759,13 @@ class OrderController extends Controller
             }
             //dump("Orden: ". ($index2+1));
             foreach ($order->details as $index => $detail) {
-                //dump("Detalle: ". ($index+1));
-                //dump($detail->product->full_name);
+                dump("Detalle: ". ($index+1));
+                dump($detail->product->full_name);
                 $productTypeId = $detail->product_type_id; // Directamente desde OrderDetail
                 $categoryId = $detail->product->category_id ?? null; // Categoría del producto
                 $category = Category::find($categoryId);
-                //dump("Categoria: ". $category->name);
-                //dump("ProductTypeId: ". $productTypeId);
+                dump("Categoria: ". $category->name);
+                dump("ProductTypeId: ". $productTypeId);
                 // Si el producto es una pizza clásica, especial o personalizada, se cuenta directamente
                 if (in_array($categoryId, [1, 2, 8]) && $productTypeId) {
                     $this->sumarCantidad($semanas[$semanaKey], $productTypeId, $detail->quantity);
@@ -780,9 +780,9 @@ class OrderController extends Controller
                             $this->sumarCantidad($semanas[$semanaKey], $productTypeId, $detail->quantity);
                         }
                     }
-                } /*else {
+                } else {
                     dump("No pertenece a las categorias");
-                }*/
+                }
             }
         }
 
@@ -802,8 +802,8 @@ class OrderController extends Controller
             'promedioPersonal' => $numSemanas ? round($totalPersonal / $numSemanas, 2) : 0,
         ];
 
-        //dump(array_values($semanas));
-        //dump($resumen);
+        dump(array_values($semanas));
+        dump($resumen);
 
         return response()->json(['semanas' => array_values($semanas), 'resumen' => $resumen]);
     }
@@ -812,8 +812,8 @@ class OrderController extends Controller
     {
         $productType = ProductType::find($typeId);
         $type = Type::find($productType->type_id);
-        //dump("Tipo: ".$type->name);
-        //dump("Cantidad: ".$cantidad);
+        dump("Tipo: ".$type->name);
+        dump("Cantidad: ".$cantidad);
         if ( isset($productType) )
         {
             $type = $productType->type_id;
