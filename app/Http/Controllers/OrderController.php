@@ -724,16 +724,17 @@ class OrderController extends Controller
 
     public function reportePizzasFinde()
     {
-        $startDate = Carbon::create(2025, 1, 1); // Desde el 1 de enero de 2025
-        $endDate = Carbon::now(); // Hasta hoy
-
+        $startDate = Carbon::create(2025, 2, 28); // Desde el 1 de enero de 2025
+        //$endDate = Carbon::now(); // Hasta hoy
+        $endDate = Carbon::create(2025, 3, 2);
         // Obtiene las órdenes creadas en fines de semana (sábados y domingos) dentro del rango de fechas
-        $orders = Order::whereBetween('created_at', [$startDate, $endDate])
+        $orders = Order::whereDate('created_at', '>=',$startDate)
+            ->whereDate('created_at', '<=',$endDate)
             ->whereRaw('WEEKDAY(created_at) IN (4,5,6)') // Solo viernes (4), sábado (5) y domingo (6)
             ->with(['details.options']) // Solo cargamos opciones porque usaremos directamente product_type_id
             ->get();
 
-        //dump($orders);
+        dump($orders);
 
         $semanas = [];
 
