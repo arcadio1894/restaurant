@@ -720,4 +720,79 @@ class OrderController extends Controller
 
         return "Orden agregada";
     }
+
+    public function reportePizzasFinde()
+    {
+        $startDate = Carbon::create(2025, 1, 1); // Desde el 1 de enero de 2025
+        $endDate = Carbon::now(); // Hasta hoy
+
+        $orders = Order::whereBetween('created_at', [$startDate, $endDate])
+            ->whereRaw('WEEKDAY(created_at) IN (5,6)') // Solo sábados y domingos
+            ->with(['details.product.productTypes', 'details.options.product.productTypes'])
+            ->get();
+
+        $semanas = [];
+
+        foreach ($orders as $order) {
+            $weekStart = Carbon::parse($order->created_at)->startOfWeek(Carbon::SATURDAY);
+            $weekEnd = $weekStart->copy()->addDays(1); // Domingo
+            $semanaKey = $weekStart->toDateString() . ' al ' . $weekEnd->toDateString();
+
+            if (!isset($semanas[$semanaKey])) {
+                $semanas[$semanaKey] = [
+                    'id' => count($semanas) + 1,
+                    'semana' => $semanaKey,
+                    'cantFamiliar' => 0,
+                    'cantGrande' => 0,
+                    'cantPersonal' => 0,
+                ];
+            }
+
+            foreach ($order->details as $detail) {
+                $productTypeId = optional($detail->product->productType)->id;
+
+                if (in_array($productTypeId, [1, 2, 8])) { // Clásicas, Especiales y Personalizadas
+                    $this->sumarCantidad($semanas[$semanaKey], $detail->product->type, $detail->quantity);
+                } elseif (in_array($productTypeId, [3, 7])) { // Combos y Promos
+                    foreach ($detail->orderDetailOptions as $option) {
+                        $optionTypeId = optional($option->product->productType)->id;
+                        if (in_array($optionTypeId, [1, 2, 8])) {
+                            $this->sumarCantidad($semanas[$semanaKey], $option->product->type, 1);
+                        }
+                    }
+                }
+            }
+        }
+
+        $totalFamiliar = array_sum(array_column($semanas, 'cantFamiliar'));
+        $totalGrande = array_sum(array_column($semanas, 'cantGrande'));
+        $totalPersonal = array_sum(array_column($semanas, 'cantPersonal'));
+        $numSemanas = count($semanas);
+
+        $resumen = [
+            'totalFamiliar' => $totalFamiliar,
+            'totalGrande' => $totalGrande,
+            'totalPersonal' => $totalPersonal,
+            'promedioFamiliar' => $numSemanas ? round($totalFamiliar / $numSemanas, 2) : 0,
+            'promedioGrande' => $numSemanas ? round($totalGrande / $numSemanas, 2) : 0,
+            'promedioPersonal' => $numSemanas ? round($totalPersonal / $numSemanas, 2) : 0,
+        ];
+
+        return response()->json(['semanas' => array_values($semanas), 'resumen' => $resumen]);
+    }
+
+    private function sumarCantidad(&$semana, $typeId, $cantidad)
+    {
+        switch ($typeId) {
+            case 1:
+                $semana['cantFamiliar'] += $cantidad;
+                break;
+            case 2:
+                $semana['cantGrande'] += $cantidad;
+                break;
+            case 3:
+                $semana['cantPersonal'] += $cantidad;
+                break;
+        }
+    }
 }
