@@ -1015,6 +1015,7 @@ class CartController extends Controller
 
             $tienda = $request->input('tienda');
             $shippingCost = isset($tienda['precioEnvio']) ? $tienda['precioEnvio'] : 0;
+            $shopId = isset($tienda['precioEnvio']) ? $tienda['tiendaId'] : null;
             $total = $this->getTotalCart($cart);
             $totalWithShipping = $total + $shippingCost;
 
@@ -1118,7 +1119,9 @@ class CartController extends Controller
                 'status' => 'created',
                 'payment_method_id' => $validatedData['paymentMethod'],
                 'amount_shipping' => $shippingCost,
-                'shipping_district_id' => $districtId,
+                //'shipping_district_id' => $districtId,
+                'shipping_district_id' => null,
+                'shop_id' => $shopId,
                 'observations' => $request->input('observations', ''),
             ]);
 
@@ -1251,8 +1254,8 @@ class CartController extends Controller
                         'order' => "ORDEN - ".$order->id
                     ];
 
-                    $telegramController = new TelegramController();
-                    $telegramController->sendNotification('process', $data);
+                    /*$telegramController = new TelegramController();
+                    $telegramController->sendNotification('process', $data);*/
 
                     // Agregar movimientos a la caja
                     $paymentType = 2;

@@ -862,13 +862,13 @@ function submitFormAjax(extraData = {}) {
     let cart = localStorage.getItem('cart'); // Asume que está guardado con la clave 'cart'
     let observations = localStorage.getItem('observations');
 
-    let tienda = localStorage.getItem('tienda');
+    let tienda = localStorage.getItem('tiendaSeleccionada');
 
     if (cart) {
         try {
             // Parsear el carrito
             cart = JSON.parse(cart); // Convertir el JSON en objeto
-
+            tienda = JSON.parse(tienda);
             // Validar y parsear las observaciones (si existen)
             if (observations && observations.trim() !== "") {
                 try {
@@ -939,7 +939,7 @@ function submitFormAjax(extraData = {}) {
                     $("#verifyModal").modal('hide');
                     $('#btn-submit').attr("disabled", false);
                     $('#btn-continue').attr("disabled", false);
-                    window.location.href = data.redirect_url;
+                    //window.location.href = data.redirect_url;
                 }, 2000 )
             } else {
 

@@ -31,6 +31,7 @@ class Order extends Model
         'estimated_time',
         'distributor_id',
         'date_processing',
+        'shop_id',
 
         // Campos adicionales para facturación
         'serie',              // Serie del documento (ejemplo: F001, B001)
