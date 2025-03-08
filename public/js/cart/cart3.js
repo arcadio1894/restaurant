@@ -110,7 +110,8 @@ $(document).ready(function() {
                     <p class="text-center">En este momento no podemos atenderte, pues nos encontramos fuera del horario de servicio de atención al cliente.</p>
                   
                     <p class="mb-2 text-center"><strong >Estos son nuestros horarios:</strong></p>
-                    <p class="mb-0 text-center">Lunes a Domingos: 6:30pm - 11:30pm</p>
+                    <p class="mb-0 text-center">Lunes a Viernes: 6:30pm - 11:30pm</p>
+                    <p class="mb-0 text-center">Sábados y Domingos: 4:00pm - 11:30pm</p>
                 `,
                         buttons: {
                             close: {

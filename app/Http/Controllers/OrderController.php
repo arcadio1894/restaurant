@@ -10,8 +10,11 @@ use App\Mail\OrderStatusEmailAnulled;
 use App\Models\Address;
 use App\Models\CashMovement;
 use App\Models\CashRegister;
+use App\Models\Category;
 use App\Models\Order;
+use App\Models\ProductType;
 use App\Models\ShippingDistrict;
+use App\Models\Type;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -719,5 +722,114 @@ class OrderController extends Controller
         broadcast(new OrderCreated($orden, 90));
 
         return "Orden agregada";
+    }
+
+    public function reportePizzasFinde()
+    {
+        $startDate = Carbon::create(2025, 1, 3); // Desde el 1 de enero de 2025
+        $endDate = Carbon::now(); // Hasta hoy
+        //$endDate = Carbon::create(2025, 2, 23);
+        // Obtiene las órdenes creadas en fines de semana (sábados y domingos) dentro del rango de fechas
+        $orders = Order::whereDate('created_at', '>=',$startDate)
+            ->whereDate('created_at', '<=',$endDate)
+            ->whereRaw('WEEKDAY(created_at) IN (4,5,6)') // Solo viernes (4), sábado (5) y domingo (6)
+            ->with(['details.options']) // Solo cargamos opciones porque usaremos directamente product_type_id
+            ->where('state_annulled', 0)
+            ->get();
+
+        //dump(count($orders));
+
+        $semanas = [];
+
+        foreach ($orders as $index2 => $order) {
+            // Determina el inicio (sábado) y fin (domingo) de la semana de la orden
+            $weekStart = Carbon::parse($order->created_at)->startOfWeek(Carbon::FRIDAY);
+            $weekEnd = $weekStart->copy()->addDays(2); // Sábado + Domingo
+            $semanaKey = $weekStart->toDateString() . ' al ' . $weekEnd->toDateString();
+
+            // Inicializa la estructura para la semana si no existe
+            if (!isset($semanas[$semanaKey])) {
+                $semanas[$semanaKey] = [
+                    'id' => count($semanas) + 1,
+                    'semana' => $semanaKey,
+                    'cantFamiliar' => 0,
+                    'cantGrande' => 0,
+                    'cantPersonal' => 0,
+                ];
+            }
+            //dump("Orden: ". ($index2+1));
+            foreach ($order->details as $index => $detail) {
+                //dump("Detalle: ". ($index+1));
+                //dump($detail->product->full_name);
+                $productTypeId = $detail->product_type_id; // Directamente desde OrderDetail
+                $categoryId = $detail->product->category_id ?? null; // Categoría del producto
+                $category = Category::find($categoryId);
+                //dump("Categoria: ". $category->name);
+                //dump("ProductTypeId: ". $productTypeId);
+                // Si el producto es una pizza clásica, especial o personalizada, se cuenta directamente
+                if (in_array($categoryId, [1, 2, 8]) && $productTypeId) {
+                    $this->sumarCantidad($semanas[$semanaKey], $productTypeId, $detail->quantity);
+                }
+                // Si el producto es un combo o promoción, se revisan sus opciones
+                elseif (in_array($categoryId, [3, 7])) {
+                    foreach ($detail->options as $option) {
+                        $optionCategoryId = $option->product->category_id ?? null;
+                        //$optionTypeId = $option->product_type_id; // Directamente desde OrderDetailOption
+
+                        if (in_array($optionCategoryId, [1, 2, 8]) && $productTypeId) {
+                            $this->sumarCantidad($semanas[$semanaKey], $productTypeId, $detail->quantity);
+                        }
+                    }
+                } /*else {
+                    dump("No pertenece a las categorias");
+                }*/
+            }
+        }
+
+        // Calcula los totales de cada tipo de pizza en todas las semanas
+        $totalFamiliar = array_sum(array_column($semanas, 'cantFamiliar'));
+        $totalGrande = array_sum(array_column($semanas, 'cantGrande'));
+        $totalPersonal = array_sum(array_column($semanas, 'cantPersonal'));
+        $numSemanas = count($semanas);
+
+        // Calcula el promedio de pizzas vendidas por semana
+        $resumen = [
+            'totalFamiliar' => $totalFamiliar,
+            'totalGrande' => $totalGrande,
+            'totalPersonal' => $totalPersonal,
+            'promedioFamiliar' => $numSemanas ? round($totalFamiliar / $numSemanas, 2) : 0,
+            'promedioGrande' => $numSemanas ? round($totalGrande / $numSemanas, 2) : 0,
+            'promedioPersonal' => $numSemanas ? round($totalPersonal / $numSemanas, 2) : 0,
+        ];
+
+        //dump(array_values($semanas));
+        //dump($resumen);
+
+        return response()->json(['semanas' => array_values($semanas), 'resumen' => $resumen]);
+    }
+
+    private function sumarCantidad(&$semana, $typeId, $cantidad)
+    {
+        $productType = ProductType::find($typeId);
+        $type = Type::find($productType->type_id);
+        //dump("Tipo: ".$type->name);
+        //dump("Cantidad: ".$cantidad);
+        if ( isset($productType) )
+        {
+            $type = $productType->type_id;
+            //dump($typeId);
+            switch ($type) {
+                case 1:
+                    $semana['cantFamiliar'] += $cantidad;
+                    break;
+                case 2:
+                    $semana['cantGrande'] += $cantidad;
+                    break;
+                case 3:
+                    $semana['cantPersonal'] += $cantidad;
+                    break;
+            }
+        }
+
     }
 }
