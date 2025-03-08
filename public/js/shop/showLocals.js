@@ -28,17 +28,12 @@ $(document).ready(function () {
                   
                     <p class="mb-2 text-center"><strong >Estos son nuestros horarios:</strong></p>
                     <p class="mb-0 text-center">Lunes a Domingos: 6:30pm - 11:30pm</p>
+                    <p class="mb-0 text-center">Sábados y Domingos: 4:00pm - 11:30pm</p>
                 `,
                         buttons: {
                             close: {
                                 text: 'Ir igualmente',
                                 action: function () {
-                                    // Acción al cerrar el pop-up
-                                    /*if (href) {
-                                        window.location.href = href;
-                                    } else {
-                                        console.error("El atributo data-href no está definido en el botón.");
-                                    }*/
                                     // Verificar la tienda seleccionada antes de redirigir
                                     const tiendaSeleccionada = localStorage.getItem('tiendaSeleccionada');
                                     if (tiendaSeleccionada && tiendaSeleccionada.trim() !== '') {
@@ -55,12 +50,6 @@ $(document).ready(function () {
                         }
                     });
                 } else {
-                    // Redirigir al enlace en data-href
-                    /*if (href) {
-                        window.location.href = href;
-                    } else {
-                        console.error("El atributo data-href no está definido en el botón.");
-                    }*/
                     // Verificar la tienda seleccionada antes de redirigir
                     const tiendaSeleccionada = localStorage.getItem('tiendaSeleccionada');
                     if (tiendaSeleccionada && tiendaSeleccionada.trim() !== '') {
@@ -82,93 +71,6 @@ $(document).ready(function () {
     });
 });
 
-// Función para inicializar el mapa
-/*function initAutocomplete() {
-    console.log("Google Maps API cargada correctamente.");
-
-    // Inicializamos el mapa en la Plaza de Armas de Trujillo, Perú
-    const trujilloLatLng = { lat: -8.1132, lng: -79.0290 }; // Coordenadas de la Plaza de Armas de Trujillo
-    map = new google.maps.Map(document.getElementById("map"), {
-        center: trujilloLatLng,
-        zoom: 14,
-    });
-
-    // Creamos el marcador
-    marker = new google.maps.Marker({
-        position: trujilloLatLng,
-        map: map,
-        draggable: true, // Permitimos que el marcador sea arrastrado
-        title: "Arrastra el marcador para cambiar la dirección"
-    });
-
-    // Creamos el infowindow
-    infowindow = new google.maps.InfoWindow();
-
-    // Mostrar el infowindow con la dirección actual del marcador
-    google.maps.event.addListener(marker, "dragend", function() {
-        updateMarkerPosition(marker.getPosition());
-    });
-
-    // Permitir colocar el marcador al hacer clic en el mapa
-    map.addListener("click", function(event) {
-        marker.setPosition(event.latLng);
-        updateMarkerPosition(event.latLng);
-    });
-
-    // Inicializar el Autocomplete
-    const input = $("#searchInput")[0];
-    autocomplete = new google.maps.places.Autocomplete(input);
-    autocomplete.bindTo("bounds", map);
-
-    // Escuchar el evento cuando se seleccione una dirección
-    autocomplete.addListener("place_changed", function() {
-        const place = autocomplete.getPlace();
-        if (!place.geometry) {
-            alert("No se encontró información para esta dirección.");
-            return;
-        }
-
-        // Colocamos el marcador en la nueva dirección
-        marker.setPosition(place.geometry.location);
-        map.setCenter(place.geometry.location);
-        updateMarkerPosition(place.geometry.location);
-    });
-
-    // Evento para el botón "Seleccionar esta dirección"
-    $("#selectAddress").on("click", function() {
-        // Obtener la dirección y las coordenadas del marcador
-        const address = $("#searchInput").val();
-        const latLng = marker.getPosition();
-        const latitude = latLng.lat();
-        const longitude = latLng.lng();
-
-        // Colocar los valores en los campos de entrada
-        $("#address").val(address);
-        $("#latitude").val(latitude);
-        $("#longitude").val(longitude);
-
-        // Hacer la solicitud AJAX al servidor
-        $.ajax({
-            url: "/buscar-tiendas",
-            method: "POST",
-            data: {
-                latitude: latitude,
-                longitude: longitude,
-                address: address,
-                _token: $('meta[name="csrf-token"]').attr("content") // Agregar el token CSRF
-            },
-            success: function(response) {
-                if (response.success) {
-                    mostrarTiendas(response.tiendas); // Función para renderizar las tiendas
-                } else {
-                    $("#body-locals").html(`<div class="alert alert-danger">${response.message}</div>`);
-                }
-            }
-        });
-
-    });
-
-}*/
 // Función para inicializar el mapa
 function initAutocomplete() {
     console.log("Google Maps API cargada correctamente.");
@@ -244,7 +146,11 @@ function updateMarkerPosition(latLng, fetchStores = false) {
     });
 }
 
+// Modificación en `fetchShops()` para limpiar `localStorage` antes de buscar tiendas
 function fetchShops(latitude, longitude, address) {
+    // Borrar la tienda seleccionada antes de buscar nuevas tiendas
+    localStorage.removeItem("tiendaSeleccionada");
+
     $.ajax({
         url: "/buscar-tiendas",
         method: "POST",
@@ -269,9 +175,11 @@ function fetchShops(latitude, longitude, address) {
 
 function mostrarTiendas(tiendas) {
     let html = "";
+
     tiendas.forEach((tienda, index) => {
         html += `
-            <div class="card mb-2 tienda-card" data-id="${tienda.id}" data-precio="${tienda.price}" 
+            <div class="card mb-2 tienda-card ${index === 0 ? 'border border-success' : ''}" 
+                 data-id="${tienda.id}" data-precio="${tienda.price}" 
                  data-name="${tienda.name}" data-lat="${tienda.latitude}" data-lng="${tienda.longitude}">
                 <div class="card-body">
                     <h5 class="card-title">${tienda.name}</h5>
@@ -288,6 +196,14 @@ function mostrarTiendas(tiendas) {
 
     $("#body-locals").html(html);
 
+    // Si hay tiendas, seleccionar automáticamente la primera
+    if (tiendas.length > 0) {
+        seleccionarTienda($(".tienda-card").first());
+    } else {
+        // Si no hay tiendas, borrar tiendaSeleccionada del localStorage
+        localStorage.removeItem("tiendaSeleccionada");
+    }
+
     // Evento para ver en el mapa
     $(".btn-ver-mapa").on("click", function () {
         let lat = $(this).data("lat");
@@ -295,30 +211,29 @@ function mostrarTiendas(tiendas) {
         verMapa(lat, lng);
     });
 
-    // Evento para seleccionar tienda
+    // Evento para seleccionar tienda manualmente
     $(".btn-seleccionar-tienda").on("click", function () {
-        let card = $(this).closest(".tienda-card");
-
-        // Resetear selección previa
-        $(".tienda-card").removeClass("border border-success");
-
-        // Agregar borde de selección
-        card.addClass("border border-success");
-
-        // Guardar datos en Local Storage
-        let tiendaSeleccionada = {
-            tiendaId: card.data("id"),
-            precioEnvio: card.data("precio"),
-            nombreTienda: card.data("name"),
-            direccionCliente: $("#searchInput").val(), // Dirección ingresada
-            latitudCliente: $("#latitude").val(), // Latitud del cliente
-            longitudCliente: $("#longitude").val() // Longitud del cliente
-        };
-
-        localStorage.setItem("tiendaSeleccionada", JSON.stringify(tiendaSeleccionada));
-
-        console.log("Tienda seleccionada:", tiendaSeleccionada);
+        seleccionarTienda($(this).closest(".tienda-card"));
     });
+}
+
+// Función para seleccionar una tienda y guardarla en localStorage
+function seleccionarTienda(card) {
+    $(".tienda-card").removeClass("border border-success"); // Resetear selección previa
+    card.addClass("border border-success"); // Marcar como seleccionada
+
+    let tiendaSeleccionada = {
+        tiendaId: card.data("id"),
+        precioEnvio: card.data("precio"),
+        nombreTienda: card.data("name"),
+        direccionCliente: $("#searchInput").val(),
+        latitudCliente: $("#latitude").val(),
+        longitudCliente: $("#longitude").val()
+    };
+
+    localStorage.setItem("tiendaSeleccionada", JSON.stringify(tiendaSeleccionada));
+
+    console.log("Tienda seleccionada automáticamente:", tiendaSeleccionada);
 }
 
 // Función para mostrar la tienda en el mapa
@@ -343,45 +258,6 @@ function verMapa(lat, lng) {
     //map.setCenter(shopMarker.getPosition());
     map.setZoom(15); // Ajustar el zoom para mejor visualización
 }
-
-// Actualiza el valor del input y muestra la dirección en el infowindow
-/*function updateMarkerPosition(latLng) {
-    // Usamos geocoding para obtener la dirección a partir de las coordenadas
-    const geocoder = new google.maps.Geocoder();
-    geocoder.geocode({ location: latLng }, function(results, status) {
-        if (status === "OK" && results[0]) {
-            const address = results[0].formatted_address;
-
-            // Establecemos la dirección en el input de búsqueda
-            $("#searchInput").val(address);
-
-            // Creamos el contenido HTML para el InfoWindow
-            const contentString = `
-                        <div style="font-family: Arial, sans-serif;">
-                            <div style="font-size: 14px; font-weight: bold; color: #000;">Dirección:</div>
-                            <div style="font-size: 16px; font-weight: bold; color: #007BFF;">${address}</div>
-                        </div>
-                    `;
-
-            // Establecemos el contenido en el infowindow
-            infowindow.setContent(contentString);
-            infowindow.open(map, marker);
-
-            // Reducir el tamaño del botón de cerrar (X) después de abrir el infowindow
-            google.maps.event.addListenerOnce(infowindow, 'domready', function() {
-                // Seleccionar el botón de cerrar (la "X")
-                const closeButton = document.querySelector('.gm-ui-hover-effect');
-
-                // Aplicar un estilo más pequeño al botón de cierre
-                if (closeButton) {
-                    closeButton.style.fontSize = '8px';  // Cambiar tamaño de la "X"
-                    closeButton.style.width = '50px';     // Ajustar el tamaño del botón
-                    closeButton.style.height = '50px';    // Ajustar el tamaño del botón
-                }
-            });
-        }
-    });
-}*/
 
 // Inicializar el mapa y la funcionalidad de autocomplete al cargar el script
 window.initAutocomplete = initAutocomplete;
