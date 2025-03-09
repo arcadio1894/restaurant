@@ -145,7 +145,7 @@ class ZoneController extends Controller
                 ->toArray()
         ]);
 
-        dd($request->all());
+        //dd($request->all());
 
         // ✅ Validar los datos después de corregir la estructura
         $request->validate([
