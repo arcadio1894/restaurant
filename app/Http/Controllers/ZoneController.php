@@ -239,13 +239,27 @@ class ZoneController extends Controller
 
     public function show(Zone $zone)
     {
-        return response()->json([
+        /*return response()->json([
             'id' => $zone->id,
             'name' => $zone->name,
             'price' => $zone->price,
             'coordinates' => $this->convertPolygonToArray($zone->coordinates), // Convierte el POLYGON en array
             'shop_latitude' => $zone->shop->latitude, // Latitud de la tienda
             'shop_longitude' => $zone->shop->longitude // Longitud de la tienda
-        ]);
+        ]);*/
+        $zones = Zone::where('id', $zone->id)
+            ->selectRaw("id, name, status, price, ST_AsText(coordinates) as coordinates") // Convertir POLYGON a texto
+            ->get()
+            ->map(function ($zone) {
+                return [
+                    'id' => $zone->id,
+                    'name' => $zone->name,
+                    'status' => $zone->status,
+                    'price' => $zone->price,
+                    'coordinates' => $this->convertPolygonToArray($zone->coordinates), // Convertir POLYGON a array
+                ];
+            });
+
+        return response()->json($zones);
     }
 }
