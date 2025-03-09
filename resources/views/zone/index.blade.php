@@ -106,6 +106,6 @@
 @endsection
 
 @section('scripts')
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDBG5pTai_rF775fdoi3-9X8K462l1-aMo&callback=initMap&v=weekly" async defer></script>
     <script src="{{ asset('js/zone/index.js') }}?v={{ time() }}"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDBG5pTai_rF775fdoi3-9X8K462l1-aMo&callback=initMap&v=weekly" async defer></script>
 @endsection
