@@ -75,7 +75,7 @@ function viewZone(zoneId) {
 
 function drawPolygon(coordinates) {
     let polygon = new google.maps.Polygon({
-        paths: coordinates.map(coord => ({ lat: coord.lat, lng: coord.lng })), // ✅ Correcto // Formato lat/lng
+        paths: coordinates.map(coord => ({ lat: coord[1], lng: coord[0] })), // Formato lat/lng
         strokeColor: "#FF0000",
         strokeOpacity: 0.8,
         strokeWeight: 2,
