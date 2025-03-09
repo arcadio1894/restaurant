@@ -939,7 +939,7 @@ function submitFormAjax(extraData = {}) {
                     $("#verifyModal").modal('hide');
                     $('#btn-submit').attr("disabled", false);
                     $('#btn-continue').attr("disabled", false);
-                    //window.location.href = data.redirect_url;
+                    window.location.href = data.redirect_url;
                 }, 2000 )
             } else {
 
