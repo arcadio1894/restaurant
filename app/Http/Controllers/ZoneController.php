@@ -83,12 +83,12 @@ class ZoneController extends Controller
     /**
      * Convierte un objeto GEOMETRY (POLYGON) a un array de coordenadas.
      */
-    private function convertPolygonToArray($polygon)
+    private function convertPolygonToArray($polygonWKT)
     {
         //dd($polygon);
         $coordinates = [];
 
-        if ($polygon) {
+        /*if ($polygon) {
             $wkt = DB::selectOne("SELECT ST_AsText(?) AS wkt", [$polygon])->wkt;
             preg_match('/\(\((.*?)\)\)/', $wkt, $matches);
 
@@ -97,6 +97,23 @@ class ZoneController extends Controller
                 foreach ($points as $point) {
                     list($lng, $lat) = explode(' ', trim($point));
                     $coordinates[] = [floatval($lng), floatval($lat)];
+                }
+            }
+        }*/
+        if ($polygonWKT) {
+            // Extraer la parte interna del POLYGON
+            preg_match('/\(\((.*?)\)\)/', $polygonWKT, $matches);
+
+            if (!empty($matches[1])) {
+                $points = explode(',', $matches[1]); // Separar por comas (cada punto)
+
+                foreach ($points as $point) {
+                    $point = trim($point); // Eliminar espacios extra
+                    list($lng, $lat) = explode(' ', $point); // Separar latitud y longitud
+                    $coordinates[] = [
+                        'lat' => floatval($lat),
+                        'lng' => floatval($lng)
+                    ];
                 }
             }
         }
