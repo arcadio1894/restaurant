@@ -288,7 +288,7 @@ class ShopController extends Controller
         // Obtener las tiendas de esas zonas y el precio del envío
         $tiendas = Shop::join('zones', 'shops.id', '=', 'zones.shop_id')
             ->whereIn('zones.id', $zones->pluck('id'))
-            ->select('shops.id', 'shops.name', 'shops.latitude', 'shops.longitude', 'zones.price')
+            ->select('shops.id', 'shops.name', 'shops.address', 'shops.phone', 'shops.latitude', 'shops.longitude', 'zones.price')
             ->orderBy('zones.price', 'asc') // Ordenar por precio (de menor a mayor)
             ->get();
 

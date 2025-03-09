@@ -181,10 +181,10 @@ function mostrarTiendas(tiendas) {
             <div class="card mb-2 tienda-card ${index === 0 ? 'border border-success' : ''}" 
                  data-id="${tienda.id}" data-precio="${tienda.price}" 
                  data-name="${tienda.name}" data-lat="${tienda.latitude}" data-lng="${tienda.longitude}">
-                <div class="card-body">
-                    <h5 class="card-title">${tienda.name}</h5>
-                    <p>Precio de Envío: S/ ${tienda.price}</p>
-                    
+                <div class="card-body p-2">
+                    <strong class="m-1">${tienda.name}</strong>
+                    <p class="m-1" style="font-size: 0.9rem" ><i class="fas fa-map-marker-alt"></i> ${tienda.address}</p>
+                    <p class="m-1" style="font-size: 0.9rem"><i class="fas fa-mobile-alt"></i> ${tienda.phone} - <i class="far fa-money-bill-alt"></i> S/ ${tienda.price}</p>
                     <button class="btn btn-primary btn-sm btn-ver-mapa" 
                         data-lat="${tienda.latitude}" data-lng="${tienda.longitude}">Ver en mapa</button>
 
