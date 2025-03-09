@@ -239,7 +239,9 @@ class ZoneController extends Controller
 
     public function show(Zone $zone)
     {
-        dd($zone->coordinates);
+        //dd($zone->coordinates);
+        $zone->coordinates = DB::selectOne("SELECT ST_AsText(coordinates) AS wkt FROM zones WHERE id = ?", [$zone->id])->wkt;
+
         return response()->json([
             'id' => $zone->id,
             'name' => $zone->name,
