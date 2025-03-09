@@ -239,6 +239,7 @@ class ZoneController extends Controller
 
     public function show(Zone $zone)
     {
+        dd($zone->coordinates);
         return response()->json([
             'id' => $zone->id,
             'name' => $zone->name,
