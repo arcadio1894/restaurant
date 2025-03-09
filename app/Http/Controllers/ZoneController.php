@@ -137,8 +137,12 @@ class ZoneController extends Controller
                     }
                 }
 
-                // 🔹 Si no hay coordenadas válidas, asignamos un array vacío para que Laravel no lo elimine
-                $zone['coordinates'] = !empty($fixedCoordinates) ? $fixedCoordinates : [[]];
+                // 🔹 Si no hay coordenadas válidas, eliminamos la clave coordinates completamente
+                if (empty($fixedCoordinates)) {
+                    unset($zone['coordinates']);
+                } else {
+                    $zone['coordinates'] = $fixedCoordinates;
+                }
 
                 return $zone;
             })->toArray()
