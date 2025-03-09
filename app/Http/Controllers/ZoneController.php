@@ -129,21 +129,22 @@ class ZoneController extends Controller
             'zones' => collect($request->input('zones'))->map(function ($zone) {
                 $fixedCoordinates = [];
 
-                if (isset($zone['coordinates']) && is_array($zone['coordinates'])) {
+                if (!empty($zone['coordinates']) && is_array($zone['coordinates'])) {
                     foreach ($zone['coordinates'] as $coords) {
-                        // Validar que el punto tenga dos valores (latitud y longitud)
                         if (is_array($coords) && count($coords) >= 2) {
                             $fixedCoordinates[] = ['lat' => $coords[1], 'lng' => $coords[0]];
                         }
                     }
                 }
 
-                // Asegurar que coordinates siempre exista, aunque sea vacío
-                $zone['coordinates'] = $fixedCoordinates;
+                // 🔹 Si no hay coordenadas válidas, asignamos un array vacío para que Laravel no lo elimine
+                $zone['coordinates'] = !empty($fixedCoordinates) ? $fixedCoordinates : [[]];
 
                 return $zone;
             })->toArray()
         ]);
+
+        dd($request->all());
 
         // ✅ Validar los datos después de corregir la estructura
         $request->validate([
