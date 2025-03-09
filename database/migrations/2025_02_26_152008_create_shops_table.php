@@ -23,9 +23,9 @@ class CreateShopsTable extends Migration
             $table->text('address')->nullable();
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
-            $table->string('department_id')->nullable();
-            $table->string('province_id')->nullable();
-            $table->string('district_id')->nullable();
+            $table->string('department_id', 2)->nullable();
+            $table->string('province_id', 4)->nullable();
+            $table->string('district_id', 6)->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->enum('type', ['principal', 'sucursal'])->default('principal');
             $table->timestamps();
