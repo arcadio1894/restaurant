@@ -103,7 +103,7 @@ function drawPolygon(coordinates, zoneId = null, status) {
     let color = (status == 'active') ? "#FF0000" : "#808080"; // Rojo si está activa, gris si está inactiva
 
     let polygon = new google.maps.Polygon({
-        paths: coordinates.map(coord => ({ lat: coord[1], lng: coord[0] })), // [lat, lng]
+        paths: coordinates.map(coord => ({ lat: coord.lat, lng: coord.lng })), // ✅ Correcto
         strokeColor: color,
         strokeOpacity: 0.8,
         strokeWeight: 2,
