@@ -124,6 +124,24 @@ class ZoneController extends Controller
     // Guardar nuevas zonas
     public function store(Request $request)
     {
+        // 🔄 Ajustar la estructura de coordenadas antes de la validación
+        $request->merge([
+            'zones' => collect($request->input('zones'))->map(function ($zone) {
+                if (isset($zone['coordinates'])) {
+                    // Convertir estructura incorrecta en un array de objetos { lat, lng }
+                    $fixedCoordinates = [];
+                    foreach ($zone['coordinates'] as $index => $coords) {
+                        if (is_array($coords) && count($coords) >= 2) {
+                            $fixedCoordinates[] = ['lat' => $coords[1], 'lng' => $coords[0]];
+                        }
+                    }
+                    $zone['coordinates'] = $fixedCoordinates;
+                }
+                return $zone;
+            })->toArray()
+        ]);
+
+        // ✅ Validar los datos después de corregir la estructura
         $request->validate([
             'shop_id' => 'required|exists:shops,id',
             'zones' => 'required|array',
@@ -158,7 +176,7 @@ class ZoneController extends Controller
                 // 🔄 Convertir coordenadas a formato WKT POLYGON
                 $wktPolygon = "POLYGON((";
                 foreach ($coordinates as $point) {
-                    $wktPolygon .= number_format($point[0], 6, '.', '') . " " . number_format($point[1], 6, '.', '') . ",";
+                    $wktPolygon .= number_format($point['lng'], 6, '.', '') . " " . number_format($point['lat'], 6, '.', '') . ",";
                 }
                 $wktPolygon = rtrim($wktPolygon, ',') . "))";
 
