@@ -126,26 +126,23 @@ class ZoneController extends Controller
     {
         // 🔄 Ajustar la estructura de coordenadas antes de la validación
         $request->merge([
-            'zones' => collect($request->input('zones'))->map(function ($zone) {
-                $fixedCoordinates = [];
+            'zones' => collect($request->input('zones'))
+                ->map(function ($zone) {
+                    $fixedCoordinates = [];
 
-                if (!empty($zone['coordinates']) && is_array($zone['coordinates'])) {
-                    foreach ($zone['coordinates'] as $coords) {
-                        if (is_array($coords) && count($coords) >= 2) {
-                            $fixedCoordinates[] = ['lat' => $coords[1], 'lng' => $coords[0]];
+                    if (!empty($zone['coordinates']) && is_array($zone['coordinates'])) {
+                        foreach ($zone['coordinates'] as $coords) {
+                            if (is_array($coords) && count($coords) >= 2) {
+                                $fixedCoordinates[] = ['lat' => $coords[1], 'lng' => $coords[0]];
+                            }
                         }
                     }
-                }
 
-                // 🔹 Si no hay coordenadas válidas, eliminamos la clave coordinates completamente
-                if (empty($fixedCoordinates)) {
-                    unset($zone['coordinates']);
-                } else {
-                    $zone['coordinates'] = $fixedCoordinates;
-                }
-
-                return $zone;
-            })->toArray()
+                    // 🔹 Si no hay coordenadas válidas, eliminamos la zona completa
+                    return !empty($fixedCoordinates) ? ['coordinates' => $fixedCoordinates] : null;
+                })
+                ->filter() // 🔥 Elimina zonas nulas o vacías
+                ->toArray()
         ]);
 
         dd($request->all());
