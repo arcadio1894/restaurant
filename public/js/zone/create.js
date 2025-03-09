@@ -30,11 +30,7 @@ function initMap() {
 }
 
 // 📌 Definir `initMap` globalmente para que Google Maps lo reconozca
-// Definir initMap para que Google Maps lo llame
-window.initMap = function () {
-    console.log("Google Maps cargado");
-    initMap(); // Llama a tu función real de inicialización
-};
+window.initMap = initMap;
 
 $(document).ready(function () {
     console.log("Documento listo");
