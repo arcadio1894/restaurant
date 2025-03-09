@@ -145,7 +145,7 @@ class ZoneController extends Controller
                 ->toArray()
         ]);
 
-        //dd($request->all());
+        dd($request->all());
 
         // ✅ Validar los datos después de corregir la estructura
         $request->validate([
@@ -177,7 +177,7 @@ class ZoneController extends Controller
             $usedNumbers = $existingZones->toArray(); // Guardamos los números usados
 
             foreach ($request->zones as $zoneData) {
-                $coordinates = $zoneData['coordinates'];
+                //$coordinates = $zoneData['coordinates'];
 
                 // 🔄 Convertir coordenadas a formato WKT POLYGON
                 /*$wktPolygon = "POLYGON((";
