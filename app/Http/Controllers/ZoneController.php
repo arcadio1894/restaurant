@@ -127,7 +127,7 @@ class ZoneController extends Controller
         // 🔄 Ajustar la estructura de coordenadas antes de la validación
         $request->merge([
             'zones' => collect($request->input('zones'))
-                ->map(function ($zone) {
+                ->mapWithKeys(function ($zone, $key) {
                     $fixedCoordinates = [];
 
                     if (!empty($zone['coordinates']) && is_array($zone['coordinates'])) {
@@ -138,10 +138,8 @@ class ZoneController extends Controller
                         }
                     }
 
-                    // 🔹 Si no hay coordenadas válidas, eliminamos la zona completa
-                    return !empty($fixedCoordinates) ? ['coordinates' => $fixedCoordinates] : null;
+                    return !empty($fixedCoordinates) ? [$key => ['coordinates' => $fixedCoordinates]] : [];
                 })
-                ->filter() // 🔥 Elimina zonas nulas o vacías
                 ->toArray()
         ]);
 
