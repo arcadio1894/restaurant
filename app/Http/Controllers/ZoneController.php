@@ -85,7 +85,7 @@ class ZoneController extends Controller
      */
     private function convertPolygonToArray($polygon)
     {
-        dd($polygon);
+        //dd($polygon);
         $coordinates = [];
 
         if ($polygon) {
