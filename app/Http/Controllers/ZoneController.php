@@ -127,16 +127,20 @@ class ZoneController extends Controller
         // 🔄 Ajustar la estructura de coordenadas antes de la validación
         $request->merge([
             'zones' => collect($request->input('zones'))->map(function ($zone) {
-                if (isset($zone['coordinates'])) {
-                    // Convertir estructura incorrecta en un array de objetos { lat, lng }
-                    $fixedCoordinates = [];
-                    foreach ($zone['coordinates'] as $index => $coords) {
+                $fixedCoordinates = [];
+
+                if (isset($zone['coordinates']) && is_array($zone['coordinates'])) {
+                    foreach ($zone['coordinates'] as $coords) {
+                        // Validar que el punto tenga dos valores (latitud y longitud)
                         if (is_array($coords) && count($coords) >= 2) {
                             $fixedCoordinates[] = ['lat' => $coords[1], 'lng' => $coords[0]];
                         }
                     }
-                    $zone['coordinates'] = $fixedCoordinates;
                 }
+
+                // Asegurar que coordinates siempre exista, aunque sea vacío
+                $zone['coordinates'] = $fixedCoordinates;
+
                 return $zone;
             })->toArray()
         ]);
