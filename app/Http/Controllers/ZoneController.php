@@ -124,7 +124,7 @@ class ZoneController extends Controller
     // Guardar nuevas zonas
     public function store(Request $request)
     {
-        dd($request->input('zones'));
+        //dd($request->input('zones'));
         // 🔄 Ajustar la estructura de coordenadas antes de la validación
         $request->merge([
             'zones' => collect($request->input('zones'))
@@ -144,7 +144,7 @@ class ZoneController extends Controller
                 ->toArray()
         ]);
 
-        dd($request->all());
+        //dd($request->all());
 
         // ✅ Validar los datos después de corregir la estructura
         $request->validate([
