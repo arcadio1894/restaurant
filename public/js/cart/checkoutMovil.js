@@ -57,7 +57,7 @@ $(document).ready(function() {
 
         // Actualizar el costo de envío en la vista
         if (tienda.precioEnvio) {
-            $('#amount_shipping').text(`+$${tienda.precioEnvio}`);
+            $('#amount_shipping').text(`+S/.${tienda.precioEnvio}`);
             $('#info_shipping').removeClass('hidden'); // Mostrar el elemento si estaba oculto
         }
     }
