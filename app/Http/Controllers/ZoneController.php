@@ -55,13 +55,22 @@ class ZoneController extends Controller
     // Obtener las zonas de una tienda
     public function getZones($shopId)
     {
-        $zones = Zone::where('shop_id', $shopId)->get()->map(function ($zone) {
+        /*$zones = Zone::where('shop_id', $shopId)->get()->map(function ($zone) {
             return [
                 'id' => $zone->id,
                 'name' => $zone->name,
                 'status' => $zone->status,
                 'price' => $zone->price,
                 'coordinates' => $this->convertPolygonToArray($zone->coordinates), // Convertir POLYGON a array
+            ];
+        });*/
+        $zones = Zone::where('shop_id', $shopId)->get()->map(function ($zone) {
+            return [
+                'id' => $zone->id,
+                'name' => $zone->name,
+                'status' => $zone->status,
+                'price' => $zone->price,
+                'coordinates' => $this->convertPolygonToArray(DB::selectOne("SELECT ST_AsText('$zone->coordinates') AS wkt")->wkt),
             ];
         });
 
@@ -73,6 +82,7 @@ class ZoneController extends Controller
      */
     private function convertPolygonToArray($polygon)
     {
+        dd($polygon);
         $coordinates = [];
 
         if ($polygon) {
