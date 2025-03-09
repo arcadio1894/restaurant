@@ -180,6 +180,24 @@ class ZoneController extends Controller
                 $coordinates = $zoneData['coordinates'];
 
                 // 🔄 Convertir coordenadas a formato WKT POLYGON
+                /*$wktPolygon = "POLYGON((";
+                foreach ($coordinates as $point) {
+                    $wktPolygon .= number_format($point['lng'], 6, '.', '') . " " . number_format($point['lat'], 6, '.', '') . ",";
+                }
+                $wktPolygon = rtrim($wktPolygon, ',') . "))";*/
+                $coordinates = $zoneData['coordinates'];
+
+                // Si hay menos de 3 puntos, saltamos esta zona
+                if (count($coordinates) < 3) {
+                    continue;
+                }
+
+                // Asegurar que el primer y último punto sean iguales (cerrar el polígono)
+                if ($coordinates[0] !== end($coordinates)) {
+                    $coordinates[] = $coordinates[0];
+                }
+
+                // Generar WKT POLYGON
                 $wktPolygon = "POLYGON((";
                 foreach ($coordinates as $point) {
                     $wktPolygon .= number_format($point['lng'], 6, '.', '') . " " . number_format($point['lat'], 6, '.', '') . ",";
