@@ -94,6 +94,7 @@ function loadZones(shopId) {
                 let polygon = drawPolygon(zone.coordinates, zone.id, zone.status);
                 polygon.zoneId = zone.id; // Guardamos el ID en el polígono
                 polygon.status = zone.status; // Guardamos el status
+                polygon.isExisting = true; // 📌 Marcar como existente
             });
         }
     });
@@ -242,6 +243,8 @@ function saveZones() {
     let shopId = $("#shop_id").val();
     var zones = [];
     polygons.forEach(function (polygon, index) {
+        if (polygon.isExisting) return; // ⚠️ No enviar zonas ya existentes
+
         var path = polygon.getPath();
         var coordinates = [];
 
@@ -256,6 +259,11 @@ function saveZones() {
     });
 
     console.log("Zonas a enviar:", JSON.stringify(zones));
+
+    if (zones.length === 0) {
+        alert("No hay nuevas zonas para guardar.");
+        return;
+    }
 
     $.ajax({
         url: `/dashboard/zones/store`,

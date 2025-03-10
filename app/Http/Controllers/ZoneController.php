@@ -231,9 +231,13 @@ class ZoneController extends Controller
                 $zonesToKeep[] = $newZone->id;
             }
 
-            // ❌ Eliminar zonas que ya no están en la lista enviada
+            // Mantener solo las zonas que no han sido enviadas nuevamente
+            $zonesToKeep = Zone::where('shop_id', $shopId)->pluck('id')->toArray();
+
+            // Solo eliminar zonas que no estén en la lista a mantener
             Zone::where('shop_id', $shopId)
                 ->whereNotIn('id', $zonesToKeep)
+                ->whereNotIn('id', array_column($request->zones, 'id')) // ⚠️ Verificar que no sean nuevas
                 ->delete();
 
             DB::commit();
