@@ -55,6 +55,11 @@
     <p><b>Cliente:</b> {{ ($order->shipping_address_id == null) ? 'Incognito':$order->shipping_address->first_name." ".$order->shipping_address->last_name  }}</p>
     <p><b>Telefono:</b> {{ ($order->shipping_address_id == null) ? 'N/A':$order->shipping_address->phone }}</p>
     <p><b>Dirección:</b> {{ ($order->shipping_address_id == null) ? 'N/A':$order->shipping_address->address_line }}</p>
+    @if ($order->shipping_address_id == null)
+        <p><b>Referencia:</b> ----------------------------------</p>
+    @else
+        <p><b>Referencia:</b> {{ ($order->shipping_address->reference == null || $order->shipping_address->reference == "") ? '----------------------------------':$order->shipping_address->reference }}</p>
+    @endif
     {{--<div class="line"></div>--}}
     @foreach ($order->details as $detail)
         <div class="line"></div>
