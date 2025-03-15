@@ -16,7 +16,7 @@ class AntiBotMiddleware
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next)
+    /*public function handle(Request $request, Closure $next)
     {
         $ip = $request->ip(); // Obtener la IP del usuario
         $cacheKey = "bot_protection:$ip";
@@ -31,6 +31,27 @@ class AntiBotMiddleware
 
         // Incrementar el contador de solicitudes
         Cache::put($cacheKey, $requests + 1, now()->addSeconds(10));
+
+        return $next($request);
+    }*/
+    public function handle(Request $request, Closure $next)
+    {
+        $ip = $request->ip();
+        $cacheKey = "bot_protection:$ip";
+
+        // Excluir peticiones a archivos estáticos (AJAX, imágenes, CSS, JS)
+        if ($request->is('css/*') || $request->is('js/*') || $request->is('images/*') || $request->ajax()) {
+            return $next($request);
+        }
+
+        $requests = Cache::get($cacheKey, 0);
+
+        if ($requests > 50) {
+            Log::warning("Posible bot detectado: $ip");
+            abort(429, "Demasiadas solicitudes. Espere un momento.");
+        }
+
+        Cache::put($cacheKey, $requests + 1, now()->addSeconds(30));
 
         return $next($request);
     }
