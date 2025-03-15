@@ -107,7 +107,9 @@ Route::post('/save/custom/product', [CartController::class, 'saveCustomProduct']
 
 Route::get('/api/usuarios-activos', function () {
     $activeUsers = Cache::get("active_users", []);
-    return response()->json(['activeUsers' => count($activeUsers)]);
+    // Filtrar por IP para evitar muchos registros del mismo origen
+    $uniqueUsers = collect($activeUsers)->unique('ip')->count();
+    return response()->json(['activeUsers' => $uniqueUsers]);
 });
 
 Route::get('/api/usuarios-registrados', [WelcomeController::class, 'getRegisteredUsers']);
