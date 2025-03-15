@@ -39,6 +39,8 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
 
             \App\Http\Middleware\TrackActiveUsers::class, // ← Agrega esta línea
+            \App\Http\Middleware\AntiBotMiddleware::class,
+
         ],
 
         'api' => [
@@ -65,5 +67,7 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        'anti-bot' => \App\Http\Middleware\AntiBotMiddleware::class,
+
     ];
 }
