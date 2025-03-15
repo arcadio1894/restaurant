@@ -13,23 +13,28 @@ class TrackActiveUsers
 {
     public function handle(Request $request, Closure $next)
     {
-        $sessionId = session()->getId(); // ✅ Usamos el ID de sesión en lugar de la IP
+        $sessionId = session()->getId();
         $cacheKey = "active_users";
 
-        Log::info("Middleware ejecutado para la IP: " . $sessionId); // ✅ Log para ver si se ejecuta
-
-        // Obtener los usuarios activos
+        // Obtener la lista actual de usuarios activos
         $activeUsers = Cache::get($cacheKey, []);
 
-        if (!in_array($sessionId, $activeUsers)) {
-            $activeUsers[] = $sessionId;
-            Cache::put($cacheKey, $activeUsers, now()->addMinutes(5));
+        // Guardamos el tiempo actual para saber cuándo se conectó este usuario
+        $activeUsers[$sessionId] = now()->timestamp;
 
-            Log::info("Usuarios activos actualizados: " . count($activeUsers));
+        // Eliminar sesiones inactivas (más de 5 minutos sin actividad)
+        $activeUsers = array_filter($activeUsers, function ($timestamp) {
+            return (now()->timestamp - $timestamp) <= 300; // 300 segundos = 5 minutos
+        });
 
-            // Emitir el evento con la cantidad actualizada de usuarios
-            broadcast(new UserActive(count($activeUsers)));
-        }
+        // Guardar la lista de usuarios activos
+        Cache::put($cacheKey, $activeUsers, now()->addMinutes(5));
+
+        // Log para depuración
+        Log::info("Usuarios activos actualizados: " . count($activeUsers));
+
+        // Emitir evento con la cantidad de usuarios activos
+        broadcast(new UserActive(count($activeUsers)));
 
         return $next($request);
     }
