@@ -24,7 +24,8 @@ class TrackActiveUsers
 
         // Eliminar sesiones inactivas (más de 5 minutos sin actividad)
         $activeUsers = array_filter($activeUsers, function ($timestamp) {
-            return (now()->timestamp - $timestamp) <= 300; // 300 segundos = 5 minutos
+            return (now()->timestamp - (int) $timestamp) <= 300; // Convertimos a entero
+
         });
 
         // Guardar la lista de usuarios activos
