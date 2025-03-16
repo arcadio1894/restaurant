@@ -48,21 +48,22 @@ $(document).ready(function () {
     }
 
     function updateChartTitle(filter, startDate, endDate) {
-        let title = "Tipos de usuarios de hoy"; // Default for 'daily'
+        let title = "Tipos de usuarios de hoy"; // Default para 'daily'
 
         if (filter === 'weekly') {
             title = "Tipos de usuario de la última semana";
         } else if (filter === 'monthly') {
             title = "Tipos de usuario de los últimos 7 meses";
         } else if (filter === 'date_range') {
-            let start = startDate ? new Date(startDate).toLocaleDateString() : '';
-            let end = endDate ? new Date(endDate).toLocaleDateString() : '';
+            let start = startDate ? new Date(startDate + "T00:00:00").toLocaleDateString() : '';
+            let end = endDate ? new Date(endDate + "T00:00:00").toLocaleDateString() : '';
             title = `Tipos de usuario desde ${start} hasta ${end}`;
         }
 
         // Almacenar el título dinámico en una variable global para usarlo en Chart.js
         window.chartTitle = title;
     }
+
 
     function updateChart(data) {
         let ctx = $("#lineChart").get(0).getContext("2d");
@@ -225,8 +226,8 @@ $(document).ready(function () {
         } else if (filter === 'monthly') {
             title = "Promociones usadas en los últimos 7 meses";
         } else if (filter === 'date_range_promo') {
-            let start = startDate ? new Date(startDate).toLocaleDateString() : '';
-            let end = endDate ? new Date(endDate).toLocaleDateString() : '';
+            let start = startDate ? new Date(startDate + "T00:00:00").toLocaleDateString() : '';
+            let end = endDate ? new Date(endDate + "T00:00:00").toLocaleDateString() : '';
             title = `Promociones usadas desde ${start} hasta ${end}`;
         }
 
@@ -277,8 +278,8 @@ $(document).ready(function () {
         } else if (filter === 'monthly') {
             title = "Total de ventas de los últimos 7 meses";
         } else if (filter === 'date_range') {
-            let start = startDate ? new Date(startDate).toLocaleDateString() : '';
-            let end = endDate ? new Date(endDate).toLocaleDateString() : '';
+            let start = startDate ? new Date(startDate + "T00:00:00").toLocaleDateString() : '';
+            let end = endDate ? new Date(endDate + "T00:00:00").toLocaleDateString() : '';
             title = `Total de ventas desde ${start} hasta ${end}`;
         }
 
