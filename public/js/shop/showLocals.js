@@ -7,10 +7,10 @@ $(document).ready(function () {
         e.preventDefault(); // Prevenir el comportamiento predeterminado
 
         // Obtener las observaciones
-        const observations = $('#observations').val();
+        //const observations = $('#observations').val();
 
         // Guardar las observaciones en el localStorage
-        localStorage.setItem('observations', observations);
+        //localStorage.setItem('observations', observations);
 
         const href = $(this).data('href');
 
