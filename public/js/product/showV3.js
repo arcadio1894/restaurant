@@ -212,7 +212,7 @@ $(document).ready(function () {
                 selectedAdditions.forEach(addition => {
                     const existingAddition = cart.find(item =>
                         item.product_id === addition.id &&
-                        item.product_type_id === null // Asegúrate de que sea un adicional
+                        item.product_type_id === addition.productTypeId // Asegúrate de que sea un adicional
                     );
 
                     if (existingAddition) {
@@ -220,18 +220,35 @@ $(document).ready(function () {
                         existingAddition.quantity += 1;
                     } else {
                         // Si el adicional no existe, agregar como nuevo elemento
-                        cart.push({
-                            product_id: addition.id,
-                            product_type_id: null,
-                            name: addition.name,
-                            price: addition.price,
-                            quantity: 1,
-                            user_id: userId,
-                            options: {}, // Adicionales no tienen opciones
-                            custom: false, // Marcado como adicional
-                            total: addition.price,
-                            cart_index: generateUUID()
-                        });
+                        if ( addition.productTypeId == "" )
+                        {
+                            cart.push({
+                                product_id: addition.id,
+                                product_type_id: null,
+                                name: addition.name,
+                                price: addition.price,
+                                quantity: 1,
+                                user_id: userId,
+                                options: {}, // Adicionales no tienen opciones
+                                custom: false, // Marcado como adicional
+                                total: addition.price,
+                                cart_index: generateUUID()
+                            });
+                        } else {
+                            cart.push({
+                                product_id: addition.id,
+                                product_type_id: addition.productTypeId,
+                                name: addition.name,
+                                price: addition.price,
+                                quantity: 1,
+                                user_id: userId,
+                                options: {}, // Adicionales no tienen opciones
+                                custom: false, // Marcado como adicional
+                                total: addition.price,
+                                cart_index: generateUUID()
+                            });
+                        }
+
                     }
                 });
 

@@ -545,7 +545,7 @@
 @endsection
 
 @section('content')
-    <div id="clickHere"></div>
+    {{--<div id="clickHere"></div>--}}
     <section class="py-5">
         <div class="container">
             <div class="row gx-5">
@@ -741,7 +741,7 @@
                                     <div class="card-body scrollable-container">
                                         <div class="custom-checkbox-group">
                                             <!-- Opción 1 -->
-                                            @foreach ($adicionales as $adicional)
+                                            {{--@foreach ($adicionales as $adicional)
                                             <label class="custom-checkbox-container {{ $loop->index >= 4 ? 'hidden-elements' : '' }}" for="topping{{$adicional->id}}">
                                                 <input type="checkbox" data-product_id = "{{$adicional->id}}" data-price="{{ $adicional->price_default }}" data-product_name="{{ $adicional->full_name }}" id="topping{{$adicional->id}}" class="custom-checkbox-input">
                                                 <span class="checkbox-box"></span>
@@ -753,6 +753,35 @@
                                                     </div>
                                                 </div>
                                             </label>
+                                            @endforeach--}}
+                                            @foreach ($adicionales as $adicional)
+                                                @if ($adicional->productTypes->isEmpty())
+                                                    <label class="custom-checkbox-container {{ $loop->index >= 4 ? 'hidden-elements' : '' }}" for="topping{{$adicional->id}}">
+                                                        <input type="checkbox" data-product_id="{{ $adicional->id }}" data-product_type_id="" data-price="{{ $adicional->price_default }}" data-product_name="{{ $adicional->full_name }}" id="topping{{$adicional->id}}" class="custom-checkbox-input">
+                                                        <span class="checkbox-box"></span>
+                                                        <div class="custom-checkbox-content">
+                                                            <img src="{{ asset('images/products/'.$adicional->image) }}" alt="{{ $adicional->full_name }}">
+                                                            <div class="custom-checkbox-details">
+                                                                <span class="topping-name">{{ $adicional->full_name }}</span>
+                                                                <span class="topping-price">+S/. {{ $adicional->price_default }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </label>
+                                                @else
+                                                    @foreach ($adicional->productTypes as $productType)
+                                                        <label class="custom-checkbox-container {{ $loop->index >= 4 ? 'hidden-elements' : '' }}" for="topping{{$adicional->id}}_type{{$productType->id}}">
+                                                            <input type="checkbox" data-product_id="{{ $adicional->id }}" data-product_type_id="{{ $productType->id }}" data-price="{{ $productType->price }}" data-product_name="{{ $adicional->full_name }} - {{ $productType->type->name ?? 'Sin Tipo' }}" id="topping{{$adicional->id}}_type{{$productType->id}}" class="custom-checkbox-input">
+                                                            <span class="checkbox-box"></span>
+                                                            <div class="custom-checkbox-content">
+                                                                <img src="{{ asset('images/products/'.$adicional->image) }}" alt="{{ $adicional->full_name }}">
+                                                                <div class="custom-checkbox-details">
+                                                                    <span class="topping-name">{{ $adicional->full_name }} - {{ $productType->type->name ?? 'Sin Tipo' }}</span>
+                                                                    <span class="topping-price">+S/. {{ $productType->price }}</span>
+                                                                </div>
+                                                            </div>
+                                                        </label>
+                                                    @endforeach
+                                                @endif
                                             @endforeach
                                             @if(count($adicionales) > 4)
                                                 <button id="showMoreBtn" class="btn btn-link">Ver más</button>
@@ -920,7 +949,7 @@
 
             $(".custom-checkbox-input").on("focus", function (e) {
                 e.preventDefault(); // Previene el comportamiento de foco
-                $("#clickHere").blur(); // Quita el foco del checkbox
+                //$("#clickHere").blur(); // Quita el foco del checkbox
             });
 
             // Aplica la clase 'active' al contenedor del radio button ya seleccionado
@@ -962,32 +991,39 @@
 
             // Evento cuando se hace clic en un checkbox
             $(".custom-checkbox-input").on("change", function () {
+                const scrollPosition = $(window).scrollTop(); // Guarda la posición actual
+
                 const container = $(this).closest(".custom-checkbox-container");
                 const productId = $(this).data("product_id");
                 const productName = $(this).data("product_name");
                 const productPrice = parseFloat($(this).data("price")); // Asegurarse de que sea número
-
+                const productTypeId = $(this).data("product_type_id");
                 if ($(this).is(":checked")) {
                     // Añadir el adicional al array
                     $selectedAdditions.push({
                         id: productId,
                         name: productName,
                         price: productPrice,
+                        productTypeId: productTypeId
                     });
 
                     container.addClass("selected"); // Añade la clase cuando está seleccionado
                 } else {
                     // Remover el adicional del array
-                    $selectedAdditions = $selectedAdditions.filter(item => item.id !== productId);
+                    $selectedAdditions = $selectedAdditions.filter(item =>
+                        !(item.id === productId && item.productTypeId === productTypeId)
+                    );
                     $(this).addClass("no-focus");
                     container.removeClass("selected"); // Remueve la clase cuando no está seleccionado
                 }
-
+                // Restaurar la posición del scroll
+                $(window).scrollTop(scrollPosition);
                 // Simula un clic o cambio de foco
                 $(this).blur(); // Intenta quitar el foco
-                setTimeout(() => {
-                    $("#clickHere").trigger("click"); // Simula un clic en el body
-                }, 50);
+
+                /*setTimeout(() => {
+                    $("#clickHere").trigger("click");
+                }, 50);*/
 
                 // Actualizar los precios dinámicamente
                 updatePrices();
