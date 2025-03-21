@@ -2759,6 +2759,17 @@ class CartController extends Controller
     public function saveCustomProduct(Request $request)
     {
         $dataGeneral = DataGeneral::where('name', 'product_id_custom')->first();
+        // DataGeneral
+        $data_base_price_familiar = DataGeneral::where('name', 'base_price_familiar')->first();
+        $data_base_price_large = DataGeneral::where('name', 'base_price_large')->first();
+        $data_base_price_personal = DataGeneral::where('name', 'base_price_personal')->first();
+        $data_price_adicional = DataGeneral::where('name', 'price_adicional')->first();
+
+        $base_price_familiar = $data_base_price_familiar->valueNumber;
+        $base_price_large = $data_base_price_large->valueNumber;
+        $base_price_personal = $data_base_price_personal->valueNumber;
+        $price_adicional = $data_price_adicional->valueNumber;
+
         //dd($request);
         $idProductCustom = $dataGeneral->valueNumber;
 
@@ -2785,6 +2796,8 @@ class CartController extends Controller
         $productType = ProductType::with('type')->where('product_id', $product->id)
             ->where('type_id', $type)->first();
 
+        $priceExtraSalsa = 0;
+        $priceExtraQueso = 0;
         // Procesar la salsa
         if ($salsa) {
             $toppingSalsa = Topping::where('slug', 'Salsa')->first();
@@ -2796,7 +2809,7 @@ class CartController extends Controller
                 if (isset($salsa['elecciones'])) {
                     $tipo = isset($salsa['elecciones']['tipo']) ? $salsa['elecciones']['tipo'] : '';
                     $extraSalsa = ($salsa['elecciones']['extra'] === 'Sí') ? 1 : 0;
-
+                    $priceExtraSalsa = ($salsa['elecciones']['extra'] === 'Sí') ? $toppingSalsa->price_extra : 0;
                     if (preg_match('/(left|whole|right)/', $tipo, $matches)) {
                         $typeSalsa = $matches[1];
                     }
@@ -2815,7 +2828,7 @@ class CartController extends Controller
                 if (isset($queso['elecciones'])) {
                     $tipo = isset($queso['elecciones']['tipo']) ? $queso['elecciones']['tipo'] : '';
                     $extraQueso = ($queso['elecciones']['extra'] === 'Sí') ? 1 : 0;
-
+                    $priceExtraQueso = ($salsa['elecciones']['extra'] === 'Sí') ? $toppingQueso->price_extra : 0;
                     if (preg_match('/(left|whole|right)/', $tipo, $matches)) {
                         $typeQueso = $matches[1];
                     }
@@ -2893,8 +2906,8 @@ class CartController extends Controller
         $total = $productType->price; // Precio base
 
         // Caso 1: Sin toppings seleccionados
-        $extraSalsa = isset($extraSalsa) ? $extraSalsa : 0;
-        $extraQueso = isset($extraQueso) ? $extraQueso : 0;
+        $extraSalsa = isset($extraSalsa) ? $priceExtraSalsa : 0;
+        $extraQueso = isset($extraQueso) ? $priceExtraQueso : 0;
         // Asegurando que $isSelectedSalsa y $isSelectedQueso siempre tengan valores predeterminados
         $isSelectedSalsa = isset($isSelectedSalsa) ? $isSelectedSalsa : 0;
         $isSelectedQueso = isset($isSelectedQueso) ? $isSelectedQueso : 0;
@@ -2909,11 +2922,11 @@ class CartController extends Controller
 
             // Establecer el precio base según el tamaño
             if ($size === 'familiar') {
-                $basePrice = 35;
+                $basePrice = $base_price_familiar;
             } elseif ($size === 'large') {
-                $basePrice = 30;
+                $basePrice = $base_price_large;
             } elseif ($size === 'personal') {
-                $basePrice = 20;
+                $basePrice = $base_price_personal;
             }
 
             // Caso 2: Una carne y un vegetal, o dos vegetales
@@ -2942,7 +2955,12 @@ class CartController extends Controller
 
                     // +3 soles por cada carne extra a partir de la segunda
                     if ($index >= 1) {
-                        $total += 3;
+                        if ( $meat['type'] == 'whole' )
+                        {
+                            $total += $price_adicional;
+                        } else {
+                            $total += ($price_adicional/2);
+                        }
                     }
                 }
 
@@ -2955,7 +2973,12 @@ class CartController extends Controller
 
                         // +3 soles por cada vegetal extra a partir del tercero
                         if ($index >= 2) {
-                            $total += 3;
+                            if ( $veggie['type'] == 'whole' )
+                            {
+                                $total += $price_adicional;
+                            } else {
+                                $total += ($price_adicional/2);
+                            }
                         }
                     }
                 } else {
@@ -2966,7 +2989,13 @@ class CartController extends Controller
 
                         // +3 soles por cada vegetal extra a partir del segundo
                         if ($index >= 1) {
-                            $total += 3;
+                            if ( $veggie['type'] == 'whole' )
+                            {
+                                $total += $price_adicional;
+                            } else {
+                                $total += ($price_adicional/2);
+                            }
+
                         }
                     }
                 }
@@ -3001,8 +3030,43 @@ class CartController extends Controller
             }*/
 
             // Agregar costos de extras en salsa y queso
-            $total += ($extraSalsa ? 1 : 0) + ($extraQueso ? 1 : 0);
+            $total += ($extraSalsa ? $priceExtraSalsa : 0) + ($extraQueso ? $priceExtraQueso : 0);
         }
+
+        /*dump([
+            'url_redirect' => route('cart.show'),
+            'custom' => true,
+            'options' => (object)[], // Objeto vacío como indicastes
+            'product_id' => $product->id,
+            'product_type_id' => $productType->id,
+            'product_type_name' => $productType->type->name."(".$productType->type->size.")",
+            'quantity' => 1,
+            'total' => $total,
+            'toppings' => [
+                'salsa' => [
+                    'isSelected' => isset($isSelectedSalsa) ? $isSelectedSalsa : 0,
+                    'type' => isset($typeSalsa) ? $typeSalsa : null,
+                    'topping_id' => isset($toppingSalsa) ? $toppingSalsa->id : null,
+                    'topping_name' => isset($toppingSalsa) ? $toppingSalsa->name : null,
+                    'topping_price_exception' => isset($toppingSalsa) ? $toppingSalsa->price_exception : null,
+                    'topping_price_extra' => isset($toppingSalsa) ? $toppingSalsa->price_extra : null,
+                    'extra' => isset($extraSalsa) ? $extraSalsa : 0,
+                ],
+                'queso' => [
+                    'isSelected' => isset($isSelectedQueso) ? $isSelectedQueso : 0,
+                    'type' => isset($typeQueso) ? $typeQueso : null,
+                    'topping_id' => isset($toppingQueso) ? $toppingQueso->id : null,
+                    'topping_name' => isset($toppingQueso) ? $toppingQueso->name : null,
+                    'topping_price_exception' => isset($toppingQueso) ? $toppingQueso->price_exception : null,
+                    'topping_price_extra' => isset($toppingQueso) ? $toppingQueso->price_extra : null,
+                    'extra' => isset($extraQueso) ? $extraQueso : 0,
+                ],
+                'meats' => $processedMeats,
+                'veggies' => $processedVeggies,
+            ],
+            'user_id' => (Auth::id() !== null) ? Auth::id() : null, // Devuelve el ID del usuario autenticado, o null si no está autenticado
+        ]);
+        dd();*/
 
         // Formato de respuesta
         return response()->json([
