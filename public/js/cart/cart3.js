@@ -102,7 +102,7 @@ $(document).ready(function() {
             method: 'GET',
             success: function (response) {
                 if (!response.is_open) {
-                    $.confirm({
+                    /*$.confirm({
                         title: '¡Aún no estamos atendiendo!',
                         content: `
                     <img src="/images/checkout/cerrado.png" style="display:block; margin: 0 auto; padding-bottom: 15px; width: 100px; height: auto;" />
@@ -112,6 +112,40 @@ $(document).ready(function() {
                     <p class="mb-2 text-center"><strong >Estos son nuestros horarios:</strong></p>
                     <p class="mb-0 text-center">Lunes a Viernes: 6:30pm - 11:30pm</p>
                     <p class="mb-0 text-center">Sábados y Domingos: 4:00pm - 11:30pm</p>
+                `,
+                        buttons: {
+                            close: {
+                                text: 'Ir igualmente',
+                                action: function () {
+                                    // Acción al cerrar el pop-up
+                                    /!*if (href) {
+                                        window.location.href = href;
+                                    } else {
+                                        console.error("El atributo data-href no está definido en el botón.");
+                                    }*!/
+                                    // Verificar la tienda seleccionada antes de redirigir
+                                    const tiendaSeleccionada = localStorage.getItem('tiendaSeleccionada');
+                                    if (tiendaSeleccionada && tiendaSeleccionada.trim() !== '') {
+                                        if (href) {
+                                            window.location.href = href;
+                                        } else {
+                                            console.error("El atributo data-href no está definido en el botón.");
+                                        }
+                                    } else {
+                                        window.location.href = '/seleccionar/local';
+                                    }
+                                }
+                            }
+                        }
+                    });*/
+                    $.confirm({
+                        title: '¡Atención!',
+                        content: `
+                    <img src="/images/checkout/senal-de-advertencia.png" style="display:block; margin: 0 auto; padding-bottom: 15px; width: 100px; height: auto;" />
+                   
+                    <p class="text-center">Estimados clientes, las fuertes lluvias han afectado las rutas de reparto y, para cuidar la seguridad de nuestro equipo, hoy no podremos atender en Fuego y Masa. Agradecemos su comprensión y esperamos verlos pronto para seguir compartiendo la pasión por la pizza. 🍕🔥 </p>
+                  
+                    <p class="mb-2 text-center"><strong >¡Cuídense mucho!</strong></p>
                 `,
                         buttons: {
                             close: {
