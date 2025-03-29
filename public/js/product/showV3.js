@@ -124,8 +124,23 @@ $(document).ready(function () {
                     };
                 }).get();
 
-                if (!selected) {
+                console.log("Verificar: selected");
+                console.log(selected);
+                /*if (!selected) {
                     showError(`Debes seleccionar una opción para: ${optionDescription}.`);
+                    valid = false;
+                    return false; // Detener iteración
+                }*/
+
+                // Validar selección mínima y máxima
+                if (selected.length === 0 || selected.length < maxQuantity) {
+                    showError(`Debes seleccionar productos para la opción: ${optionDescription}.`);
+                    valid = false;
+                    return false; // Detener iteración
+                }
+
+                if (selected.length > maxQuantity) {
+                    showError(`Has seleccionado más opciones de las permitidas para: ${optionDescription}.`);
                     valid = false;
                     return false; // Detener iteración
                 }
