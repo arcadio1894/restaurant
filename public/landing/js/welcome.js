@@ -6,7 +6,7 @@ $(document).ready(function() {
         method: 'GET',
         success: function (response) {
             if (!response.is_open) {
-                /*$.confirm({
+                $.confirm({
                     title: '¡Aún no estamos atendiendo!',
                     content: `
                     <img src="/images/checkout/cerrado.png" style="display:block; margin: 0 auto; padding-bottom: 15px; width: 100px; height: auto;" />
@@ -25,8 +25,8 @@ $(document).ready(function() {
                             }
                         }
                     }
-                });*/
-                $.confirm({
+                });
+                /*$.confirm({
                     title: '¡Atención!',
                     content: `
                     <img src="/images/checkout/senal-de-advertencia.png" style="display:block; margin: 0 auto; padding-bottom: 15px; width: 100px; height: auto;" />
@@ -44,7 +44,7 @@ $(document).ready(function() {
                             }
                         }
                     }
-                });
+                });*/
             }
         },
         error: function () {
