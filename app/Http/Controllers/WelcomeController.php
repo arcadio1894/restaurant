@@ -41,7 +41,13 @@ class WelcomeController extends Controller
             ->orderByRaw('FIELD(category_id, ' . implode(',', $order) . ')') // Categorías en orden específico
             ->orderBy('category_id') // Ordenar categorías no listadas
             ->orderBy('id') // Ordenar por ID como criterio secundario
-            ->get();
+            ->get()
+            ->filter(function ($product) {
+                $productTypes = $product->productTypes;
+
+                // Verificar si el producto tiene solo un ProductType y su Type está inactivo
+                return !($productTypes->count() === 1 && optional($productTypes->first()->type)->active == 0);
+            });
 
         $slidersSmalls = Slider::where('size', 's')->where('active', 1)->orderBy('order', 'asc')->get();
         $slidersLarges = Slider::where('size', 'l')->where('active', 1)->orderBy('order', 'asc')->get();

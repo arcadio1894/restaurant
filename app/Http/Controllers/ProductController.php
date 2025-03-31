@@ -680,12 +680,23 @@ class ProductController extends Controller
         $product = Product::where('slug', $slug)->firstOrFail();
 
         // Obtener los tipos relacionados al producto
-        $productTypes = $product->productTypes()
+        /*$productTypes = $product->productTypes()
             ->whereHas('type', function ($query) {
                 $query->where('active', 1); // Filtra solo los tipos activos
             })
             ->with('type')
+            ->get();*/
+        $productTypes = $product->productTypes()
+            ->with('type')
             ->get();
+
+        // Verificar si el producto tiene solo un productType y si su type está inactivo
+        if ($productTypes->count() === 1 && optional($productTypes->first()->type)->active == 0) {
+            return redirect()->route('welcome'); // Redirigir si la condición se cumple
+        }
+
+        // Filtrar solo los tipos activos
+        $productTypes = $productTypes->where('type.active', 1);
 
         // Obtener el tipo por defecto
         $defaultProductType = $productTypes->where('default', true)->first();
