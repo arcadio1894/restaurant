@@ -466,6 +466,15 @@ $(document).ready(function () {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                title: {
+                    display: true,
+                    text: window.chartTitleUtilidad, // Usar el título dinámico
+                    fontSize: 14,
+                    fontStyle: 'bold',
+                    padding: 3,
+                    align: 'center',
+                    fontColor: "#ffffff", // Título en blanco
+                },
                 scales: {
                     xAxes: [{
                         ticks: {
