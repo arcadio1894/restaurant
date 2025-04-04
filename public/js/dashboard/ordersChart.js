@@ -390,6 +390,145 @@ $(document).ready(function () {
         $('#quantityKnobTotalSale').text('S/. '+data.total);
     }
 
+
+    // Graficos de Ingresos VS Egresos
+    let utilidadChart;
+    let selectedFilterUtilidad = 'daily';
+
+    function fetchChartDataUtilidad(filter, startDate = null, endDate = null) {
+        // Actualizar el título según el filtro seleccionado
+        updateChartTitleUtilidad(filter, startDate, endDate);
+
+        $.ajax({
+            url: '/dashboard/orders/chart-data-utilidad',
+            type: 'GET',
+            data: { filter, start_date: startDate, end_date: endDate },
+            success: function (response) {
+                updateChartUtilidad(response);
+                updateKnobsUtilidad(response)
+            },
+            error: function () {
+                alert('Error al obtener los datos del gráfico.');
+            }
+        });
+    }
+
+    function updateChartTitleUtilidad(filter, startDate, endDate) {
+        let title = "Ingresos Vs Egresos de hoy"; // Default for 'daily'
+
+        if (filter === 'weekly') {
+            title = "Ingresos Vs Egresos de la última semana";
+        } else if (filter === 'monthly') {
+            title = "Ingresos Vs Egresos de los últimos 7 meses";
+        } else if (filter === 'date_range') {
+            let start = startDate ? new Date(startDate + "T00:00:00").toLocaleDateString() : '';
+            let end = endDate ? new Date(endDate + "T00:00:00").toLocaleDateString() : '';
+            title = `Ingresos Vs Egresos desde ${start} hasta ${end}`;
+        }
+
+        // Almacenar el título dinámico en una variable global para usarlo en Chart.js
+        window.chartTitleUtilidad = title;
+    }
+
+    function updateChartUtilidad(data) {
+        let ctx = $("#utilidad-chart").get(0).getContext("2d");
+
+        // Destruir el gráfico anterior si existe
+        if (utilidadChart) {
+            utilidadChart.destroy();
+        }
+
+        utilidadChart = new Chart(ctx, {
+            type: 'line',  // Gráfico de línea
+            data: {
+                labels: data.labels,  // Fechas en el eje X
+                datasets: [
+                    {
+                        label: "Ingresos (S/.)",
+                        fill: false,
+                        borderColor: "#28a745", // Verde para ingresos
+                        backgroundColor: "rgba(40, 167, 69, 0.2)", // Sombra verde
+                        borderWidth: 2,
+                        data: data.incomes, // Datos de ingresos
+                        lineTension: 0.1
+                    },
+                    {
+                        label: "Egresos (S/.)",
+                        fill: false,
+                        borderColor: "#dc3545", // Rojo para egresos
+                        backgroundColor: "rgba(220, 53, 69, 0.2)", // Sombra roja
+                        borderWidth: 2,
+                        data: data.expenses, // Datos de egresos
+                        lineTension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    xAxes: [{
+                        ticks: {
+                            fontColor: "#ffffff",
+                            autoSkip: false,
+                            padding: 10
+                        },
+                        gridLines: {
+                            color: "rgba(255,255,255,0.2)",
+                            zeroLineColor: "#ffffff"
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            fontColor: "#ffffff",
+                            beginAtZero: true,
+                            callback: function(value) {
+                                return "S/ " + value.toLocaleString(); // Formato en soles
+                            }
+                        },
+                        gridLines: {
+                            color: "rgba(255,255,255,0.2)",
+                            zeroLineColor: "#ffffff"
+                        }
+                    }]
+                },
+                legend: {
+                    labels: {
+                        fontColor: "#ffffff"
+                    }
+                }
+            }
+        });
+    }
+
+    // Cargar datos iniciales (Diario por defecto)
+    fetchChartDataUtilidad(selectedFilterUtilidad);
+
+    // Manejo de botones de filtro
+    $(".filter-btn-utilidad").click(function () {
+        selectedFilter = $(this).data("filter");
+
+        if (selectedFilter === "date_range") {
+            let startDate = $("#start_date_utilidad").val();
+            let endDate = $("#end_date_utilidad").val();
+
+            if (!startDate || !endDate) {
+                alert("Por favor, seleccione ambas fechas.");
+                return;
+            }
+
+            fetchChartDataUtilidad(selectedFilter, startDate, endDate);
+        } else {
+            fetchChartDataUtilidad(selectedFilter);
+        }
+    });
+
+    function updateKnobsUtilidad(data) {
+        $('#quantityKnobIngresos').text('S/. '+data.total_income);
+        $('#quantityKnobEgresos').text('S/. '+data.total_expense);
+        $('#quantityKnobUtilidad').text('S/. '+data.profit);
+    }
+
 });
 
 function activateTemplate(id) {

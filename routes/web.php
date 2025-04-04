@@ -255,6 +255,7 @@ Route::middleware('auth')->group(function (){
         Route::get('/orders/chart-data', [OrdersChartController::class, 'getChartData']);
         Route::get('/promos/chart-data', [OrdersChartController::class, 'getChartDataPromo']);
         Route::get('/orders/chart-data-sale', [OrdersChartController::class, 'getChartDataSale']);
+        Route::get('/orders/chart-data-utilidad', [OrdersChartController::class, 'getChartDataCashFlow']);
 
         // Rutas de reclamos
         Route::get('/reclamos/activos', [ReclamacionController::class, 'index'])->name('reclamos.index');

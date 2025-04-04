@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CashMovement;
 use App\Models\Coupon;
 use App\Models\UserCoupon;
 use Illuminate\Http\Request;
@@ -270,6 +271,119 @@ class OrdersChartController extends Controller
             'sales_total' => round($whatsappSales + $webSales, 2), // Total para el gráfico por fecha
             'whatsapp_sales' => $whatsappSales,
             'web_sales' => $webSales
+        ];
+    }
+
+    public function getChartDataCashFlow(Request $request)
+    {
+        $filter = $request->input('filter', 'daily');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        $data = [
+            'labels' => [],
+            'incomes' => [], // Ingresos por fecha
+            'expenses' => []  // Egresos por fecha
+        ];
+
+        // Variables para el total de ingresos y egresos
+        $totalIncome = 0;
+        $totalExpense = 0;
+
+        if ($filter === 'daily') {
+            $startDate = Carbon::today();
+            $endDate = Carbon::today();
+            $cashData = $this->getCashData($startDate, $endDate);
+
+            $data['labels'][] = $startDate->format('d-m-Y');
+            $data['incomes'][] = $cashData['income_total'];
+            $data['expenses'][] = $cashData['expense_total'];
+
+            $totalIncome = $cashData['income_total'];
+            $totalExpense = $cashData['expense_total'];
+
+        } elseif ($filter === 'weekly') {
+            for ($i = 6; $i >= 0; $i--) {
+                $date = Carbon::today()->subDays($i);
+                $data['labels'][] = $date->format('d-m-Y');
+
+                $cashData = $this->getCashData($date, $date);
+                $data['incomes'][] = $cashData['income_total'];
+                $data['expenses'][] = $cashData['expense_total'];
+
+                $totalIncome += $cashData['income_total'];
+                $totalExpense += $cashData['expense_total'];
+            }
+
+        } elseif ($filter === 'monthly') {
+            for ($i = 6; $i >= 0; $i--) {
+                $date = Carbon::today()->subMonths($i)->startOfMonth();
+                $endMonth = $date->copy()->endOfMonth();
+
+                $data['labels'][] = $date->format('m-Y');
+
+                $cashData = $this->getCashData($date, $endMonth);
+                $data['incomes'][] = $cashData['income_total'];
+                $data['expenses'][] = $cashData['expense_total'];
+
+                $totalIncome += $cashData['income_total'];
+                $totalExpense += $cashData['expense_total'];
+            }
+
+        } elseif ($filter === 'date_range' && $startDate && $endDate) {
+            $startDate = Carbon::parse($startDate);
+            $endDate = Carbon::parse($endDate);
+
+            while ($startDate <= $endDate) {
+                $data['labels'][] = $startDate->format('d-m-Y');
+
+                $cashData = $this->getCashData($startDate, $startDate);
+                $data['incomes'][] = $cashData['income_total'];
+                $data['expenses'][] = $cashData['expense_total'];
+
+                $totalIncome += $cashData['income_total'];
+                $totalExpense += $cashData['expense_total'];
+
+                $startDate->addDay();
+            }
+        } else {
+            return response()->json(['error' => 'Invalid filter'], 400);
+        }
+
+        // Calcular utilidad
+        $profit = $totalIncome - $totalExpense;
+
+        // Agregar datos de totales
+        $data['total_income'] = number_format($totalIncome, 2, '.', '');
+        $data['total_expense'] = number_format($totalExpense, 2, '.', '');
+        $data['profit'] = number_format($profit, 2, '.', '');
+
+        return response()->json($data);
+    }
+
+    /**
+     * Obtiene los ingresos y egresos en un rango de fechas.
+     */
+    private function getCashData($startDate, $endDate)
+    {
+        // Sumar ingresos (type = income) + (type = sale con regularize = 1)
+        $incomeTotal = CashMovement::whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()])
+            ->where(function ($query) {
+                $query->where('type', 'income')
+                    ->orWhere(function ($subQuery) {
+                        $subQuery->where('type', 'sale')->where('regularize', 1);
+                    });
+            })
+            ->sum('amount');
+
+        // Sumar egresos (type = expense)
+        $expenseTotal = CashMovement::whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()])
+            ->where('type', 'expense')
+            ->sum('amount');
+
+        return [
+            'income_total' => $incomeTotal,
+            'expense_total' => $expenseTotal
         ];
     }
 }
