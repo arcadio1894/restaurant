@@ -245,7 +245,7 @@ class OrdersChartController extends Controller
 
     private function getSalesData($startDate, $endDate, $adminIds)
     {
-        // Obtener todas las órdenes del rango de fechas
+        /*// Obtener todas las órdenes del rango de fechas
         $whatsappOrders = Order::whereIn('user_id', $adminIds)
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
@@ -269,6 +269,49 @@ class OrdersChartController extends Controller
 
         return [
             'sales_total' => round($whatsappSales + $webSales, 2), // Total para el gráfico por fecha
+            'whatsapp_sales' => $whatsappSales,
+            'web_sales' => $webSales
+        ];*/
+        $orders = Order::with(['cashMovements' => function ($query) {
+            $query->where('type', 'sale');
+        }])
+            ->whereDate('created_at', '>=', $startDate)
+            ->whereDate('created_at', '<=', $endDate)
+            ->where('state_annulled', 0)
+            ->get();
+
+        $whatsappSales = 0;
+        $webSales = 0;
+
+        foreach ($orders as $order) {
+            $isWhatsapp = in_array($order->user_id, $adminIds->toArray());
+            $movements = $order->cashMovements;
+
+            // Buscar si tiene movimiento POS
+            $posMovement = $movements->first(function ($m) {
+                return $m->subtype === 'pos';
+            });
+
+            if ($posMovement) {
+                if ($posMovement->regularize) {
+                    $amount = $posMovement->amount;
+                } else {
+                    continue; // No sumar esta orden si POS no está regularizada
+                }
+            } else {
+                // No es POS, tomar el valor original de la orden
+                $amount = $order->amount_pay;
+            }
+
+            if ($isWhatsapp) {
+                $whatsappSales += $amount;
+            } else {
+                $webSales += $amount;
+            }
+        }
+
+        return [
+            'sales_total' => round($whatsappSales + $webSales, 2),
             'whatsapp_sales' => $whatsappSales,
             'web_sales' => $webSales
         ];

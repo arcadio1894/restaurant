@@ -50,6 +50,11 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function cashMovements()
+    {
+        return $this->hasMany(CashMovement::class, 'order_id');
+    }
+
     public function distributor()
     {
         return $this->belongsTo(Distributor::class);
