@@ -367,7 +367,10 @@ class OrdersChartController extends Controller
     private function getCashData($startDate, $endDate)
     {
         // Sumar ingresos (type = income) + (type = sale con regularize = 1)
-        $incomeTotal = CashMovement::whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()])
+        $incomeTotal = CashMovement::
+        /*whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()])*/
+            whereDate('created_at', '>=', $startDate->startOfDay())
+            ->whereDate('created_at', '<=', $endDate->endOfDay())
             ->where(function ($query) {
                 $query->where('type', 'income')
                     ->orWhere(function ($subQuery) {
@@ -377,7 +380,10 @@ class OrdersChartController extends Controller
             ->sum('amount');
 
         // Sumar egresos (type = expense)
-        $expenseTotal = CashMovement::whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()])
+        $expenseTotal = CashMovement::
+        /*whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()])*/
+            whereDate('created_at', '>=', $startDate->startOfDay())
+            ->whereDate('created_at', '<=', $endDate->endOfDay())
             ->where('type', 'expense')
             ->sum('amount');
 
