@@ -89,123 +89,104 @@
 @endsection
 
 @section('content')
-    <!-- offer section -->
-    <section class="offer_section layout_padding-bottom pt-0">
-        <div class="offer_container">
-            <div class="row">
-                <div class="col-md-12">
-                    @if ($slidersLarges->isNotEmpty())
-                        <div id="carouselLarge" class="carousel slide d-none d-md-block" data-ride="carousel">
-                            <ol class="carousel-indicators">
-                                {{--<li data-target="#carouselLarge" data-slide-to="0" class="active"></li>
-                                <li data-target="#carouselLarge" data-slide-to="1"></li>
-                                <li data-target="#carouselLarge" data-slide-to="2"></li>--}}
-                                @foreach ($slidersLarges as $index => $slider)
-                                    <li data-target="#carouselLarge" data-slide-to="{{ $index }}" class="{{ $index === 0 ? 'active' : '' }}"></li>
-                                @endforeach
-                            </ol>
-                            <div class="carousel-inner">
-                                @foreach ($slidersLarges as $index => $slider)
-                                    <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                        @if (!empty($slider->link))
-                                            <a href="{{ $slider->link }}">
-                                                <img src="{{ asset('images/slider/' . $slider->image) }}" class="d-block w-100" alt="...">
-                                            </a>
-                                        @else
-                                            <img src="{{ asset('images/slider/' . $slider->image) }}" class="d-block w-100" alt="...">
-                                        @endif
-                                    </div>
-                                @endforeach
-                                {{--<div class="carousel-item active">
-                                    <a href="http://restaurant.site:8080/producto/margarita-del-campo">
-                                        <img src="{{ asset('images/slider/slide1_g.webp') }}" class="d-block w-100" alt="...">
+    <div class="row">
+        <div class="col-md-12">
+            @if ($slidersLarges->isNotEmpty())
+                <div id="carouselLarge" class="carousel slide d-none d-md-block" data-ride="carousel">
+                    <ol class="carousel-indicators">
+                        {{--<li data-target="#carouselLarge" data-slide-to="0" class="active"></li>
+                        <li data-target="#carouselLarge" data-slide-to="1"></li>
+                        <li data-target="#carouselLarge" data-slide-to="2"></li>--}}
+                        @foreach ($slidersLarges as $index => $slider)
+                            <li data-target="#carouselLarge" data-slide-to="{{ $index }}" class="{{ $index === 0 ? 'active' : '' }}"></li>
+                        @endforeach
+                    </ol>
+                    <div class="carousel-inner">
+                        @foreach ($slidersLarges as $index => $slider)
+                            <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                @if (!empty($slider->link))
+                                    <a href="{{ $slider->link }}">
+                                        <img src="{{ asset('images/slider/' . $slider->image) }}" class="d-block w-100" alt="...">
                                     </a>
-                                </div>
+                                @else
+                                    <img src="{{ asset('images/slider/' . $slider->image) }}" class="d-block w-100" alt="...">
+                                @endif
+                            </div>
+                        @endforeach
+                        {{--<div class="carousel-item active">
+                            <a href="http://restaurant.site:8080/producto/margarita-del-campo">
+                                <img src="{{ asset('images/slider/slide1_g.webp') }}" class="d-block w-100" alt="...">
+                            </a>
+                        </div>
 
-                                <div class="carousel-item">
-                                    <img src="{{ asset('images/slider/slide1_g.webp') }}" class="d-block w-100" alt="...">
-                                </div>
-                                <div class="carousel-item">
-                                    <img src="{{ asset('images/slider/slide1_g.webp') }}" class="d-block w-100" alt="...">
-                                </div>--}}
-                            </div>
-                            <a class="carousel-control-prev" href="#carouselLarge" role="button" data-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="sr-only">Previous</span>
-                            </a>
-                            <a class="carousel-control-next" href="#carouselLarge" role="button" data-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="sr-only">Next</span>
-                            </a>
+                        <div class="carousel-item">
+                            <img src="{{ asset('images/slider/slide1_g.webp') }}" class="d-block w-100" alt="...">
                         </div>
-                    @endif
-                    <!-- Carrusel para dispositivos pequeños -->
-                    @if ($slidersSmalls->isNotEmpty())
-                        <div id="carouselSmall" class="carousel slide d-block d-md-none" data-ride="carousel">
-                            <ol class="carousel-indicators">
-                                {{--<li data-target="#carouselSmall" data-slide-to="0" class="active"></li>
-                                <li data-target="#carouselSmall" data-slide-to="1"></li>
-                                <li data-target="#carouselSmall" data-slide-to="2"></li>--}}
-                                @foreach ($slidersSmalls as $index => $slider)
-                                    <li data-target="#carouselSmall" data-slide-to="{{ $index }}" class="{{ $index === 0 ? 'active' : '' }}"></li>
-                                @endforeach
-                            </ol>
-                            <div class="carousel-inner">
-                                @foreach ($slidersSmalls as $index => $slider)
-                                    <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                        @if (!empty($slider->link))
-                                            <a href="{{ $slider->link }}">
-                                                <img src="{{ asset('images/slider/' . $slider->image) }}" class="d-block w-100" alt="...">
-                                            </a>
-                                        @else
-                                            <img src="{{ asset('images/slider/' . $slider->image) }}" class="d-block w-100" alt="...">
-                                        @endif
-                                    </div>
-                                @endforeach
-                                {{--<div class="carousel-item active">
-                                    <a href="http://restaurant.site:8080/producto/margarita-del-campo">
-                                        <img src="{{ asset('images/slider/slide1_p.webp') }}" class="d-block w-100" alt="...">
-                                    </a>
-                                </div>
-                                <div class="carousel-item">
-                                    <img src="{{ asset('images/slider/slide1_p.webp') }}" class="d-block w-100" alt="...">
-                                </div>
-                                <div class="carousel-item">
-                                    <img src="{{ asset('images/slider/slide1_p.webp') }}" class="d-block w-100" alt="...">
-                                </div>--}}
-                            </div>
-                            <a class="carousel-control-prev" href="#carouselSmall" role="button" data-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="sr-only">Previous</span>
-                            </a>
-                            <a class="carousel-control-next" href="#carouselSmall" role="button" data-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="sr-only">Next</span>
-                            </a>
-                        </div>
-                    @endif
-                </div>
-            </div>
-            {{--<div class="row">
-                <div class="col-md-6 offset-md-3">
-                    <div class="box ">
-                        <div class="img-box">
-                            <img src="{{ asset('images/products/7.png') }}" alt="">
-                        </div>
-                        <div class="detail-box">
-                            <h5>
-                                <b>¿Es tu primera pizza?</b>
-                            </h5>
-                            <h6>
-                                <span>50%</span> descuento
-                            </h6>
-                            <a href="{{ route('home') }}" class="text-center">
-                                Usa el codigo <b>MiPrimeraPizza</b>
-                            </a>
-                        </div>
+                        <div class="carousel-item">
+                            <img src="{{ asset('images/slider/slide1_g.webp') }}" class="d-block w-100" alt="...">
+                        </div>--}}
                     </div>
+                    <a class="carousel-control-prev" href="#carouselLarge" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#carouselLarge" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
                 </div>
-            </div>--}}
+            @endif
+        <!-- Carrusel para dispositivos pequeños -->
+            @if ($slidersSmalls->isNotEmpty())
+                <div id="carouselSmall" class="carousel slide d-block d-md-none" data-ride="carousel">
+                    <ol class="carousel-indicators">
+                        {{--<li data-target="#carouselSmall" data-slide-to="0" class="active"></li>
+                        <li data-target="#carouselSmall" data-slide-to="1"></li>
+                        <li data-target="#carouselSmall" data-slide-to="2"></li>--}}
+                        @foreach ($slidersSmalls as $index => $slider)
+                            <li data-target="#carouselSmall" data-slide-to="{{ $index }}" class="{{ $index === 0 ? 'active' : '' }}"></li>
+                        @endforeach
+                    </ol>
+                    <div class="carousel-inner">
+                        @foreach ($slidersSmalls as $index => $slider)
+                            <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                @if (!empty($slider->link))
+                                    <a href="{{ $slider->link }}">
+                                        <img src="{{ asset('images/slider/' . $slider->image) }}" class="d-block w-100" alt="...">
+                                    </a>
+                                @else
+                                    <img src="{{ asset('images/slider/' . $slider->image) }}" class="d-block w-100" alt="...">
+                                @endif
+                            </div>
+                        @endforeach
+                        {{--<div class="carousel-item active">
+                            <a href="http://restaurant.site:8080/producto/margarita-del-campo">
+                                <img src="{{ asset('images/slider/slide1_p.webp') }}" class="d-block w-100" alt="...">
+                            </a>
+                        </div>
+                        <div class="carousel-item">
+                            <img src="{{ asset('images/slider/slide1_p.webp') }}" class="d-block w-100" alt="...">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="{{ asset('images/slider/slide1_p.webp') }}" class="d-block w-100" alt="...">
+                        </div>--}}
+                    </div>
+                    <a class="carousel-control-prev" href="#carouselSmall" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#carouselSmall" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+            @endif
+        </div>
+    </div>
+    <!-- offer section -->
+    <section class="offer_section layout_padding-bottom pt-0 d-none d-md-block">
+        <div class="offer_container">
+
         </div>
     </section>
 
@@ -215,7 +196,7 @@
 
     <section class="food_section layout_padding-bottom">
         <div class="container">
-            <div class="heading_container heading_center">
+            <div class="heading_container heading_center d-none d-md-block">
                 <h2>
                     Galería de Sabores
                 </h2>
