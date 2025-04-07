@@ -53,6 +53,10 @@ class TelegramController extends Controller
 
             // Envía la notificación
             $user->notify(new TelegramNotification($type, $message));
+        } elseif ($type == 'cash_register_warning') {
+            $user = User::find(2); // o el ID del admin
+            $message = $data['mensaje'];
+            $user->notify(new TelegramNotification($type, $message));
         } else {
             throw new \Exception("Tipo de notificación no soportado: {$type}");
         }

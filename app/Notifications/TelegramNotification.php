@@ -84,6 +84,10 @@ class TelegramNotification extends Notification implements ShouldQueue
             $group = env('TELEGRAM_CHAT_ID_PROCESS');
         }
 
+        if ($this->type == 'cash_register_warning') {
+            $group = env('TELEGRAM_CHAT_ID_PROCESS'); // o el grupo que elijas
+        }
+
         if (empty($group)) {
             throw new \Exception("El chat ID de Telegram no está configurado para el tipo {$this->type}.");
         }
