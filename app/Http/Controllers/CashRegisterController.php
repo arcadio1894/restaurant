@@ -12,7 +12,10 @@ class CashRegisterController extends Controller
 {
     public function indexCashRegister($type)
     {
-        $cashRegister = CashRegister::where('type', $type)->latest()->first();
+        /*$cashRegister = CashRegister::where('type', $type)->latest()->first();*/
+        $cashRegister = CashRegister::where('type', $type)
+            ->orderByDesc('opening_time') // o 'id' si lo prefieres
+            ->first();
 
         // TODO: Puede pasar 3 cosas: Que no exista, que exista abierta, que exista cerrada
         $balance_total = 0;
@@ -95,6 +98,15 @@ class CashRegisterController extends Controller
             $type = $request->get('type');
             $balance_total = $request->get('balance_total');
 
+            $existing = CashRegister::where('type', strtolower($type))
+                ->whereNull('closing_time')
+                ->exists();
+
+            if ($existing) {
+                // No abrir otra caja, ya hay una abierta
+                return response()->json(['message' => "Hay una caja abierta"], 422);
+            }
+
             $caja = CashRegister::create([
                 'opening_balance' => $balance_total,
                 'current_balance' => $balance_total,
@@ -138,7 +150,9 @@ class CashRegisterController extends Controller
             $type = $request->get('type');
             $balance_total = $request->get('balance_total');
 
-            $cashRegister = CashRegister::where('type', $type)->latest()->first();
+            $cashRegister = CashRegister::where('type', $type)
+                ->orderByDesc('opening_time') // o 'id' si lo prefieres
+                ->first();
 
             if ( !isset($cashRegister) )
             {
@@ -196,7 +210,10 @@ class CashRegisterController extends Controller
             $amount = $request->get('amount');
             $description = $request->get('description');
 
-            $cashRegister = CashRegister::where('type', $type)->latest()->first();
+            /*$cashRegister = CashRegister::where('type', $type)->latest()->first();*/
+            $cashRegister = CashRegister::where('type', $type)
+                ->orderByDesc('opening_time') // o 'id' si lo prefieres
+                ->first();
 
             if ( !isset($cashRegister) )
             {
@@ -253,8 +270,11 @@ class CashRegisterController extends Controller
             $description = $request->get('description');
 
             // Buscar la caja abierta del usuario actual
-            $cashRegister = CashRegister::where('type', $type)
+            /*$cashRegister = CashRegister::where('type', $type)
                 ->latest()
+                ->first();*/
+            $cashRegister = CashRegister::where('type', $type)
+                ->orderByDesc('opening_time') // o 'id' si lo prefieres
                 ->first();
 
             if (!isset($cashRegister)) {
@@ -312,7 +332,10 @@ class CashRegisterController extends Controller
             $cash_movement_id = $request->get('cash_movement_id');
             $amount = round((float)$request->get('amount'), 2);
 
-            $cashRegister = CashRegister::where('type', $type)->latest()->first();
+            /*$cashRegister = CashRegister::where('type', $type)->latest()->first();*/
+            $cashRegister = CashRegister::where('type', $type)
+                ->orderByDesc('opening_time') // o 'id' si lo prefieres
+                ->first();
 
             if ( !isset($cashRegister) )
             {

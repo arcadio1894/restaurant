@@ -365,7 +365,7 @@ class CartController extends Controller
                 // Obtener la caja del tipo de pago
                 $cashRegister = CashRegister::where('type', 'bancario')
                     ->where('status', 1) // Caja abierta
-                    ->latest()
+                    ->orderByDesc('opening_time')
                     ->first();
 
                 if (!isset($cashRegister)) {
@@ -375,7 +375,7 @@ class CartController extends Controller
             } elseif ( $method_payment->code == 'efectivo' ) {
                 $cashRegister = CashRegister::where('type', 'efectivo')
                     ->where('status', 1) // Caja abierta
-                    ->latest()
+                    ->orderByDesc('opening_time')
                     ->first();
 
                 if (!isset($cashRegister)) {
@@ -691,7 +691,7 @@ class CartController extends Controller
                     // Obtener la caja del tipo de pago
                     $cashRegister = CashRegister::where('type', $paymentTypeMap[$paymentType])
                         ->where('status', 1) // Caja abierta
-                        ->latest()
+                        ->orderByDesc('opening_time')
                         ->first();
 
                     /*if (!isset($cashRegister)) {
@@ -751,7 +751,7 @@ class CartController extends Controller
                     // Obtener la caja del tipo de pago
                     $cashRegister = CashRegister::where('type', $paymentTypeMap[1])
                         ->where('status', 1) // Caja abierta
-                        ->latest()
+                        ->orderByDesc('opening_time')
                         ->first();
 
                     /*if (!isset($cashRegister)) {
@@ -842,7 +842,7 @@ class CartController extends Controller
                         // Obtener la caja del tipo de pago
                         $cashRegister = CashRegister::where('type', $paymentTypeMap[$paymentType])
                             ->where('status', 1) // Caja abierta
-                            ->latest()
+                            ->orderByDesc('opening_time')
                             ->first();
 
                        /* if (!isset($cashRegister)) {
@@ -940,7 +940,7 @@ class CartController extends Controller
                 // Obtener la caja del tipo de pago
                 $cashRegister = CashRegister::where('type', 'bancario')
                     ->where('status', 1) // Caja abierta
-                    ->latest()
+                    ->orderByDesc('opening_time')
                     ->first();
 
                 if (!isset($cashRegister)) {
@@ -950,7 +950,7 @@ class CartController extends Controller
             } elseif ( $method_payment->code == 'efectivo' ) {
                 $cashRegister = CashRegister::where('type', 'efectivo')
                     ->where('status', 1) // Caja abierta
-                    ->latest()
+                    ->orderByDesc('opening_time')
                     ->first();
 
                 if (!isset($cashRegister)) {
@@ -1262,7 +1262,7 @@ class CartController extends Controller
                     // Obtener la caja del tipo de pago
                     $cashRegister = CashRegister::where('type', $paymentTypeMap[$paymentType])
                         ->where('status', 1) // Caja abierta
-                        ->latest()
+                        ->orderByDesc('opening_time')
                         ->first();
 
                     /*if (!isset($cashRegister)) {
@@ -1325,7 +1325,7 @@ class CartController extends Controller
                     // Obtener la caja del tipo de pago
                     $cashRegister = CashRegister::where('type', $paymentTypeMap[1])
                         ->where('status', 1) // Caja abierta
-                        ->latest()
+                        ->orderByDesc('opening_time')
                         ->first();
 
                     /*if (!isset($cashRegister)) {
@@ -1419,7 +1419,7 @@ class CartController extends Controller
                         // Obtener la caja del tipo de pago
                         $cashRegister = CashRegister::where('type', $paymentTypeMap[$paymentType])
                             ->where('status', 1) // Caja abierta
-                            ->latest()
+                            ->orderByDesc('opening_time')
                             ->first();
 
                         /* if (!isset($cashRegister)) {
