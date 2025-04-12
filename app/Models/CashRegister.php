@@ -28,4 +28,9 @@ class CashRegister extends Model
     {
         return $this->hasMany(CashMovement::class);
     }
+
+    public function logs()
+    {
+        return $this->hasMany(CashRegisterLog::class);
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CashMovement;
 use App\Models\CashRegister;
+use App\Models\CashRegisterLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -32,8 +33,17 @@ class CashRegisterController extends Controller
             </div>
           </div>';
 
-        if ( !isset($cashRegister) )
+        if ( !$cashRegister )
         {
+            // No existe caja
+            CashRegisterLog::create([
+                'cash_register_id' => null,
+                'user_id' => auth()->id(),
+                'action' => 'Ver estado de caja',
+                'description' => "Caja de tipo '{$type}' no existe. Mostrando opción para abrir."
+            ]);
+
+
             // TODO: No existe
             array_push($buttons, ['open']);
 
@@ -42,6 +52,14 @@ class CashRegisterController extends Controller
 
             if ( $cashRegister->status == 1 ) // abierta
             {
+                // Caja abierta
+                CashRegisterLog::create([
+                    'cash_register_id' => $cashRegister->id,
+                    'user_id' => auth()->id(),
+                    'action' => 'Ver estado de caja',
+                    'description' => "Caja de tipo '{$type}' está ABIERTA. Mostrando opción para cerrar."
+                ]);
+
                 $balance_total = round($cashRegister->current_balance, 2);
                 array_push($buttons, ['close']);
                 $state = '<div class="col-md-4 col-6">
@@ -57,6 +75,15 @@ class CashRegisterController extends Controller
                             </div>
                           </div>';
             } else {
+
+                // Caja cerrada
+                CashRegisterLog::create([
+                    'cash_register_id' => $cashRegister->id,
+                    'user_id' => auth()->id(),
+                    'action' => 'Ver estado de caja',
+                    'description' => "Caja de tipo '{$type}' está CERRADA. Mostrando opción para abrir."
+                ]);
+
                 // cerrada
                 $balance_total = $cashRegister->closing_balance;
                 array_push($buttons, ['open']);
@@ -113,6 +140,14 @@ class CashRegisterController extends Controller
                 'opening_time' => Carbon::now('America/Lima'),
                 'type' => strtolower($type),
                 'status' => 1,
+            ]);
+
+            // ✅ Registrar en log
+            CashRegisterLog::create([
+                'cash_register_id' => $caja->id,
+                'user_id' => auth()->id(),
+                'action' => 'Apertura de caja',
+                'description' => "Caja de tipo '{$type}' aperturada con S/ {$balance_total}."
             ]);
 
             $state = '<div class="col-md-4 col-6">
@@ -174,6 +209,14 @@ class CashRegisterController extends Controller
             $cashRegister->closing_time = Carbon::now('America/Lima');
             $cashRegister->status = 0;
             $cashRegister->save();
+
+            // ✅ Registrar en log
+            CashRegisterLog::create([
+                'cash_register_id' => $cashRegister->id,
+                'user_id' => auth()->id(),
+                'action' => 'Cierre de caja',
+                'description' => "Caja de tipo '{$type}' cerrada con S/ {$balance_total}."
+            ]);
 
             $state = '<div class="col-md-4 col-6">
                             <div class="small-box bg-danger">
@@ -240,6 +283,14 @@ class CashRegisterController extends Controller
 
                     // Guardar los cambios en la caja
                     $cashRegister->save();
+
+                    // ✅ Registrar en CashRegisterLog
+                    CashRegisterLog::create([
+                        'cash_register_id' => $cashRegister->id,
+                        'user_id' => auth()->id(),
+                        'action' => 'Ingreso',
+                        'description' => "Ingreso de S/ {$amount}. {$description}"
+                    ]);
                 } else {
                     // cerrada
                     return response()->json(['message' => "No se puede hacer un ingreso a una caja cerrada."], 422);
@@ -304,6 +355,14 @@ class CashRegisterController extends Controller
                     // Guardar los cambios en la caja
                     $cashRegister->save();
 
+                    // ✅ Registrar en log
+                    CashRegisterLog::create([
+                        'cash_register_id' => $cashRegister->id,
+                        'user_id' => auth()->id(),
+                        'action' => 'Egreso',
+                        'description' => "Egreso de S/ {$amount}. {$description}"
+                    ]);
+
                 } else {
                     // Caja cerrada
                     return response()->json(['message' => "No se puede hacer un egreso de una caja cerrada."], 422);
@@ -360,6 +419,14 @@ class CashRegisterController extends Controller
 
                     // Guardar los cambios en la caja
                     $cashRegister->save();
+
+                    // ✅ Registrar en log
+                    CashRegisterLog::create([
+                        'cash_register_id' => $cashRegister->id,
+                        'user_id' => auth()->id(),
+                        'action' => 'Regularizacion',
+                        'description' => "Regularizacion de S/ {$cashMovement->amount}."
+                    ]);
                 } else {
                     // cerrada
                     return response()->json(['message' => "No se puede hacer un ingreso a una caja cerrada."], 422);
