@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CashRegister;
 use App\Models\DataGeneral;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -51,6 +52,26 @@ class BusinessController extends Controller
 
         if (!in_array($newStatus, [0, 1])) {
             return response()->json(['error' => 'Estado inválido.'], 400);
+        }
+
+        if ($newStatus == 1) {
+            $today = Carbon::now('America/Lima')->format('Y-m-d');
+
+            $cashOpen = CashRegister::whereDate('opening_time', $today)
+                ->where('type', 'efectivo')
+                ->where('status', 1)
+                ->exists();
+
+            $bankOpen = CashRegister::whereDate('opening_time', $today)
+                ->where('type', 'bancario')
+                ->where('status', 1)
+                ->exists();
+
+            if (!$cashOpen || !$bankOpen) {
+                return response()->json([
+                    'error' => 'PRIMERO APERTURA LAS CAJAS.'
+                ], 420);
+            }
         }
 
         DataGeneral::setValue('status_store', $newStatus);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CashMovement;
 use App\Models\CashRegister;
 use App\Models\CashRegisterLog;
+use App\Models\DataGeneral;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -184,6 +185,13 @@ class CashRegisterController extends Controller
 
             $type = $request->get('type');
             $balance_total = $request->get('balance_total');
+
+            // Verificar si la tienda está abierta
+            $currentStatus = DataGeneral::getValue('status_store'); // 1: Abierta, 0: Cerrada
+            if ($currentStatus == 1) {
+                return response()->json(['message' => 'PRIMERO DEBES CERRAR LA TIENDA.'], 422);
+            }
+
 
             $cashRegister = CashRegister::where('type', $type)
                 ->orderByDesc('opening_time') // o 'id' si lo prefieres

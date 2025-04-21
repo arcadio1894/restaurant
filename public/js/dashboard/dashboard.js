@@ -35,8 +35,8 @@ $(document).ready(function () {
                 });
             },
             error: function (xhr) {
-                console.error('Error:', xhr.responseText);
-                toastr.error('Ocurrió un error al cambiar el estado de la tienda.', 'Error', {
+                console.error(xhr);
+                toastr.error(xhr.responseJSON.error, 'Error', {
                     closeButton: true,
                     progressBar: true,
                     positionClass: 'toast-top-right',
