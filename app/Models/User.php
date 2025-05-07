@@ -21,7 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'is_admin'
+        'is_admin',
+        'flames'
     ];
 
     /**
@@ -46,5 +47,10 @@ class User extends Authenticatable
     public function routeNotificationForTelegram()
     {
         return $this->telegram_chat_id;
+    }
+
+    public function rewards()
+    {
+        $this->hasMany(Reward::class);
     }
 }

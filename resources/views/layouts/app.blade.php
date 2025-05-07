@@ -197,6 +197,29 @@
             color: white; /* Mantener el color blanco */
             margin-left: 5px; /* Espacio entre el ícono y el número */
         }
+
+        /* Icono de fuego */
+        .fuego-icon {
+            width: 30px;
+            height: 30px;
+            animation: pulse-fuego 1.5s infinite;
+        }
+
+        .pulse-text {
+            animation: pulse-fuego 1.5s infinite;
+        }
+
+        @keyframes pulse-fuego {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Opcional: efecto hover */
+        .premios-btn:hover {
+            text-decoration: none;
+            color: #ffc107; /* dorado o como prefieras */
+        }
     </style>
     @yield('styles')
 </head>
@@ -216,9 +239,21 @@
                         </span>
                     </a>
 
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class=""> </span>
-                    </button>
+                    <div class="d-flex align-items-center d-lg-none">
+
+                        <!-- Botón link que envuelve el fuego + texto -->
+                        {{--<a href="{{ route('rewards') }}" class="d-flex align-items-center mr-3 text-white text-decoration-none premios-btn">
+                            <img src="{{ asset('images/icons/fire.png') }}" alt="Fuego"
+                                 class="mr-2 fuego-icon" />
+                            <span class="font-weight-bold pulse-text">Premios</span>
+                        </a>--}}
+                        <!-- Botón hamburguesa -->
+                        <button class="navbar-toggler" type="button" data-toggle="collapse"
+                                data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                                aria-expanded="false" aria-label="Toggle navigation">
+                            <span class=""> </span>
+                        </button>
+                    </div>
 
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav  mx-auto ">
@@ -238,11 +273,14 @@
                                     </li>
                                 @endguest
                             @endif
-                            @auth
-                                <li class="nav-item @yield('orders-active')">
-                                    <a class="nav-link" href="{{ route('orders.index') }}">Pedidos</a>
-                                </li>
-                            @endauth
+
+                                {{--<li class="nav-item @yield('orders-active')">
+                                    <a class="nav-link" href="{{ route('orders.index') }}">Premios</a>
+                                </li>--}}
+                            {{--<li class="nav-item @yield('reward-active')">
+                                <a class="nav-link" href="{{ route('rewards') }}">Premios</a>
+                            </li>--}}
+
                         </ul>
                         <div class="user_option">
                             @if (Route::has('login'))
@@ -526,6 +564,7 @@
 </div>
 @endif
 
+@if (!request()->routeIs('rewards') && !request()->routeIs('perfil.usuario') && !request()->routeIs('orders.index'))
 <a href="https://wa.me/51906343258?text=Hola%20FUEGO%20Y%20MASA,%20quiero%20comprar%20una%20pizza.%20%F0%9F%8D%95" target="_blank" class="whatsapp-btn">
             <span class="whatsapp-text">
                 <span class="whatsapp-line">PIDE POR</span>
@@ -533,8 +572,8 @@
             </span>
     <i class="fab fa-whatsapp"></i>
 </a>
-
-@if (!request()->routeIs('cart.show') && !request()->routeIs('cart.checkout') && !request()->routeIs('product.custom') && !request()->routeIs('reclamaciones') && !request()->routeIs('showlocals'))
+@endif
+@if (!request()->routeIs('cart.show') && !request()->routeIs('cart.checkout') && !request()->routeIs('product.custom') && !request()->routeIs('reclamaciones') && !request()->routeIs('showlocals') && !request()->routeIs('rewards') && !request()->routeIs('perfil.usuario') && !request()->routeIs('orders.index'))
     {{-- Botón flotante --}}
     <a href="{{ route('cart.show') }}" id="cartButton" class="floating-cart d-sm-none">
         <i class="fas fa-shopping-cart"></i>

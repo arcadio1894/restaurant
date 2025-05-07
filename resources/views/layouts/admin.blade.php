@@ -621,6 +621,24 @@
                         </ul>
                     </li>
 
+                    <li class="nav-item has-treeview @yield('openRewards')">
+                        <a href="#" class="nav-link @yield('activeRewards')">
+                            <i class="nav-icon fas fa-fire"></i>
+                            <p>
+                                Rewards
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{route('milestones.index')}}" class="nav-link @yield('activeListRewards')">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Listado Hitos</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
                     <li class="nav-header">CENTRO DE AYUDA</li>
 
                     <li class="nav-item has-treeview @yield('openHelpCenter')">

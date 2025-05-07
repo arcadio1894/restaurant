@@ -22,6 +22,9 @@ use Illuminate\Support\Facades\Cache;
 use \App\Http\Controllers\ShopController;
 use \App\Http\Controllers\ZoneController;
 use Illuminate\Http\Request;
+use \App\Http\Controllers\RewardController;
+use \App\Http\Controllers\ProfileController;
+use \App\Http\Controllers\MilestoneController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -98,7 +101,7 @@ Route::get('/pago-exitoso', [CartController::class, 'pagoExitoso'])->name('pago.
 Route::get('/pago-fallido', [CartController::class, 'pagoFallido'])->name('pago.fallido');
 Route::get('/pago-pendiente', [CartController::class, 'pagoPendiente'])->name('pago.pendiente');
 
-Route::get('/pedidos', [OrderController::class, 'index'])->name('orders.index');
+
 Route::get('/get/orders/{page}', [OrderController::class, 'getOrders']);
 
 Route::get('/api/business-hours', [BusinessController::class, 'getBusinessHours']);
@@ -307,7 +310,26 @@ Route::middleware('auth')->group(function (){
         Route::get('/shops/{id}', [ShopController::class, 'showShop']); // Obtener datos de una tienda
         Route::get('/shops/{id}/zones', [ZoneController::class, 'getZones']); // Obtener zonas de una tienda
         Route::post('/shops/{id}/zones/save', [ZoneController::class, 'store']); // Guardar zonas
+
+        // TODO: RUTAS DE MILESTONE
+        Route::get('/milestones', [MilestoneController::class, 'index'])
+            ->name('milestones.index');
+        Route::get('/get/data/milestones/{page}', [MilestoneController::class, 'getDataRewards']);
+        Route::get('/crear/hito', [MilestoneController::class, 'create'])
+            ->name('milestones.create');
+        Route::post('/milestones/store', [MilestoneController::class, 'store'])
+            ->name('milestones.store');
+        Route::post('/milestones/{id}/eliminar', [ShopController::class, 'changeState']);
     });
+
+    // TODO: RUTAS DE PREMIOS
+    Route::get('/rewards/', [RewardController::class, 'index'])->name('rewards');
+
+    // TODO: RUTAS DE PROFILE
+    Route::get('/perfil/usuario', [ProfileController::class, 'index'])->name('perfil.usuario');
+    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/pedidos', [OrderController::class, 'index'])->name('orders.index');
+
 });
 
 Route::get('/seleccionar/local', [ShopController::class, 'showLocals'])->name('showlocals');

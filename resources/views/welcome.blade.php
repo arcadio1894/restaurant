@@ -271,6 +271,29 @@
                 object-fit: cover; /* Escala la imagen sin distorsión */
                 object-position: center;
             }
+
+            /* Icono de fuego */
+            .fuego-icon {
+                width: 30px;
+                height: 30px;
+                animation: pulse-fuego 1.5s infinite;
+            }
+
+            .pulse-text {
+                animation: pulse-fuego 1.5s infinite;
+            }
+
+            @keyframes pulse-fuego {
+                0% { transform: scale(1); opacity: 1; }
+                50% { transform: scale(1.2); opacity: 0.7; }
+                100% { transform: scale(1); opacity: 1; }
+            }
+
+            /* Opcional: efecto hover */
+            .premios-btn:hover {
+                text-decoration: none;
+                color: #ffc107; /* dorado o como prefieras */
+            }
         </style>
     </head>
     <body>
@@ -285,9 +308,21 @@
                             </span>
                         </a>
 
-                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                            <span class=""> </span>
-                        </button>
+                        <div class="d-flex align-items-center d-lg-none">
+
+                            <!-- Botón link que envuelve el fuego + texto -->
+                            {{--<a href="{{ route('rewards') }}" class="d-flex align-items-center mr-3 text-white text-decoration-none premios-btn">
+                                <img src="{{ asset('images/icons/fire.png') }}" alt="Fuego"
+                                     class="mr-2 fuego-icon" />
+                                <span class="font-weight-bold pulse-text">Premios</span>
+                            </a>--}}
+                            <!-- Botón hamburguesa -->
+                            <button class="navbar-toggler" type="button" data-toggle="collapse"
+                                    data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                                    aria-expanded="false" aria-label="Toggle navigation">
+                                <span class=""> </span>
+                            </button>
+                        </div>
 
                         <div class="collapse navbar-collapse" id="navbarSupportedContent">
                             <ul class="navbar-nav  mx-auto ">
@@ -307,11 +342,14 @@
                                         </li>
                                     @endguest
                                 @endif
-                                @auth
+                                {{--@auth
                                     <li class="nav-item">
                                         <a class="nav-link" href="{{ route('orders.index') }}">Pedidos</a>
                                     </li>
-                                @endauth
+                                @endauth--}}
+                                {{--<li class="nav-item @yield('orders-active')">
+                                    <a class="nav-link" href="{{ route('rewards') }}">Premios</a>
+                                </li>--}}
                             </ul>
                             <div class="user_option">
                                 @if (Route::has('login'))
