@@ -15,7 +15,7 @@ class CreateMilestoneRewardsTable extends Migration
     {
         Schema::create('milestone_rewards', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('milestone_id')->nullable()->constrained('milestone');
+            $table->foreignId('milestone_id')->nullable()->constrained('milestones');
             $table->foreignId('product_id')->nullable()->constrained('products');
             $table->timestamps();
         });
