@@ -20,4 +20,14 @@ class Milestone extends Model
     {
         return $this->hasMany(MilestoneReward::class);
     }
+
+    public function getSlugRewardAttribute()
+    {
+        $reward = MilestoneReward::with('product')->where('milestone_id', $this->id)->first();
+
+        $slug = $reward->product->slug;
+
+        return $slug;
+
+    }
 }

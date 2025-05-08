@@ -328,6 +328,7 @@ Route::middleware('auth')->group(function (){
 
     // TODO: RUTAS DE PREMIOS
     Route::get('/rewards/', [RewardController::class, 'index'])->name('rewards');
+    Route::get('/reclamar/recompensa/{slug}', [RewardController::class, 'show'])->name('reward.show');
 
     // TODO: RUTAS DE PROFILE
     Route::get('/perfil/usuario', [ProfileController::class, 'index'])->name('perfil.usuario');

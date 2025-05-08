@@ -317,6 +317,9 @@
                                         <p>{!! $milestone->description !!}</p>
                                     </div>
                                 </div>
+                                <div class="text-right mt-3">
+                                    <a class="nav-link-perfil" href="{{--{{ route('reward.show', ) }}--}}"><strong><i class="fas fa-trophy"></i></i> Reclamar aquí <i class="far fa-arrow-alt-circle-right"></i></strong></a>
+                                </div>
                             </div>
                         @endforeach
                     </div>
