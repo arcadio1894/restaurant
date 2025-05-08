@@ -23,9 +23,13 @@ class Milestone extends Model
 
     public function getSlugRewardAttribute()
     {
+        $slug = "";
+
         $reward = MilestoneReward::with('product')->where('milestone_id', $this->id)->first();
 
-        $slug = $reward->product->slug;
+        if ( $reward ) {
+            $slug = $reward->product->slug;
+        }
 
         return $slug;
 

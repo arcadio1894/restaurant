@@ -325,7 +325,7 @@
                                 </div>
                                 @if($flames >= $milestone->flames)
                                     <div class="text-right mt-3">
-                                        <a class="nav-link-perfil" href="{{--{{ route('reward.show', ) }}--}}">
+                                        <a class="nav-link-perfil" href="{{ route('reward.show', $milestone->slug_reward) }}">
                                             <strong><i class="fas fa-trophy"></i> Reclamar aquí <i class="far fa-arrow-alt-circle-right"></i></strong>
                                         </a>
                                     </div>
@@ -349,7 +349,6 @@
                             <div class="text-content">
                                 <h5 class="font-weight-bold title-mobile">Ordena y gana FLAMAS</h5>
                                 <p class="mb-1 desc-mobile">Haz tu pedido para Delivery; págalo online o en efectivo y gana FLAMAS por cada consumo.</p>
-                                <p class="mb-0 desc-mobile">Ingresa desde nuestra web www.fuegoymasa.com.</p>
                             </div>
                         </div>
 
@@ -359,7 +358,7 @@
                             </div>
                             <div class="text-content">
                                 <h5 class="font-weight-bold title-mobile">Acumula FLAMAS</h5>
-                                <p class="mb-0 desc-mobile">Gana 1 FLAMA por cada S/10 en compras que realices. Cuantas más pizzas disfrutes, más FLAMAS acumulas. Además, puedes ganar FLAMAS extra en promociones especiales y eventos exclusivos.</p>
+                                <p class="mb-0 desc-mobile">Gana 1 FLAMA por cada S/10 en compras que realices. Además, puedes ganar FLAMAS extra en promociones especiales y eventos exclusivos.</p>
                             </div>
                         </div>
 
@@ -369,7 +368,7 @@
                             </div>
                             <div class="text-content">
                                 <h5 class="font-weight-bold title-mobile">Canjea tus FLAMAS</h5>
-                                <p class="mb-0 desc-mobile">Podrás canjear tus FLAMAS acumuladas por:🧄 Entrantes como pan de ajo , 🍕 Riquísimas Pizzas, 🎉 Merchandising Coleccionable exclusivo.</p>
+                                <p class="mb-0 desc-mobile">Podrás canjear tus FLAMAS acumuladas por: Panes al Ajo y bebidas , 🍕 Riquísimas Pizzas, 🎉 Merchandising Coleccionable exclusivo.</p>
                             </div>
                         </div>
 
@@ -379,7 +378,7 @@
                             </div>
                             <div class="text-content">
                                 <h5 class="font-weight-bold title-mobile">Aprovecha los Bónus de FLAMAS</h5>
-                                <p class="mb-0 desc-mobile">Gana FLAMAS aún más rápido participando en: Días de Doble FLAMA (doble recompensa por cada compra), Eventos especiales (como aniversarios o celebraciones de Fuego y Masa).</p>
+                                <p class="mb-0 desc-mobile">Gana FLAMAS aún más rápido participando en: Días de Doble FLAMA (doble recompensa por cada compra), Eventos especiales.</p>
                             </div>
                         </div>
                     </div>
