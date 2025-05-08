@@ -91,7 +91,7 @@ class MilestoneController extends Controller
             // ✅ Procesar y guardar imagen con Intervention Image
             $image = $request->file('image');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $imagePath = public_path('images/reward/' . $imageName);
+            $imagePath = public_path('/images/reward/' . $imageName);
 
             // Guardar sin modificar tamaño
             Image::make($image)->save($imagePath, 90); // 90% de calidad para optimización
@@ -142,7 +142,7 @@ class MilestoneController extends Controller
             $milestone = Milestone::findOrFail($id);
 
             // ✅ Eliminar la imagen del servidor
-            $imagePath = public_path('images/reward/' . $milestone->image);
+            $imagePath = public_path('/images/reward/' . $milestone->image);
             if (File::exists($imagePath)) {
                 File::delete($imagePath);
             }
@@ -208,7 +208,7 @@ class MilestoneController extends Controller
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
                 $imageName = time() . '.' . $image->getClientOriginalExtension();
-                $imagePath = public_path('images/reward/');
+                $imagePath = public_path('/images/reward/');
 
                 // Eliminar la imagen anterior
                 $oldImagePath = $imagePath . $milestone->image;
