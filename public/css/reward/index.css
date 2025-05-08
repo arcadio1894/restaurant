@@ -1,0 +1,71 @@
+/* Estilo general de los enlaces */
+.sidebar .nav-link {
+    color: #007a33; /* Verde principal */
+    font-weight: bold;
+    text-decoration: none;
+    padding: 10px;
+    transition: all 0.3s ease;
+}
+
+/* Hover: Efecto al pasar el cursor */
+.sidebar .nav-link:hover {
+    color: #005a26; /* Verde más oscuro */
+    background-color: #ccf2dd; /* Fondo verde claro */
+    border-radius: 5px;
+}
+
+/* Activo: Enlace seleccionado */
+.sidebar .nav-link.active {
+    position: relative;
+    color: #00411a; /* Verde muy oscuro */
+    background-color: #b3e6cc; /* Verde claro */
+    padding-left: 16px; /* Espaciado para separar el texto del borde */
+}
+
+/* Raya decorativa a la izquierda */
+.sidebar .nav-link.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background-color: #007a33; /* Verde principal */
+    border-radius: 2px;
+}
+
+.info-reclamacion {
+    color: #000000;
+}
+
+.info-reclamacion h2 {
+    color: #000000;
+    margin-bottom: 20px;
+}
+
+.datos-reclamacion p {
+    font-size: 1rem;
+    margin: 2px 0;
+}
+
+.card-header {
+    background-color: #007a33; /* Verde principal */
+    font-weight: bold;
+    text-align: center;
+}
+
+.form-group label {
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.letraTabla {
+    font-family: "Calibri", Arial, sans-serif; /* Utiliza Calibri si está instalado, de lo contrario, usa Arial o una fuente sans-serif similar */
+    font-size: 15px; /* Tamaño de fuente 11 */
+}
+.normal-title {
+    background-color: #203764; /* Color deseado para el fondo */
+    color: #fff; /* Color deseado para el texto */
+    text-align: center;
+}
+

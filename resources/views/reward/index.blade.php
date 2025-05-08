@@ -5,12 +5,12 @@
 @section('text-header', '')
 
 @section('styles')
-    <link href="{{ asset('css/welcome/reclamaciones.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/reward/index.css') }}" rel="stylesheet">
     <style>
         .btn-read {
             display: inline-block;
             padding: 10px 45px;
-            background-color: #ffbe33;
+            background-color: #007a33;
             color: #ffffff;
             border-radius: 45px;
             -webkit-transition: all 0.3s;
@@ -19,7 +19,7 @@
             margin-top: 15px;
         }
         .nav-link-perfil {
-            color: #ffbe33;
+            color: #007a33;
             transition: color 0.3s ease;
         }
 
@@ -56,7 +56,7 @@
         }
 
         .milestone-point.active .dot {
-            background-color: #ffbe33;
+            background-color: #007a33;
         }
 
         .dot {
@@ -84,7 +84,7 @@
         }
 
         .milestone-content img {
-            max-height: 100px;
+            max-height: inherit;
         }
 
         .milestone-content {
@@ -223,6 +223,12 @@
             display: block;
             margin: 0 auto 5px auto;
         }
+
+        .milestone-image {
+            width: 80%;     /* Ocupa todo el ancho del contenedor */
+            max-width: 400px; /* Máximo de 400px para evitar que se expanda demasiado */
+            height: auto;     /* Mantiene la proporción */
+        }
     </style>
 @endsection
 
@@ -309,17 +315,21 @@
                         @foreach($milestones as $index => $milestone)
                             <div class="milestone-content {{ $index == 0 ? 'active' : '' }}" id="milestone-{{ $milestone->id }}">
                                 <div class="row align-items-center">
-                                    <div class="col-md-3 text-center mb-3 mb-md-0">
-                                        <img src="{{ asset('images/reward/' . $milestone->image) }}" alt="{{ $milestone->title }}">
+                                    <div class="col-md-4 text-center mb-3 mb-md-0">
+                                        <img src="{{ asset('images/reward/' . $milestone->image) }}" alt="{{ $milestone->title }}" class="img-fluid milestone-image">
                                     </div>
-                                    <div class="col-md-9">
+                                    <div class="col-md-8 text-md-left text-center">
                                         <h4 class="font-weight-bold">{{ $milestone->title }}</h4>
                                         <p>{!! $milestone->description !!}</p>
                                     </div>
                                 </div>
-                                <div class="text-right mt-3">
-                                    <a class="nav-link-perfil" href="{{--{{ route('reward.show', ) }}--}}"><strong><i class="fas fa-trophy"></i></i> Reclamar aquí <i class="far fa-arrow-alt-circle-right"></i></strong></a>
-                                </div>
+                                @if($flames >= $milestone->flames)
+                                    <div class="text-right mt-3">
+                                        <a class="nav-link-perfil" href="{{--{{ route('reward.show', ) }}--}}">
+                                            <strong><i class="fas fa-trophy"></i> Reclamar aquí <i class="far fa-arrow-alt-circle-right"></i></strong>
+                                        </a>
+                                    </div>
+                                @endif
                             </div>
                         @endforeach
                     </div>
