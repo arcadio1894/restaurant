@@ -114,16 +114,21 @@
         }
 
         @media (max-width: 576px) {
+            #milestoneTabs {
+                justify-content: flex-start !important;
+            }
+
             .tab-custom-reward {
-                display: flex; /* Asegura que se mantenga en línea */
+                display: flex;
                 flex-wrap: nowrap;
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
-                scrollbar-width: none; /* Oculta scrollbar en Firefox */
+                scrollbar-width: none;
+                position: relative;
             }
 
             .tab-custom-reward::-webkit-scrollbar {
-                display: none; /* Oculta scrollbar en Chrome/Safari */
+                display: none;
             }
 
             .tab-custom-reward .nav-item {
@@ -134,6 +139,8 @@
             .tab-custom-reward .nav-link {
                 font-size: 13px;
                 padding: 2px 6px;
+                min-width: 40px;
+                text-align: center;
             }
 
             .flame-icon-small {
@@ -287,7 +294,7 @@
 
                         <ul class="nav justify-content-center tab-custom-reward mt-3" id="milestoneTabs" role="tablist">
                             @foreach($milestones as $index => $milestone)
-                                <li class="nav-item mx-2">
+                                <li class="nav-item">
                                     <a class="nav-link {{ $index == 0 ? 'active' : '' }}"
                                        data-toggle="tab"
                                        href="#milestone-{{ $milestone->id }}"
