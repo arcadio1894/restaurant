@@ -323,47 +323,49 @@
                 </div>
 
                 <div class="info-reclamacion mb-4" id="como-funciona">
-                    <p class="m-0">Como miembro del programa Starbucks Rewards, ganas Estrellas por las compras que realizas en nuestras tiendas, desde la web Starbucks.pe o nuestra App.</p>
-                    <p class="m-0">Podrás canjear las Estrellas por bebidas, alimentos, café en grano y mucho más.</p>
+                    <p class="text-center"><strong><img src="{{ asset('images/icons/fire.png') }}" alt="Flame" width="30px"> Programa de Recompensas FLAMAS</strong></p>
+                    <p class="m-0">Como miembro del programa de recompensas FLAMAS de Fuego y Masa, acumulas Flamas por cada compra que realices en nuestra pizzería.</p>
+                    <br>
+                    <p class="m-0">Podrás canjear tus Flamas por pizzas, bebidas, postres, individuales coleccionables, tomatodos exclusivos y mucho más.</p>
                     <div class="container my-4">
                         <div class="card-info d-flex align-items-start mb-4 pb-4 border-bottom">
                             <div class="card-img-wrapper mr-3 text-center">
-                                <img src="{{ asset('images/reward/headwithphone.svg') }}" alt="Icono 1" class="card-img-icon">
+                                <img src="{{ asset('images/reward/info-1.webp') }}" alt="Icono 1" class="card-img-icon">
                             </div>
                             <div class="text-content">
-                                <h5 class="font-weight-bold title-mobile">Ordena y paga</h5>
-                                <p class="mb-1 desc-mobile">Haz tu pedido Delivery, Recojo en tienda o Auto Starbucks; págalo online y gana Estrellas</p>
-                                <p class="mb-0 desc-mobile">Ingresa desde nuestra Starbucks App o la web Starbucks.pe</p>
+                                <h5 class="font-weight-bold title-mobile">Ordena y gana FLAMAS</h5>
+                                <p class="mb-1 desc-mobile">Haz tu pedido para Delivery; págalo online o en efectivo y gana FLAMAS por cada consumo.</p>
+                                <p class="mb-0 desc-mobile">Ingresa desde nuestra web www.fuegoymasa.com.</p>
                             </div>
                         </div>
 
                         <div class="card-info d-flex align-items-start mb-4 pb-4 border-bottom">
                             <div class="card-img-wrapper mr-3 text-center">
-                                <img src="{{ asset('images/reward/paystar.svg') }}" alt="Icono 2" class="card-img-icon">
+                                <img src="{{ asset('images/reward/info-2.webp') }}" alt="Icono 2" class="card-img-icon">
                             </div>
                             <div class="text-content">
-                                <h5 class="font-weight-bold title-mobile">Acumula Estrellas</h5>
-                                <p class="mb-0 desc-mobile">Gana Estrellas por las compras que realices con tu Starbucks Card u otros medios de pago</p>
+                                <h5 class="font-weight-bold title-mobile">Acumula FLAMAS</h5>
+                                <p class="mb-0 desc-mobile">Gana 1 FLAMA por cada S/10 en compras que realices. Cuantas más pizzas disfrutes, más FLAMAS acumulas. Además, puedes ganar FLAMAS extra en promociones especiales y eventos exclusivos.</p>
                             </div>
                         </div>
 
                         <div class="card-info d-flex align-items-start mb-4 pb-4 border-bottom">
                             <div class="card-img-wrapper mr-3 text-center">
-                                <img src="{{ asset('images/reward/coffeewithbread.svg') }}" alt="Icono 2" class="card-img-icon">
+                                <img src="{{ asset('images/reward/info-3.webp') }}" alt="Icono 2" class="card-img-icon">
                             </div>
                             <div class="text-content">
-                                <h5 class="font-weight-bold title-mobile">Canjea tus Estrellas</h5>
-                                <p class="mb-0 desc-mobile">Podrás canjear tus Estrellas acumuladas por bebidas, sándwiches, postres, galletas, café en grano y mucho más</p>
+                                <h5 class="font-weight-bold title-mobile">Canjea tus FLAMAS</h5>
+                                <p class="mb-0 desc-mobile">Podrás canjear tus FLAMAS acumuladas por:🧄 Entrantes como pan de ajo , 🍕 Riquísimas Pizzas, 🎉 Merchandising Coleccionable exclusivo.</p>
                             </div>
                         </div>
 
                         <div class="card-info d-flex align-items-start mb-4 pb-4 border-bottom">
                             <div class="card-img-wrapper mr-3 text-center">
-                                <img src="{{ asset('images/reward/icecream_reward.svg') }}" alt="Icono 2" class="card-img-icon">
+                                <img src="{{ asset('images/reward/info-4.webp') }}" alt="Icono 2" class="card-img-icon">
                             </div>
                             <div class="text-content">
-                                <h5 class="font-weight-bold title-mobile">Aprovecha los Star Bonus</h5>
-                                <p class="mb-0 desc-mobile">Gana Estrellas aún más rápido participando de Star Bonus, Double Star Days y mucho más</p>
+                                <h5 class="font-weight-bold title-mobile">Aprovecha los Bónus de FLAMAS</h5>
+                                <p class="mb-0 desc-mobile">Gana FLAMAS aún más rápido participando en: Días de Doble FLAMA (doble recompensa por cada compra), Eventos especiales (como aniversarios o celebraciones de Fuego y Masa).</p>
                             </div>
                         </div>
                     </div>
