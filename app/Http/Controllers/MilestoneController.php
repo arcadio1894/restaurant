@@ -208,7 +208,7 @@ class MilestoneController extends Controller
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
                 $imageName = time() . '.' . $image->getClientOriginalExtension();
-                $imagePath = public_path('/images/reward/');
+                $imagePath = public_path('/images/reward/' . $imageName);
 
                 // Eliminar la imagen anterior
                 $oldImagePath = $imagePath . $milestone->image;
@@ -220,7 +220,7 @@ class MilestoneController extends Controller
                 $img = Image::make($image);
 
                 // Guardar en el directorio (sin resize, como me indicaste antes)
-                $img->save($imageName, 90);
+                $img->save($imagePath, 90);
 
                 // Guardar el nuevo nombre en la DB
                 $milestone->image = $imageName;
