@@ -323,7 +323,8 @@
                 </div>
 
                 <div class="info-reclamacion mb-4" id="como-funciona">
-                    <p class="text-center"><strong><img src="{{ asset('images/icons/fire.png') }}" alt="Flame" width="30px"> Programa de Recompensas FLAMAS</strong></p>
+                    {{--<p class="text-center"><strong><img src="{{ asset('images/icons/fire.png') }}" alt="Flame" width="30px"> Programa de Recompensas FLAMAS</strong></p>
+                    --}}
                     <p class="m-0">Como miembro del programa de recompensas FLAMAS de Fuego y Masa, acumulas Flamas por cada compra que realices en nuestra pizzería.</p>
                     <br>
                     <p class="m-0">Podrás canjear tus Flamas por pizzas, bebidas, postres, individuales coleccionables, tomatodos exclusivos y mucho más.</p>
