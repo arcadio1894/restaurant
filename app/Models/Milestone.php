@@ -16,8 +16,8 @@ class Milestone extends Model
         'image'
     ];
 
-    public function products()
+    public function rewards()
     {
-        $this->hasMany(MilestoneReward::class);
+        return $this->hasMany(MilestoneReward::class);
     }
 }

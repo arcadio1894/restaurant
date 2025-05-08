@@ -16,11 +16,11 @@ class MilestoneReward extends Model
 
     public function milestone()
     {
-        $this->belongsTo(Milestone::class);
+        return $this->belongsTo(Milestone::class);
     }
 
     public function product()
     {
-        $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class);
     }
 }

@@ -48,7 +48,7 @@
 @endsection
 
 @section('page-title')
-    <h5 class="card-title">Crear nuevo Hito</h5>
+    <h5 class="card-title">Editar Hito</h5>
 @endsection
 
 @section('page-breadcrumb')
@@ -59,38 +59,39 @@
         <li class="breadcrumb-item">
             <a href="{{ route('milestones.index') }}"><i class="fa fa-archive"></i> Hitos</a>
         </li>
-        <li class="breadcrumb-item"><i class="fa fa-plus-circle"></i> Nuevo</li>
+        <li class="breadcrumb-item"><i class="fa fa-plus-circle"></i> Editar</li>
     </ol>
 @endsection
 
 @section('content')
-    <form id="formCreate" class="form-horizontal" data-url="{{ route('milestones.store') }}" enctype="multipart/form-data">
+    <form id="formCreate" class="form-horizontal" data-url="{{ route('milestones.update') }}" enctype="multipart/form-data">
         @csrf
-
+        <input type="hidden" name="milestone_id" value="{{ $milestone->id }}">
         <div class="form-group row">
             <div class="col-md-6">
                 <div class="col-md-12">
                     <label for="title" class="col-12 col-form-label">Título <span class="right badge badge-danger">(*)</span></label>
                     <div class="col-sm-12">
-                        <textarea name="title" class="form-control" id="title" rows="3"></textarea>
+                        <textarea name="title" class="form-control" id="title" rows="3">{{ $milestone->title }}</textarea>
                     </div>
                 </div>
                 <div class="col-md-12">
                     <label for="description" class="col-12 col-form-label">Descripción <span class="right badge badge-danger">(*)</span></label>
                     <div class="col-sm-12">
-                        <textarea name="description" class="form-control" id="description" rows="5"></textarea>
+                        <textarea name="description" class="form-control" id="description" rows="5">{{ $milestone->description }}</textarea>
                     </div>
                 </div>
                 <div class="col-md-12">
                     <label for="image" class="col-12 col-form-label">Imagen <span class="right badge badge-danger">(*)</span></label>
                     <div class="col-sm-12">
                         <input type="file" class="form-control" name="image" id="image">
+                        <img src="{{ asset('images/reward/'.$milestone->image) }}" alt="{{ $milestone->title }}" width="100px">
                     </div>
                 </div>
                 <div class="col-md-12">
                     <label for="flames" class="col-12 col-form-label">Flamitas <span class="right badge badge-danger">(*)</span></label>
                     <div class="col-sm-12">
-                        <input type="number" min="0" step="1" class="form-control" name="flames" id="flames">
+                        <input type="number" min="0" step="1" class="form-control" name="flames" id="flames" value="{{ $milestone->flames }}">
                     </div>
                 </div>
             </div>
@@ -115,6 +116,14 @@
                 <div class="col-md-12 mt-3">
                     <div class="col-md-12" id="selected-products">
                         <!-- Aquí se mostrarán los productos seleccionados -->
+                        @foreach( $milestone->rewards as $milestoneReward )
+                            <div class="card mb-2" data-id="{{ $milestoneReward->product_id }}" style="max-width: 100%;">
+                                <div class="card-body d-flex align-items-center justify-content-between p-2">
+                                    <span class="product-name flex-grow-1">{{ $milestoneReward->product->full_name }}</span>
+                                    <button class="btn btn-danger btn-sm btn-remove-product ml-2" style="min-width: 32px;">&times;</button>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -125,7 +134,7 @@
         <div class="row">
             <div class="col-12">
                 <button type="reset" class="btn btn-outline-secondary">Cancelar</button>
-                <button type="button" id="btn-submit" class="btn btn-outline-success float-right">Guardar Hito</button>
+                <button type="button" id="btn-submit" class="btn btn-outline-success float-right">Guardar cambios del Hito</button>
             </div>
         </div>
         <!-- /.card-footer -->
@@ -153,5 +162,5 @@
             });
         })
     </script>
-    <script src="{{ asset('js/milestone/create.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/milestone/edit.js') }}?v={{ time() }}"></script>
 @endsection

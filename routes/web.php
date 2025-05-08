@@ -319,7 +319,11 @@ Route::middleware('auth')->group(function (){
             ->name('milestones.create');
         Route::post('/milestones/store', [MilestoneController::class, 'store'])
             ->name('milestones.store');
-        Route::post('/milestones/{id}/eliminar', [ShopController::class, 'changeState']);
+        Route::post('/milestones/{id}/eliminar', [MilestoneController::class, 'destroy']);
+        Route::get('/modificar/hito/{id}', [MilestoneController::class, 'edit'])
+            ->name('milestones.edit');
+        Route::post('/milestones/update', [MilestoneController::class, 'update'])
+            ->name('milestones.update');
     });
 
     // TODO: RUTAS DE PREMIOS

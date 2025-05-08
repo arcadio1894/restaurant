@@ -1,7 +1,7 @@
 $(document).ready(function () {
     $formCreate = $('#formCreate');
     //$formCreate.on('submit', storeMaterial);
-    $('#btn-submit').on('click', storeMilestone);
+    $('#btn-submit').on('click', updateMilestone);
 
     // Cuando se hace clic en el botón "Agregar"
     $('#btn-add-product').on('click', function () {
@@ -42,14 +42,13 @@ $(document).ready(function () {
 
 var $formCreate;
 
-function storeMilestone() {
+function updateMilestone() {
     event.preventDefault();
     $("#btn-submit").attr("disabled", true);
 
     // Validar datos del formulario
     var title = $('#title').val();
     var description = $('#description').val();
-    var image = $('#image').val();
     var flames = $('#flames').val();
     var products = [];
 
@@ -59,7 +58,7 @@ function storeMilestone() {
     });
 
     // Verificar si los campos están completos
-    if (!title || !description || !image || !flames || products.length === 0) {
+    if (!title || !description || !flames || products.length === 0) {
         $.confirm({
             title: 'Error',
             content: 'Todos los campos son obligatorios y debe seleccionar al menos un producto.',
