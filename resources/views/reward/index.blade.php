@@ -225,7 +225,7 @@
         }
 
         .milestone-image {
-            width: 80%;     /* Ocupa todo el ancho del contenedor */
+            width: 65%;     /* Ocupa todo el ancho del contenedor */
             max-width: 400px; /* Máximo de 400px para evitar que se expanda demasiado */
             height: auto;     /* Mantiene la proporción */
         }
