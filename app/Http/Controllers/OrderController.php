@@ -13,6 +13,7 @@ use App\Models\CashRegister;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\ProductType;
+use App\Models\Reward;
 use App\Models\ShippingDistrict;
 use App\Models\Type;
 use App\Models\User;
@@ -685,6 +686,14 @@ class OrderController extends Controller
         if ($user) {
             $user->flames -=$flames;
             $user->save();
+
+            /*$reward = Reward::create([
+                'user_id' => $user->id,
+                'order_id' => $order->id,
+                'flames' => $flames,
+                'expiration_date' => ,
+                'state' =>
+            ]);*/
         }
 
         $order2 = Order::find($id);
