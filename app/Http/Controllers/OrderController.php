@@ -15,6 +15,7 @@ use App\Models\Order;
 use App\Models\ProductType;
 use App\Models\ShippingDistrict;
 use App\Models\Type;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -676,6 +677,15 @@ class OrderController extends Controller
 
         $order->status = $request->status;
         $order->save();
+
+        // TODO: Logica para restar las flamitas
+        $flames = $order->flames;
+        $user = User::find($order->user_id);
+
+        if ($user) {
+            $user->flames -=$flames;
+            $user->save();
+        }
 
         $order2 = Order::find($id);
 

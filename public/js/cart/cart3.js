@@ -366,11 +366,24 @@ async function loadCart() {
                 detailsPopup.style.display = "none";
             }
 
+            // Condición para 'reward'
+            if (item.reward) {
+                clone.querySelector("[data-plus]").style.display = "none"; // Ocultar el botón +
+                clone.querySelector("[data-detail_productType]").style.display = "none"; // Ocultar el tipo de producto
+                clone.querySelector("[data-detail_subtotal]").innerHTML = `${item.flames} <img src="/images/icons/fire.png" alt="Flame" class="flame-icon-small">`;
+                clone.querySelector("[data-detail_price]").innerHTML = `${item.flames} <img src="/images/icons/fire.png" alt="Flame" class="flame-icon-small"> / por item`;
+            } else {
+                // Si no es 'reward', se muestra el precio normal
+                clone.querySelector("[data-detail_subtotal]").innerHTML = `S/. ${productTotal.toFixed(2)}`;
+                clone.querySelector("[data-detail_price]").innerHTML = `S/. ${productTotal.toFixed(2)} / por item`;
+            }
+
             // Incrementar el total general
             total += productTotal;
 
             return clone;
-        } else {
+        }
+        else {
             // Caso de producto normal
             const product = await fetchProduct(item.product_id, item.product_type_id);
             if (!product) return null; // Si no conseguimos el producto, lo omitimos
@@ -430,6 +443,16 @@ async function loadCart() {
                 clone.querySelector("[data-detail_price]").innerHTML = `S/. ${product.price.toFixed(2)} / por item`;
                 detailsLink.style.display = "none";
                 detailsPopup.style.display = "none";
+            }
+
+            if (item.reward) {
+                clone.querySelector("[data-plus]").style.display = "none";
+                clone.querySelector("[data-detail_productType]").style.display = "none";
+                clone.querySelector("[data-detail_subtotal]").innerHTML = `${item.flames} <img src="/images/icons/fire.png" alt="Flame" class="flame-icon-small">`;
+                clone.querySelector("[data-detail_price]").innerHTML = `${item.flames} <img src="/images/icons/fire.png" alt="Flame" class="flame-icon-small"> / por item`;
+            } else {
+                clone.querySelector("[data-detail_subtotal]").innerHTML = `S/. ${productTotal.toFixed(2)}`;
+                clone.querySelector("[data-detail_price]").innerHTML = `S/. ${productTotal.toFixed(2)} / por item`;
             }
 
             // Actualizar subtotal del producto

@@ -22,8 +22,9 @@ class RewardController extends Controller
         return view('reward.index', compact('milestones', 'flames'));
     }
 
-    public function show($slug)
+    public function show($slug, $id)
     {
+        $milestone = Milestone::find($id);
         $product = Product::where('slug', $slug)->firstOrFail();
 
         // Obtener los tipos relacionados al producto
@@ -68,6 +69,6 @@ class RewardController extends Controller
         }
         $adicionales = [];
         //return view('product.show', compact('product', 'productTypes', 'defaultProductType', 'options', 'adicionales'));
-        return view('reward.show', compact('product', 'productTypes', 'defaultProductType', 'options', 'adicionales'));
+        return view('reward.show', compact('product', 'productTypes', 'defaultProductType', 'options', 'adicionales', 'milestone'));
     }
 }

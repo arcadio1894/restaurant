@@ -54,6 +54,7 @@ $(document).ready(function () {
     $('#add-to-cart-btn, #add-to-cart-btn-mobile').on('click', function (e) {
         e.preventDefault();
 
+        let costFlames = $("#cost_flames").val();
         let productId = $(this).data('product-id_v2');
         let authCheckUrl = $(this).data('auth-check-url');
 
@@ -202,14 +203,22 @@ $(document).ready(function () {
                 // Buscar si el producto ya está en el carrito
                 let existingProduct = cart.find(item =>
                     item.product_id === productId &&
-                    item.product_type_id === productTypeId &&
-                    JSON.stringify(item.options) === JSON.stringify(options)
+                    item.product_type_id === productTypeId /*&&
+                    JSON.stringify(item.options) === JSON.stringify(options)*/
                 );
 
-                if (existingProduct) {
+                let existingProductReward = cart.find(item =>
+                    item.reward === true
+                );
+
+                if (existingProduct || existingProductReward) {
                     // Si el producto ya existe, incrementar la cantidad
-                    existingProduct.quantity += 1;
-                } else {
+                    /*existingProduct.quantity += 1;*/
+                    showError(`Ya existe una recompensa en su carrito de compra.`);
+                    valid = false;
+                    return false; // Detener iteración
+                }
+                else {
                     // Si el producto no existe, agregarlo como un nuevo elemento
                     cart.push({
                         product_id: productId,
@@ -218,7 +227,9 @@ $(document).ready(function () {
                         quantity: 1,
                         user_id: userId, // Añadir el user_id
                         custom: false,
-                        total: totalTotal,
+                        reward: true,
+                        flames: costFlames,
+                        total: 0,
                         cart_index: generateUUID()
                     });
                 }
@@ -246,7 +257,9 @@ $(document).ready(function () {
                                 user_id: userId,
                                 options: {}, // Adicionales no tienen opciones
                                 custom: false, // Marcado como adicional
-                                total: addition.price,
+                                reward: true,
+                                flames: costFlames,
+                                total: 0,
                                 cart_index: generateUUID()
                             });
                         } else {
@@ -259,7 +272,9 @@ $(document).ready(function () {
                                 user_id: userId,
                                 options: {}, // Adicionales no tienen opciones
                                 custom: false, // Marcado como adicional
-                                total: addition.price,
+                                reward: true,
+                                flames: costFlames,
+                                total: 0,
                                 cart_index: generateUUID()
                             });
                         }
@@ -351,6 +366,7 @@ $(document).ready(function () {
                         quantity: 1,
                         user_id: userId, // Añadir el user_id
                         custom: false,
+                        reward: true,
                         total: 0,
                         cart_index: generateUUID()
                     });

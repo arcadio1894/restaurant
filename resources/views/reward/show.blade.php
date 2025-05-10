@@ -538,11 +538,20 @@
             line-height: 40px;
             color: rgb(35, 31, 32);
         }
+
+
+        .flame-icon-small {
+            width: 24px;
+            height: 24px;
+            vertical-align: top;
+            margin-top: -3px;
+        }
     </style>
 @endsection
 
 @section('content')
     {{--<div id="clickHere"></div>--}}
+    <input type="hidden" id="cost_flames" value="{{ $milestone->flames }}">
     <section class="py-5">
         <div class="container">
             <div class="row gx-5">
@@ -576,10 +585,12 @@
                                 data-auth-check-url="{{ route('auth.check') }}"
                                 data-add-cart-url="{{ route('cart.manage') }}">
                             Agregar al carrito
-                            <span class="h5">S/.
-                                <span data-base-price="{{ isset($defaultProductType->price) ? $defaultProductType->price : $product->price_default }}" id="product-price">{{ isset($defaultProductType->price) ? $defaultProductType->price : $product->price_default }}
+                            <span class="h5">
+                                <span data-base-price="{{ isset($defaultProductType->price) ? $defaultProductType->price : $product->price_default }}" id="product-price">
+                                    {{ $milestone->flames }}
                                 </span>
                             </span>
+                            <img src="{{ asset('images/icons/fire.png') }}" alt="Flame" class="flame-icon-small">
                         </button>
                     </div>
                     <!-- thumbs-wrap.// -->
@@ -594,10 +605,12 @@
                                 data-auth-check-url="{{ route('auth.check') }}"
                                 data-add-cart-url="{{ route('cart.manage') }}">
                             Agregar al carrito
-                            <span class="h5">S/.
-                                <span data-base-price="{{ isset($defaultProductType->price) ? $defaultProductType->price : $product->price_default }}" id="product-price-mobile">{{ isset($defaultProductType->price) ? $defaultProductType->price : $product->price_default }}
+                            <span class="h5">
+                                <span data-base-price="{{ isset($defaultProductType->price) ? $defaultProductType->price : $product->price_default }}" id="product-price-mobile">
+                                    {{ $milestone->flames }}
                                 </span>
                             </span>
+                            <img src="{{ asset('images/icons/fire.png') }}" alt="Flame" class="flame-icon-small">
                         </button>
                     </div>
                 </aside>
@@ -795,140 +808,10 @@
                         <hr />
 
                         <div class="row mb-2">
-                            {{--@if (count($productTypes) > 0)
-                            <div class="col-md-4 col-6">
-                                <select id="pizza-type-select" class="form-select border border-secondary" style="height: 35px;">
-                                    @foreach($productTypes as $productType)
-                                        <option value="{{ $productType->id }}"
-                                                data-price="{{ $productType->price }}"
-                                                {{ $productType->default ? 'selected' : '' }}>
-                                            {{ $productType->type->name }} {{ ($productType->type->size == null) ? "":"(".$productType->type->size.")" }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            @endif--}}
-                            <!-- col.// -->
-                            {{--<div class="col-md-4 col-6 mb-3">
-                                <a href="#"
-                                   class="btn btn-primary shadow-0"
-                                   id="add-to-cart-btn"
-                                   data-product-category="{{ $product->category_id }}"
-                                   data-product-id_v2="{{ $product->id }}"
-                                   data-product-id="{{ $product->slug }}"
-                                   data-auth-check-url="{{ route('auth.check') }}"
-                                   data-add-cart-url="{{ route('cart.manage') }}">
-                                    <i class="me-1 fa fa-shopping-basket"></i> Agregar
-                                </a>
-                            </div>--}}
                         </div>
                     </div>
                 </main>
             </div>
-            {{--<div class="row">
-                <div class="col-md-12">
-                    <h2 class="text-center">Productos <b>Adicionales</b></h2>
-                    <div class="d-none d-sm-block">
-                        <!-- Carrusel para dispositivos grandes (4 productos por slide) -->
-                        <div id="carouselLarge" class="carousel slide" data-ride="carousel">
-                            <div class="carousel-inner">
-                                @foreach ($adicionales->chunk(4) as $group)
-                                    <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
-                                        <div class="row">
-                                            @foreach ($group as $producto)
-                                                <div class="col-sm-3">
-                                                    <div class="thumb-wrapper">
-                                                        <div class="img-box">
-                                                            <img src="{{ asset('images/products/'.$producto->image) }}" class="img-fluid" alt="">
-                                                        </div>
-                                                        <div class="thumb-content">
-                                                            <h4>{{ $producto->full_name }}</h4>
-                                                            <p class="item-price">S/. {{ $producto->price_default }}</p>
-                                                            <div class="text-warning mb-1 me-2">
-                                                                <i class="fa fa-star"></i>
-                                                                <i class="fa fa-star"></i>
-                                                                <i class="fa fa-star"></i>
-                                                                <i class="fa fa-star"></i>
-                                                                <i class="fas fa-star-half"></i>
-                                                                <span class="ms-1">
-                                                                    4.5
-                                                                </span>
-                                                            </div>
-                                                            <a href="#"
-                                                               class="btn btn-primary shadow-0"
-                                                               data-add_to_cart_adicional
-                                                               data-product-category="{{ $producto->category_id }}"
-                                                               data-product-id_v2="{{ $producto->id }}"
-                                                               data-product-id="{{ $producto->slug }}"
-                                                               data-auth-check-url="{{ route('auth.check') }}"
-                                                               data-add-cart-url="{{ route('cart.manage2') }}">
-                                                                <i class="me-1 fa fa-shopping-basket"></i> Agregar
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                            <!-- Controles del carrusel -->
-                            <a class="carousel-control-prev" href="#carouselLarge" role="button" data-slide="prev">
-                                <i class="fa fa-angle-left"></i>
-                            </a>
-                            <a class="carousel-control-next" href="#carouselLarge" role="button" data-slide="next">
-                                <i class="fa fa-angle-right"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="d-block d-sm-none">
-                        <!-- Carrusel para dispositivos pequeños (1 producto por slide) -->
-                        <div id="carouselSmall" class="carousel slide" data-ride="carousel">
-                            <div class="carousel-inner">
-                                @foreach ($adicionales as $producto)
-                                    <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
-                                        <div class="thumb-wrapper text-center">
-                                            <div class="img-box">
-                                                <img src="{{ asset('images/products/'.$producto->image) }}" class="img-fluid" alt="">
-                                            </div>
-                                            <div class="thumb-content">
-                                                <h4>{{ $producto->full_name }}</h4>
-                                                <p class="item-price">S/. {{ $producto->price_default }}</p>
-                                                <div class="text-warning mb-1 me-2">
-                                                    <i class="fa fa-star"></i>
-                                                    <i class="fa fa-star"></i>
-                                                    <i class="fa fa-star"></i>
-                                                    <i class="fa fa-star"></i>
-                                                    <i class="fas fa-star-half"></i>
-                                                    <span class="ms-1">4.5</span>
-                                                </div>
-                                                <a href="#"
-                                                   class="btn btn-primary shadow-0"
-                                                   data-add_to_cart_adicional
-                                                   data-product-category="{{ $producto->category_id }}"
-                                                   data-product-id_v2="{{ $producto->id }}"
-                                                   data-product-id="{{ $producto->slug }}"
-                                                   data-auth-check-url="{{ route('auth.check') }}"
-                                                   data-add-cart-url="{{ route('cart.manage2') }}">
-                                                    <i class="me-1 fa fa-shopping-basket"></i> Agregar
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                            <!-- Controles del carrusel -->
-                            <a class="carousel-control-prev" href="#carouselSmall" role="button" data-slide="prev">
-                                <i class="fa fa-angle-left"></i>
-                            </a>
-                            <a class="carousel-control-next" href="#carouselSmall" role="button" data-slide="next">
-                                <i class="fa fa-angle-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>--}}
         </div>
     </section>
     <!-- content -->
@@ -1054,7 +937,7 @@
             let totalPrice = basePrice + additionsTotal + optionsTotal;
 
             // Actualizar los elementos del precio
-            $("#product-price, #product-price-mobile").text(totalPrice.toFixed(2));
+            /*$("#product-price, #product-price-mobile").text(totalPrice.toFixed(2));*/
 
             //$priceTotal = totalPrice;
         }

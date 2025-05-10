@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DataGeneral;
 use App\Models\Milestone;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -62,7 +63,10 @@ class MilestoneController extends Controller
 
     public function create()
     {
-        $products = Product::where('enable_status', 1)->get();
+        $data = DataGeneral::where('name', 'category_id_reward')->first();
+        $category_id = $data->valueNumber;
+        $products = Product::where('enable_status', 1)
+            ->where('category_id', $category_id)->get();
         return view('milestone.create', compact('products'));
     }
 
@@ -176,7 +180,10 @@ class MilestoneController extends Controller
         $milestone = Milestone::with('rewards.product')
             ->findOrFail($id);
 
-        $products = Product::where('enable_status', 1)->get();
+        $data = DataGeneral::where('name', 'category_id_reward')->first();
+        $category_id = $data->valueNumber;
+        $products = Product::where('enable_status', 1)
+            ->where('category_id', $category_id)->get();
         return view('milestone.edit', compact('products', 'milestone'));
     }
 

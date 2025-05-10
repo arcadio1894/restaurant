@@ -218,6 +218,7 @@ $(document).ready(function () {
                         quantity: 1,
                         user_id: userId, // Añadir el user_id
                         custom: false,
+                        reward: false,
                         total: totalTotal,
                         cart_index: generateUUID()
                     });
@@ -246,6 +247,7 @@ $(document).ready(function () {
                                 user_id: userId,
                                 options: {}, // Adicionales no tienen opciones
                                 custom: false, // Marcado como adicional
+                                reward: false,
                                 total: addition.price,
                                 cart_index: generateUUID()
                             });
@@ -259,6 +261,7 @@ $(document).ready(function () {
                                 user_id: userId,
                                 options: {}, // Adicionales no tienen opciones
                                 custom: false, // Marcado como adicional
+                                reward: false,
                                 total: addition.price,
                                 cart_index: generateUUID()
                             });
@@ -351,6 +354,7 @@ $(document).ready(function () {
                         quantity: 1,
                         user_id: userId, // Añadir el user_id
                         custom: false,
+                        reward: false,
                         total: 0,
                         cart_index: generateUUID()
                     });

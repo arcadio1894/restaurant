@@ -223,6 +223,12 @@
             width: 100%;
             margin: 0;
         }
+
+        .flame-icon-small {
+            width: 24px !important;
+            height: 24px !important;
+            vertical-align: top;
+        }
     </style>
 @endsection
 

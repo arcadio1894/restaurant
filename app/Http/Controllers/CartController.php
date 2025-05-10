@@ -1110,6 +1110,15 @@ class CartController extends Controller
                 }
             }
 
+            $flames = 0;
+
+            // Recorrer el carrito para identificar productos con reward
+            foreach ($cart as $item) {
+                if (isset($item['reward']) && $item['reward'] === true) {
+                    $flames += (int)$item['flames']; // Sumamos las flames
+                }
+            }
+
             // Crear la orden
             $order = Order::create([
                 'user_id' => $userId,
@@ -1123,6 +1132,7 @@ class CartController extends Controller
                 'shipping_district_id' => null,
                 'shop_id' => $shopId,
                 'observations' => $request->input('observations', ''),
+                'flames' => $flames
             ]);
 
             // Guardar los detalles de la orden
@@ -1316,8 +1326,8 @@ class CartController extends Controller
                         'order' => "ORDEN - ".$order->id
                     ];
 
-                    $telegramController = new TelegramController();
-                    $telegramController->sendNotification('process', $data);
+                    /*$telegramController = new TelegramController();
+                    $telegramController->sendNotification('process', $data);*/
 
                     // Agregar movimientos a la caja
                     $vuelto = (float)$request->input('cashAmount') - (float)$order->amount_pay;

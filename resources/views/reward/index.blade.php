@@ -325,7 +325,7 @@
                                 </div>
                                 @if($flames >= $milestone->flames)
                                     <div class="text-right mt-3">
-                                        <a class="nav-link-perfil" href="{{ route('reward.show', $milestone->slug_reward) }}">
+                                        <a class="nav-link-perfil" href="{{ route('reward.show', [$milestone->slug_reward, $milestone->id]) }}">
                                             <strong><i class="fas fa-trophy"></i> Reclamar aquí <i class="far fa-arrow-alt-circle-right"></i></strong>
                                         </a>
                                     </div>

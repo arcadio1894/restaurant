@@ -890,6 +890,7 @@
                                         quantity: response.quantity,
                                         user_id: response.user_id,
                                         custom: response.custom,
+                                        reward: false,
                                         total: response.total,
                                         toppings: toppings,
                                         cart_index: generateUUID()
