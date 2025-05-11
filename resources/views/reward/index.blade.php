@@ -232,13 +232,13 @@
 
 
         .rewards-list {
-            border-top: 2px solid #98e3a9; /* Línea superior verde */
+            border-top: 2px solid #98e3a9 !important; /* Línea superior verde */
         }
 
         .rewards-list .list-group-item {
             position: relative;
             padding: 10px 20px;
-            border-bottom: 2px solid #98e3a9; /* Líneas verdes */
+            border-bottom: 2px solid #98e3a9 !important; /* Líneas verdes */
             font-size: 16px;
             font-weight: bold;
             background-color: #fff;
@@ -256,6 +256,10 @@
         .expiration-date {
             color: #333;
             font-size: 16px;
+        }
+
+        .color-green {
+            background-color: #98e3a9;
         }
     </style>
 @endsection
@@ -374,7 +378,7 @@
 
                     <br>
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header color-green">
                             <h5>Estrellas próximas a vencer</h5>
                         </div>
                         <ul class="list-group list-group-flush rewards-list">
