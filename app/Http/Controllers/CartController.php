@@ -537,7 +537,7 @@ class CartController extends Controller
 
                 if ($vuelto < 0) {
                     DB::rollBack();
-                    return response()->json(['message' => 'Ingrese un valor mayor a la venta.'], 422);
+                    return response()->json(['message' => 'Ingrese un valor mayor a la venta. '.$vuelto], 422);
                 }
             }
 
