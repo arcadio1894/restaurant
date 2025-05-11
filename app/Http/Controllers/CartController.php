@@ -533,11 +533,16 @@ class CartController extends Controller
             // Validacion del vuelto antes de crear la orden
             if ( $validatedData['paymentMethod'] == 2 )
             {
-                $vuelto = (float)$request->input('cashAmount') - (float)( $totalAmount - $discountAmount + $shippingCost );
+                $cashAmount = (float)$request->input('cashAmount');
+                $totalAmount = (float)$totalAmount;
+                $discountAmount = (float)$discountAmount;
+                $shippingCost = (float)$shippingCost;
+
+                $vuelto = bcsub($cashAmount, bcadd(bcsub($totalAmount, $discountAmount, 2), $shippingCost, 2), 2);
 
                 if ($vuelto < 0) {
                     DB::rollBack();
-                    return response()->json(['message' => 'Ingrese un valor mayor a la venta. '.$vuelto], 422);
+                    return response()->json(['message' => 'Ingrese un valor mayor a la venta.'], 422);
                 }
             }
 
@@ -1102,11 +1107,17 @@ class CartController extends Controller
             // Validacion del vuelto antes de crear la orden
             if ( $validatedData['paymentMethod'] == 2 )
             {
-                $vuelto = (float)$request->input('cashAmount') - (float)( $totalAmount - $discountAmount + $shippingCost );
+                $cashAmount = (float)$request->input('cashAmount');
+                $totalAmount = (float)$totalAmount;
+                $discountAmount = (float)$discountAmount;
+                $shippingCost = (float)$shippingCost;
+
+                // Realizamos la operación con bcsub para evitar problemas de precisión
+                $vuelto = bcsub(bcsub($cashAmount, $totalAmount, 2), bcadd($discountAmount, $shippingCost, 2), 2);
 
                 if ($vuelto < 0) {
                     DB::rollBack();
-                    return response()->json(['message' => 'Ingrese un valor mayor a la venta. '.(float)$request->input('cashAmount')." ".$totalAmount. " ".$discountAmount." ".$shippingCost], 422);
+                    return response()->json(['message' => 'Ingrese un valor mayor a la venta.'], 422);
                 }
             }
 
