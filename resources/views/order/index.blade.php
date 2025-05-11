@@ -10,7 +10,7 @@
 @endsection
 
 @section('styles')
-    <link href="{{ asset('css/welcome/reclamaciones.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/reward/index.css') }}" rel="stylesheet">
     <style>
         .card{
             position: relative;
@@ -90,7 +90,7 @@
 
 
         .nav-link-perfil {
-            color: #ffbe33;
+            color: #007a33;
             transition: color 0.3s ease;
         }
 
