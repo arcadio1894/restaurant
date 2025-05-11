@@ -533,12 +533,12 @@ class CartController extends Controller
             // Validacion del vuelto antes de crear la orden
             if ( $validatedData['paymentMethod'] == 2 )
             {
-                $cashAmount = (float)$request->input('cashAmount');
-                $totalAmount = (float)$totalAmount;
-                $discountAmount = (float)$discountAmount;
-                $shippingCost = (float)$shippingCost;
+                $cashAmount = round((float)$request->input('cashAmount'), 2);
+                $totalAmount = round((float)$totalAmount, 2);
+                $discountAmount = round((float)$discountAmount, 2);
+                $shippingCost = round((float)$shippingCost, 2);
 
-                $vuelto = bcsub($cashAmount, bcadd(bcsub($totalAmount, $discountAmount, 2), $shippingCost, 2), 2);
+                $vuelto = round($cashAmount - ($totalAmount - $discountAmount + $shippingCost), 2);
 
                 if ($vuelto < 0) {
                     DB::rollBack();
@@ -1107,13 +1107,13 @@ class CartController extends Controller
             // Validacion del vuelto antes de crear la orden
             if ( $validatedData['paymentMethod'] == 2 )
             {
-                $cashAmount = (float)$request->input('cashAmount');
-                $totalAmount = (float)$totalAmount;
-                $discountAmount = (float)$discountAmount;
-                $shippingCost = (float)$shippingCost;
+                $cashAmount = round((float)$request->input('cashAmount'), 2);
+                $totalAmount = round((float)$totalAmount, 2);
+                $discountAmount = round((float)$discountAmount, 2);
+                $shippingCost = round((float)$shippingCost, 2);
 
-                // Realizamos la operación con bcsub para evitar problemas de precisión
-                $vuelto = bcsub(bcsub($cashAmount, $totalAmount, 2), bcadd($discountAmount, $shippingCost, 2), 2);
+                // Realizamos la operación matemática y redondeamos a 2 decimales
+                $vuelto = round(($cashAmount - $totalAmount) - ($discountAmount + $shippingCost), 2);
 
                 if ($vuelto < 0) {
                     DB::rollBack();
