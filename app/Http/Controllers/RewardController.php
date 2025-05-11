@@ -6,6 +6,7 @@ use App\Models\Milestone;
 use App\Models\Option;
 use App\Models\Product;
 use App\Models\ProductType;
+use App\Models\Reward;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,9 +18,22 @@ class RewardController extends Controller
 
         $user = Auth::user();
 
-        $flames = $user->flames;
+        $flames = 0;
 
-        return view('reward.index', compact('milestones', 'flames'));
+        $rewardsGrouped = [];
+
+        if ($user)
+        {
+            $flames = $user->flames;
+
+            $rewardsGrouped = Reward::where('user_id', $user->id)
+                ->selectRaw('expiration_date, SUM(flames) as total_flames')
+                ->groupBy('expiration_date')
+                ->orderBy('expiration_date', 'asc')
+                ->get();
+        }
+
+        return view('reward.index', compact('milestones', 'flames', 'rewardsGrouped'));
     }
 
     public function show($slug, $id)

@@ -229,6 +229,34 @@
             max-width: 400px; /* Máximo de 400px para evitar que se expanda demasiado */
             height: auto;     /* Mantiene la proporción */
         }
+
+
+        .rewards-list {
+            border-top: 2px solid #28a745; /* Línea superior verde */
+        }
+
+        .rewards-list .list-group-item {
+            position: relative;
+            padding: 10px 20px;
+            border-bottom: 2px solid #28a745; /* Líneas verdes */
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #fff;
+        }
+
+        .rewards-list .list-group-item:last-child {
+            border-bottom: none;
+        }
+
+        .flames-count {
+            color: #f39c12; /* Color dorado para las estrellas */
+            font-size: 18px;
+        }
+
+        .expiration-date {
+            color: #333;
+            font-size: 16px;
+        }
     </style>
 @endsection
 
@@ -296,8 +324,18 @@
 
                     <!-- Tabs personalizados -->
                     <div class="bg-light p-3 mt-5 text-center">
-                        <h5 class="small-text"><strong>{{ Auth::user()->name }}</strong>, conoce qué puedes canjear con tus Flamitas</h5>
-
+                        @if(Auth::check())
+                            <h5 class="small-text">
+                                <strong>{{ Auth::user()->name }}</strong>, conoce qué puedes canjear con tus Flamitas
+                            </h5>
+                        @else
+                            <h5 class="small-text">
+                                Hola, conoce qué puedes canjear con nuestras Flamitas
+                            </h5>
+                            <h5 class="small-text">
+                                Si deseas disfrutar de nuestro programa de recompensas, <a class="nav-link-perfil" href="{{ route('login') }}"><strong> inicia sesión aquí </strong></a>.
+                            </h5>
+                        @endif
                         <ul class="nav justify-content-center tab-custom-reward mt-3" id="milestoneTabs" role="tablist">
                             @foreach($milestones as $index => $milestone)
                                 <li class="nav-item">
@@ -332,6 +370,21 @@
                                 @endif
                             </div>
                         @endforeach
+                    </div>
+
+                    <br>
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Estrellas próximas a vencer</h5>
+                        </div>
+                        <ul class="list-group list-group-flush rewards-list">
+                            @foreach($rewardsGrouped as $reward)
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span class="flames-count">{{ $reward->total_flames }} <img src="{{ asset('images/icons/fire.png') }}" alt="Flame" class="flame-icon-small"></span>
+                                    <span class="expiration-date">{{ \Carbon\Carbon::parse($reward->expiration_date)->format('d-m-Y') }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
                     </div>
                 </div>
 

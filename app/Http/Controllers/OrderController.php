@@ -11,6 +11,7 @@ use App\Models\Address;
 use App\Models\CashMovement;
 use App\Models\CashRegister;
 use App\Models\Category;
+use App\Models\DataGeneral;
 use App\Models\Order;
 use App\Models\ProductType;
 use App\Models\Reward;
@@ -680,20 +681,73 @@ class OrderController extends Controller
         $order->save();
 
         // TODO: Logica para restar las flamitas
+        // 1. Obtener los datos necesarios
         $flames = $order->flames;
         $user = User::find($order->user_id);
+        $order_id = $order->id;
+        $total = $order->amount_pay;
 
-        if ($user) {
-            $user->flames -=$flames;
+        // 2. Obtener el valor del multiplicador y la conversión
+        $dataMultiplicador = DataGeneral::where('multiplier_flames')->first();
+        $multiplicador = isset($dataMultiplicador->valueNumber) ? $dataMultiplicador->valueNumber : 1;
+        $dataConversion = DataGeneral::where('conversion_flames')->first();
+        $conversion = isset($dataConversion->valueNumber) ? $dataConversion->valueNumber : 10;
+
+        // -------------------------
+        // Paso 1: Generar Flames (si el total es mayor a 0)
+        // -------------------------
+        if ($total > 0) {
+            // Calcular las flamas generadas
+            $flames_generated = floor(($total / $conversion) * $multiplicador);
+
+            if ($flames_generated > 0) {
+                // Calcular la fecha de expiración (último día del mismo mes del siguiente año)
+                $expiration_date = Carbon::now()->addYear()->endOfMonth();
+
+                // Crear el Reward
+                Reward::create([
+                    'user_id' => $user->id,
+                    'order_id' => $order_id,
+                    'flames' => $flames_generated,
+                    'expiration_date' => $expiration_date,
+                    'state' => 'active',
+                ]);
+
+                // Actualizar las flamas del usuario
+                $user->flames += $flames_generated;
+                $user->save();
+            }
+        }
+
+        // -------------------------
+        // Paso 2: Restar Flames si existen en la orden
+        // -------------------------
+        if ($flames > 0) {
+            // Restar las flamas del usuario
+            $user->flames -= $flames;
             $user->save();
 
-            /*$reward = Reward::create([
-                'user_id' => $user->id,
-                'order_id' => $order->id,
-                'flames' => $flames,
-                'expiration_date' => ,
-                'state' =>
-            ]);*/
+            // Obtener los rewards del usuario, ordenados por fecha de creación (los más antiguos primero)
+            $rewards = Reward::where('user_id', $user->id)
+                ->orderBy('created_at', 'asc')
+                ->get();
+
+            $remainingFlames = $flames;
+
+            foreach ($rewards as $reward) {
+                if ($remainingFlames <= 0) break;
+
+                if ($reward->flames <= $remainingFlames) {
+                    // Si el reward tiene menos o igual flamas que las que se deben restar, se elimina
+                    $remainingFlames -= $reward->flames;
+                    $reward->delete();
+                } else {
+                    // Si el reward tiene más flamas que las que se deben restar, solo se resta la cantidad necesaria
+                    $reward->flames -= $remainingFlames;
+                    $reward->save();
+                    $remainingFlames = 0;
+                }
+            }
         }
 
         $order2 = Order::find($id);

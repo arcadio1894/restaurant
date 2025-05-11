@@ -327,7 +327,7 @@ Route::middleware('auth')->group(function (){
     });
 
     // TODO: RUTAS DE PREMIOS
-    Route::get('/rewards/', [RewardController::class, 'index'])->name('rewards');
+    /*Route::get('/rewards/', [RewardController::class, 'index'])->name('rewards');*/
     Route::get('/reclamar/recompensa/{slug}/{id}', [RewardController::class, 'show'])->name('reward.show');
 
     // TODO: RUTAS DE PROFILE
@@ -336,6 +336,9 @@ Route::middleware('auth')->group(function (){
     Route::get('/pedidos', [OrderController::class, 'index'])->name('orders.index');
 
 });
+
+// TODO: RUTAS DE PREMIOS
+Route::get('/rewards/', [RewardController::class, 'index'])->name('rewards');
 
 Route::get('/seleccionar/local', [ShopController::class, 'showLocals'])->name('showlocals');
 Route::post('/buscar-tiendas', [ShopController::class, 'buscarTiendas']);
