@@ -688,9 +688,9 @@ class OrderController extends Controller
         $total = $order->amount_pay;
 
         // 2. Obtener el valor del multiplicador y la conversión
-        $dataMultiplicador = DataGeneral::where('multiplier_flames')->first();
+        $dataMultiplicador = DataGeneral::where('name', 'multiplier_flames')->first();
         $multiplicador = isset($dataMultiplicador->valueNumber) ? $dataMultiplicador->valueNumber : 1;
-        $dataConversion = DataGeneral::where('conversion_flames')->first();
+        $dataConversion = DataGeneral::where('name', 'conversion_flames')->first();
         $conversion = isset($dataConversion->valueNumber) ? $dataConversion->valueNumber : 10;
 
         // -------------------------
