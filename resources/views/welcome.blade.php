@@ -348,7 +348,7 @@
                                     </li>
                                 @endauth--}}
                                 <li class="nav-item @yield('orders-active')">
-                                    <a class="nav-link" href="{{ route('rewards') }}">Premios</a>
+                                    <a class="nav-link" href="{{ route('rewards') }}">Recompensas</a>
                                 </li>
                             </ul>
                             <div class="user_option">

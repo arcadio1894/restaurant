@@ -278,7 +278,7 @@
                                     <a class="nav-link" href="{{ route('orders.index') }}">Premios</a>
                                 </li>--}}
                             <li class="nav-item @yield('reward-active')">
-                                <a class="nav-link" href="{{ route('rewards') }}">Premios</a>
+                                <a class="nav-link" href="{{ route('rewards') }}">Recompensas</a>
                             </li>
 
                         </ul>
