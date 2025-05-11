@@ -242,11 +242,11 @@
                     <div class="d-flex align-items-center d-lg-none">
 
                         <!-- Botón link que envuelve el fuego + texto -->
-                        {{--<a href="{{ route('rewards') }}" class="d-flex align-items-center mr-3 text-white text-decoration-none premios-btn">
+                        <a href="{{ route('rewards') }}" class="d-flex align-items-center mr-3 text-white text-decoration-none premios-btn">
                             <img src="{{ asset('images/icons/fire.png') }}" alt="Fuego"
                                  class="mr-2 fuego-icon" />
                             <span class="font-weight-bold pulse-text">Premios</span>
-                        </a>--}}
+                        </a>
                         <!-- Botón hamburguesa -->
                         <button class="navbar-toggler" type="button" data-toggle="collapse"
                                 data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
@@ -277,9 +277,9 @@
                                 {{--<li class="nav-item @yield('orders-active')">
                                     <a class="nav-link" href="{{ route('orders.index') }}">Premios</a>
                                 </li>--}}
-                            {{--<li class="nav-item @yield('reward-active')">
+                            <li class="nav-item @yield('reward-active')">
                                 <a class="nav-link" href="{{ route('rewards') }}">Premios</a>
-                            </li>--}}
+                            </li>
 
                         </ul>
                         <div class="user_option">
