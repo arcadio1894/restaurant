@@ -232,13 +232,13 @@
 
 
         .rewards-list {
-            border-top: 2px solid #28a745; /* Línea superior verde */
+            border-top: 2px solid #98e3a9; /* Línea superior verde */
         }
 
         .rewards-list .list-group-item {
             position: relative;
             padding: 10px 20px;
-            border-bottom: 2px solid #28a745; /* Líneas verdes */
+            border-bottom: 2px solid #98e3a9; /* Líneas verdes */
             font-size: 16px;
             font-weight: bold;
             background-color: #fff;
@@ -249,7 +249,7 @@
         }
 
         .flames-count {
-            color: #f39c12; /* Color dorado para las estrellas */
+            color: #167c2d; /* Color dorado para las estrellas */
             font-size: 18px;
         }
 
