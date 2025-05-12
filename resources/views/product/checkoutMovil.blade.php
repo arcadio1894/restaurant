@@ -359,7 +359,7 @@
 
                     <hr class="mb-4">
 
-                    <h5 class="mb-3">
+                    <h5 class="mb-3" id="title-method">
                         <span class="d-flex align-items-center">
                             <img src="{{ asset('/images/checkout/payment-method.png') }}" alt="Cupon" style="width: 30px; height: 30px; margin-right: 10px;">
                             <strong>Elige tu método de pago</strong>

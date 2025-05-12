@@ -64,17 +64,38 @@ $(document).ready(function() {
 
     loadCheckout();
 
-    // 1️⃣ Desmarcar todos los radios primero
-    $('input[name="paymentMethod"]').prop('checked', false);
+    // Obtén el carrito del localStorage y parsea el JSON
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
-    // 2️⃣ Marcar POS como seleccionado por defecto y forzar el evento change
-    $('#method_yape_plin').prop('checked', true).trigger('change');
+    // Verifica si todos los productos tienen reward en true
+    if (cart.length > 0 && cart.every(item => item.reward === true)) {
+        // Ocultar la sección deseada (ejemplo: #section-to-hide)
+        $('#payment-slider').hide();
+        $('#title-method').hide();
 
-    // 3️⃣ Mostrar la sección del POS al inicio
-    $('#yape-section').show();
+        // Cambiar el texto (ejemplo: #text-to-change)
+        $('#btn-submit').text('RECLAMAR');
+        $('#btn-submit-mobile').text('RECLAMAR');
+    } else {
+        $('#payment-slider').show();
+        $('#title-method').show();
+        $('#btn-submit').text('COMPRAR');
+        $('#btn-submit-mobile').text('COMPRAR');
 
-    // 4️⃣ Verificar que POS está seleccionado correctamente en la consola
-    console.log("Carga inicial: Método POS seleccionado ->", $('#method_yape_plin').prop('checked'));
+        // 1️⃣ Desmarcar todos los radios primero
+        $('input[name="paymentMethod"]').prop('checked', false);
+
+        // 2️⃣ Marcar POS como seleccionado por defecto y forzar el evento change
+        $('#method_yape_plin').prop('checked', true).trigger('change');
+
+        // 3️⃣ Mostrar la sección del POS al inicio
+        $('#yape-section').show();
+
+        // 4️⃣ Verificar que POS está seleccionado correctamente en la consola
+        console.log("Carga inicial: Método POS seleccionado ->", $('#method_yape_plin').prop('checked'));
+
+    }
+
 
     // 5️⃣ Detectar cambios de slide y actualizar el método seleccionado
     $('#payment-slider').on('slid.bs.carousel', function (e) {
@@ -714,139 +735,149 @@ function procesarFormulario() {
             "hideMethod": "fadeOut"
         });
     } else {
-        // Verificar el método de pago seleccionado y validar campos adicionales
-        let selectedMethod = $("input[name='paymentMethod']:checked").attr('id');
 
-        if (selectedMethod === 'method_pos') {
-            // Enviar directamente si es "POS"
-            submitFormAjax();
-        } else if (selectedMethod === 'method_efectivo') {
-            // Validar si el monto ingresado es mayor a cero
-            let cashAmount = $('#cashAmount').val();
-            console.log(cashAmount);
-            if (parseFloat(cashAmount) > 0 || cashAmount !== "" ) {
-                console.log('Enviamos formulario');
-                submitFormAjax({ cashAmount: cashAmount });
-            } else {
-                //alert('Por favor, ingrese un monto válido en efectivo.');
-                toastr.error('Por favor, ingrese un monto válido en efectivo.', 'Error',
-                    {
-                        "closeButton": true,
-                        "debug": false,
-                        "newestOnTop": false,
-                        "progressBar": true,
-                        "positionClass": "toast-top-right",
-                        "preventDuplicates": false,
-                        "onclick": null,
-                        "showDuration": "300",
-                        "hideDuration": "1000",
-                        "timeOut": "2000",
-                        "extendedTimeOut": "1000",
-                        "showEasing": "swing",
-                        "hideEasing": "linear",
-                        "showMethod": "fadeIn",
-                        "hideMethod": "fadeOut"
-                    });
-                // Restaurar los botones a su estado original
-                $('#btn-continue').text("Continuar").attr("disabled", false);
-                $('#btn-cancel').attr("disabled", false);
-                $('#btn-submit').attr("disabled", false);
+        let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
-                $('#verifyModal').modal('hide');
-            }
-        } else if (selectedMethod === 'method_yape_plin') {
-            // Validar si el código de operación está presente
-            let operationCode = $('#operationCode').val();
-            if (operationCode) {
-                submitFormAjax({ operationCode: operationCode });
-            } else {
-                //alert('Por favor, ingrese el código de operación para Yape o Plin.');
-                toastr.error('Por favor, ingrese el código de operación para Yape o Plin.', 'Error',
-                    {
-                        "closeButton": true,
-                        "debug": false,
-                        "newestOnTop": false,
-                        "progressBar": true,
-                        "positionClass": "toast-top-right",
-                        "preventDuplicates": false,
-                        "onclick": null,
-                        "showDuration": "300",
-                        "hideDuration": "1000",
-                        "timeOut": "2000",
-                        "extendedTimeOut": "1000",
-                        "showEasing": "swing",
-                        "hideEasing": "linear",
-                        "showMethod": "fadeIn",
-                        "hideMethod": "fadeOut"
-                    });
-                // Restaurar los botones a su estado original
-                $('#btn-continue').text("Continuar").attr("disabled", false);
-                $('#btn-cancel').attr("disabled", false);
-                $('#btn-submit').attr("disabled", false);
+        // Verifica si todos los productos tienen reward en true
+        if (cart.length > 0 && cart.every(item => item.reward === true)) {
+            submitFormAjax({ paymentMethod: 1 });
+        } else {
+            // Verificar el método de pago seleccionado y validar campos adicionales
+            let selectedMethod = $("input[name='paymentMethod']:checked").attr('id');
 
-                $('#verifyModal').modal('hide');
-            }
-        } else if (selectedMethod === 'method_mercado_pago') {
+            if (selectedMethod === 'method_pos') {
+                // Enviar directamente si es "POS"
+                submitFormAjax();
+            } else if (selectedMethod === 'method_efectivo') {
+                // Validar si el monto ingresado es mayor a cero
+                let cashAmount = $('#cashAmount').val();
+                console.log(cashAmount);
+                if (parseFloat(cashAmount) > 0 || cashAmount !== "" ) {
+                    console.log('Enviamos formulario');
+                    submitFormAjax({ cashAmount: cashAmount });
+                } else {
+                    //alert('Por favor, ingrese un monto válido en efectivo.');
+                    toastr.error('Por favor, ingrese un monto válido en efectivo.', 'Error',
+                        {
+                            "closeButton": true,
+                            "debug": false,
+                            "newestOnTop": false,
+                            "progressBar": true,
+                            "positionClass": "toast-top-right",
+                            "preventDuplicates": false,
+                            "onclick": null,
+                            "showDuration": "300",
+                            "hideDuration": "1000",
+                            "timeOut": "2000",
+                            "extendedTimeOut": "1000",
+                            "showEasing": "swing",
+                            "hideEasing": "linear",
+                            "showMethod": "fadeIn",
+                            "hideMethod": "fadeOut"
+                        });
+                    // Restaurar los botones a su estado original
+                    $('#btn-continue').text("Continuar").attr("disabled", false);
+                    $('#btn-cancel').attr("disabled", false);
+                    $('#btn-submit').attr("disabled", false);
 
-            /*// Validar si los campos necesarios tienen valores
-            const installments = $('#installments').val();
-            const issuer = $('#issuer').val();
-
-            if (!installments) {
-                $('#installments').val('1'); // Valor por defecto de una cuota
-            }
-
-            if (!issuer) {
-                $('#issuer').val('default'); // Asegúrate de usar un ID válido para el banco
-            }
-
-            // Extrae los datos del formulario de tarjeta
-            console.log(cardForm);
-            const { token, issuerId, paymentMethodId } = cardForm.getCardFormData();
-            console.log({ token, issuerId, paymentMethodId });
-
-            if (!token) {
-                toastr.error('No se pudo generar el token. Verifica los datos ingresados Erorr.', 'Error');
-                return;
-            }
-
-            if (!issuerId) {
-                toastr.error('Por favor selecciona el banco.', 'Error');
-                return;
-            }
-
-            if (!$('#installments').val()) {
-                toastr.error('Por favor selecciona las cuotas.', 'Error');
-                return;
-            }
-
-            // Envía los datos al backend
-            submitFormAjax({
-                token: token,
-                installments: $('#installments').val(),
-                issuerId: issuerId,
-                paymentMethodId: paymentMethodId
-            });*/
-            /*$.ajax({
-                url: '/crear-preferencia',
-                method: 'POST',
-                success: function(data) {
-                    const mp = new MercadoPago('APP_USR-39c9eccc-78c3-42fc-b730-f1ddab6d5f39', {
-                        locale: 'es-PE'
-                    });
-                    mp.checkout({
-                        preference: {
-                            id: data.id
-                        },
-                        autoOpen: true // Abre el checkout automáticamente
-                    });
-                },
-                error: function(error) {
-                    console.error('Error al crear la preferencia:', error);
+                    $('#verifyModal').modal('hide');
                 }
-            });*/
+            } else if (selectedMethod === 'method_yape_plin') {
+                // Validar si el código de operación está presente
+                let operationCode = $('#operationCode').val();
+                if (operationCode) {
+                    submitFormAjax({ operationCode: operationCode });
+                } else {
+                    //alert('Por favor, ingrese el código de operación para Yape o Plin.');
+                    toastr.error('Por favor, ingrese el código de operación para Yape o Plin.', 'Error',
+                        {
+                            "closeButton": true,
+                            "debug": false,
+                            "newestOnTop": false,
+                            "progressBar": true,
+                            "positionClass": "toast-top-right",
+                            "preventDuplicates": false,
+                            "onclick": null,
+                            "showDuration": "300",
+                            "hideDuration": "1000",
+                            "timeOut": "2000",
+                            "extendedTimeOut": "1000",
+                            "showEasing": "swing",
+                            "hideEasing": "linear",
+                            "showMethod": "fadeIn",
+                            "hideMethod": "fadeOut"
+                        });
+                    // Restaurar los botones a su estado original
+                    $('#btn-continue').text("Continuar").attr("disabled", false);
+                    $('#btn-cancel').attr("disabled", false);
+                    $('#btn-submit').attr("disabled", false);
 
+                    $('#verifyModal').modal('hide');
+                }
+            } else if (selectedMethod === 'method_mercado_pago') {
+
+                /*// Validar si los campos necesarios tienen valores
+                const installments = $('#installments').val();
+                const issuer = $('#issuer').val();
+
+                if (!installments) {
+                    $('#installments').val('1'); // Valor por defecto de una cuota
+                }
+
+                if (!issuer) {
+                    $('#issuer').val('default'); // Asegúrate de usar un ID válido para el banco
+                }
+
+                // Extrae los datos del formulario de tarjeta
+                console.log(cardForm);
+                const { token, issuerId, paymentMethodId } = cardForm.getCardFormData();
+                console.log({ token, issuerId, paymentMethodId });
+
+                if (!token) {
+                    toastr.error('No se pudo generar el token. Verifica los datos ingresados Erorr.', 'Error');
+                    return;
+                }
+
+                if (!issuerId) {
+                    toastr.error('Por favor selecciona el banco.', 'Error');
+                    return;
+                }
+
+                if (!$('#installments').val()) {
+                    toastr.error('Por favor selecciona las cuotas.', 'Error');
+                    return;
+                }
+
+                // Envía los datos al backend
+                submitFormAjax({
+                    token: token,
+                    installments: $('#installments').val(),
+                    issuerId: issuerId,
+                    paymentMethodId: paymentMethodId
+                });*/
+                /*$.ajax({
+                    url: '/crear-preferencia',
+                    method: 'POST',
+                    success: function(data) {
+                        const mp = new MercadoPago('APP_USR-39c9eccc-78c3-42fc-b730-f1ddab6d5f39', {
+                            locale: 'es-PE'
+                        });
+                        mp.checkout({
+                            preference: {
+                                id: data.id
+                            },
+                            autoOpen: true // Abre el checkout automáticamente
+                        });
+                    },
+                    error: function(error) {
+                        console.error('Error al crear la preferencia:', error);
+                    }
+                });*/
+
+            }
         }
+
+
     }
 }
 
