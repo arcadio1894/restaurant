@@ -261,6 +261,63 @@
         .color-green {
             background-color: #98e3a9;
         }
+
+
+        .milestone-wrapper {
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            padding: 0 10px;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE 10+ */
+        }
+
+        .milestone-wrapper::-webkit-scrollbar {
+            display: none; /* Chrome, Safari y Edge */
+        }
+
+        .milestone-progress2 {
+            position: relative;
+            min-width: 600px;
+            display: inline-block;
+            height: 70px;
+        }
+
+        .progress-bar-container2 {
+            position: absolute;
+            bottom: 0;
+            left: 10px; /* 🔥 Movemos también el contenedor gris */
+            right: -10px; /* 🔥 Ajustamos para que no se corte al final */
+            height: 4px;
+            background-color: #e0e0e0;
+            margin-bottom: 10px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-bar2 {
+            position: absolute;
+            height: 100%;
+            background-color: orange;
+            width: calc(var(--progress) + 1.5%);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .milestone-point2 {
+            position: absolute;
+            display: inline-block;
+            text-align: center;
+            width: 50px;
+            bottom: 20px;
+        }
+
+        .milestone-icon2 {
+            width: 24px;
+            height: 24px;
+            display: block;
+            margin: 0 auto;
+        }
     </style>
 @endsection
 
@@ -313,7 +370,7 @@
                     </div>
 
                     <!-- Barra de progreso de milestones -->
-                    <div class="milestone-progress">
+                    {{--<div class="milestone-progress">
                         @foreach($milestones as $milestone)
                             <div class="milestone-point {{ $flames >= $milestone->flames ? 'active' : '' }}">
                                 <img
@@ -324,6 +381,51 @@
                                 <small>{{ $milestone->flames }}</small>
                             </div>
                         @endforeach
+                    </div>--}}
+
+                    <div class="milestone-wrapper">
+                        <div class="milestone-progress2 mt-5">
+                            <div class="progress-bar-container2">
+                                @php
+                                    $totalMilestones = count($milestones);
+                                    $progress = 0;
+
+                                    for ($i = 0; $i < $totalMilestones - 1; $i++) {
+                                        $current = $milestones[$i]->flames;
+                                        $next = $milestones[$i + 1]->flames;
+
+                                        if ($flames >= $current && $flames <= $next) {
+                                            $segmentPercentage = 100 / ($totalMilestones - 1);
+                                            $extra = ($flames - $current) / ($next - $current) * $segmentPercentage;
+                                            $progress = ($i * $segmentPercentage) + $extra;
+                                            break;
+                                        } elseif ($flames >= $next) {
+                                            $progress = 100;
+                                        }
+                                    }
+
+                                    // 🔥 Si el progreso está muy cerca del final, lo llevamos al 100%
+                                    if ($progress >= 99.5) {
+                                        $progress = 100;
+                                    }
+                                @endphp
+                                <div class="progress-bar2" style="--progress: {{ $progress }}%;"></div>
+                            </div>
+
+                            @foreach($milestones as $index => $milestone)
+                                <div class="milestone-point2"
+                                     style="
+                                             left: calc({{ (100 / ($totalMilestones - 1)) * $index }}% - 12px);
+                                             ">
+                                    <img
+                                            src="{{ asset($flames >= $milestone->flames ? '/images/icons/fire.png' : '/images/reward/fire-black.png') }}"
+                                            alt="Milestone flame"
+                                            class="milestone-icon2"
+                                    >
+                                    <small>{{ $milestone->flames }}</small>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
 
                     <!-- Tabs personalizados -->

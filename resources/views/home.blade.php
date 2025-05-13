@@ -85,6 +85,74 @@
             object-fit: cover; /* Escala la imagen sin distorsión */
             object-position: center;
         }
+
+        .filters_menu_wrapper2 {
+            position: relative;
+            overflow: hidden;
+            margin-top: 60px;
+        }
+
+        .filters_menu2 {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 5px;
+            scrollbar-width: none; /* Oculta el scroll en Firefox */
+            padding-left: 0px !important;
+            text-align: center;
+        }
+
+        .filters_menu2::-webkit-scrollbar {
+            display: none; /* Oculta el scroll en Chrome, Safari y Edge */
+        }
+
+        .filters_menu2 li.active {
+            background-color: #222831;
+            color: #ffffff;
+        }
+
+        .filters_menu2 li {
+            display: inline-block;
+            margin-right: 15px;
+            cursor: pointer;
+            white-space: nowrap;
+            padding: 7px 25px;
+            border-radius: 25px;
+        }
+
+        /* Indicador de más contenido a la derecha */
+        .scroll-indicator2 {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #555;
+            font-size: 18px;
+            pointer-events: none;
+            z-index: 10;
+            animation: blink 1.5s infinite;
+        }
+
+        /* Animación para que "parpadee" levemente */
+        @keyframes blink {
+            0%, 100% {
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Ocultar el icono en pantallas grandes y centrar los <li> */
+        @media (min-width: 768px) {
+            .filters_menu2 {
+                justify-content: center;
+                overflow-x: visible; /* Elimina el scroll horizontal en pantallas grandes */
+            }
+            .scroll-indicator2 {
+                display: none;
+            }
+        }
     </style>
 @endsection
 
@@ -202,12 +270,24 @@
                 </h2>
             </div>
 
-            <ul class="filters_menu">
+            {{--<ul class="filters_menu">
                 <li class="active" data-filter="*">Todos</li>
                 @foreach($categories as $category)
                     <li data-filter=".category{{ $category->id }}">{{ $category->name }}</li>
                 @endforeach
-            </ul>
+            </ul>--}}
+
+            <div class="filters_menu_wrapper2">
+                <ul class="filters_menu2">
+                    <li class="active" data-filter="*">Todos</li>
+                    @foreach($categories as $category)
+                        <li data-filter=".category{{ $category->id }}">{{ $category->name }}</li>
+                    @endforeach
+                </ul>
+                <div class="scroll-indicator2" style="margin-top: -10px">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
 
             <div class="filters-content">
                 <div class="row grid">
@@ -323,6 +403,22 @@
     <script>
         $('#Carousel').carousel({
             interval: 5000
-        })
+        });
+        const $menu = $('.filters_menu2');
+        const $indicator = $('.scroll-indicator2');
+
+        $menu.on('scroll', function () {
+            // Verifica si llegó al final del scroll
+            if ($menu[0].scrollWidth - $menu.scrollLeft() <= $menu.outerWidth()) {
+                $indicator.fadeOut(); // Oculta el icono si está al final
+            } else {
+                $indicator.fadeIn(); // Muestra el icono si no está al final
+            }
+        });
+
+        // Comprobación inicial
+        if ($menu[0].scrollWidth <= $menu.outerWidth()) {
+            $indicator.hide(); // Si no hay scroll, el icono se oculta
+        }
     </script>
 @endsection
