@@ -264,30 +264,22 @@
 
 
         .milestone-wrapper {
-            overflow-x: auto;
-            overflow-y: hidden;
-            white-space: nowrap;
+            width: 100%;
+            overflow: hidden;
             padding: 0 10px;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE 10+ */
-        }
-
-        .milestone-wrapper::-webkit-scrollbar {
-            display: none; /* Chrome, Safari y Edge */
         }
 
         .milestone-progress2 {
             position: relative;
-            min-width: 600px;
-            display: inline-block;
+            width: 100%;
             height: 70px;
         }
 
         .progress-bar-container2 {
             position: absolute;
             bottom: 0;
-            left: 10px; /* 🔥 Movemos también el contenedor gris */
-            right: -10px; /* 🔥 Ajustamos para que no se corte al final */
+            left: 0;
+            right: 0;
             height: 4px;
             background-color: #e0e0e0;
             margin-bottom: 10px;
@@ -306,10 +298,9 @@
 
         .milestone-point2 {
             position: absolute;
-            display: inline-block;
             text-align: center;
-            width: 50px;
             bottom: 20px;
+            transform: translateX(-50%);
         }
 
         .milestone-icon2 {
@@ -317,6 +308,17 @@
             height: 24px;
             display: block;
             margin: 0 auto;
+        }
+
+        @media (max-width: 576px) {
+            .milestone-icon2 {
+                width: 20px;
+                height: 20px;
+            }
+
+            .milestone-point2 small {
+                font-size: 10px;
+            }
         }
     </style>
 @endsection
@@ -404,7 +406,6 @@
                                         }
                                     }
 
-                                    // 🔥 Si el progreso está muy cerca del final, lo llevamos al 100%
                                     if ($progress >= 99.5) {
                                         $progress = 100;
                                     }
@@ -415,7 +416,8 @@
                             @foreach($milestones as $index => $milestone)
                                 <div class="milestone-point2"
                                      style="
-                                             left: calc({{ (100 / ($totalMilestones - 1)) * $index }}% - 12px);
+                                             left: {{ (100 / ($totalMilestones - 1)) * $index }}%;
+                                             transform: translateX(-50%);
                                              ">
                                     <img
                                             src="{{ asset($flames >= $milestone->flames ? '/images/icons/fire.png' : '/images/reward/fire-black.png') }}"
