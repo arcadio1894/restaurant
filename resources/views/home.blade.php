@@ -399,7 +399,7 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('landing/js/welcome.js') }}"></script>
+    <script src="{{ asset('landing/js/welcome.js') }}?v={{ time() }}"></script>
     <script>
         $('#Carousel').carousel({
             interval: 5000

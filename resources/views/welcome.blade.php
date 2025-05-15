@@ -903,7 +903,7 @@
         <!-- End Google Map -->
         <!-- Jquery-confirm -->
         <script src="{{ asset('plugins/jquery-confirm/jquery-confirm.min.js') }}"></script>
-        <script src="{{ asset('landing/js/welcome.js') }}"></script>
+        <script src="{{ asset('landing/js/welcome.js') }}?v={{ time() }}"></script>
         <script>
             const $menu = $('.filters_menu2');
             const $indicator = $('.scroll-indicator2');

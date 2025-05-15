@@ -19,7 +19,7 @@ $(document).ready(function() {
                 `,
                     buttons: {
                         close: {
-                            text: 'Cerrar',
+                            text: 'Seguir navegando',
                             action: function () {
                                 // Acción al cerrar el pop-up
                             }
