@@ -944,7 +944,7 @@ function submitFormAjax(extraData = {}) {
         },
         success: function(data) {
             if (data.success) {
-                toastr.success(data.message, 'Éxito',
+                /*toastr.success(data.message, 'Éxito',
                     {
                         "closeButton": true,
                         "debug": false,
@@ -971,7 +971,7 @@ function submitFormAjax(extraData = {}) {
                     $('#btn-submit').attr("disabled", false);
                     $('#btn-continue').attr("disabled", false);
                     window.location.href = data.redirect_url;
-                }, 2000 )
+                }, 2000 )*/
             } else {
 
                 toastr.error('Hubo un problema con tu compra. Intenta de nuevo.', 'Error',

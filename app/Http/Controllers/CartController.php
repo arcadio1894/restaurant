@@ -1115,6 +1115,18 @@ class CartController extends Controller
                 // Realizamos la operación matemática y redondeamos a 2 decimales
                 $vuelto = round(($cashAmount - $totalAmount) - ($discountAmount + $shippingCost), 2);
 
+                dump("cashAmount");
+                dump($cashAmount);
+                dump("totalAmount");
+                dump($totalAmount);
+                dump("discountAmount");
+                dump($discountAmount);
+                dump("shippingCost");
+                dump($shippingCost);
+                dump("Vuelto");
+                dump($vuelto);
+                dd();
+
                 if ($vuelto < 0) {
                     DB::rollBack();
                     return response()->json(['message' => 'Ingrese un valor mayor a la venta.'], 422);
