@@ -1125,9 +1125,17 @@ class CartController extends Controller
                 dump($shippingCost);
                 dump("Vuelto");
                 dump($vuelto);*/
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Vuelto '. $vuelto]);
+                if ( $vuelto < 0 )
+                {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Vuelto NEGATIVO  '. $vuelto]);
+                } else {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Vuelto POSITIVO'. $vuelto]);
+                }
+
 
                 if ($vuelto < 0) {
                     DB::rollBack();
