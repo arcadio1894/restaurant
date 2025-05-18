@@ -1115,7 +1115,7 @@ class CartController extends Controller
                 // Realizamos la operación matemática y redondeamos a 2 decimales
                 $vuelto = round(($cashAmount - $totalAmount) - ($discountAmount + $shippingCost), 2);
 
-                dump("cashAmount");
+                /*dump("cashAmount");
                 dump($cashAmount);
                 dump("totalAmount");
                 dump($totalAmount);
@@ -1124,8 +1124,10 @@ class CartController extends Controller
                 dump("shippingCost");
                 dump($shippingCost);
                 dump("Vuelto");
-                dump($vuelto);
-                dd();
+                dump($vuelto);*/
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Vuelto '. $vuelto]);
 
                 if ($vuelto < 0) {
                     DB::rollBack();

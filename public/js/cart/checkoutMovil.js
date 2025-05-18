@@ -944,7 +944,7 @@ function submitFormAjax(extraData = {}) {
         },
         success: function(data) {
             if (data.success) {
-                /*toastr.success(data.message, 'Éxito',
+                toastr.success(data.message, 'Éxito',
                     {
                         "closeButton": true,
                         "debug": false,
@@ -954,8 +954,8 @@ function submitFormAjax(extraData = {}) {
                         "preventDuplicates": false,
                         "onclick": null,
                         "showDuration": "300",
-                        "hideDuration": "1000",
-                        "timeOut": "2000",
+                        "hideDuration": "4000",
+                        "timeOut": "4000",
                         "extendedTimeOut": "1000",
                         "showEasing": "swing",
                         "hideEasing": "linear",
@@ -963,7 +963,7 @@ function submitFormAjax(extraData = {}) {
                         "hideMethod": "fadeOut"
                     });
                 // Limpiar las claves específicas del Local Storage
-                localStorage.removeItem('cart');
+                /*localStorage.removeItem('cart');
                 localStorage.removeItem('observations');
                 setTimeout( function () {
                     //location.reload();
