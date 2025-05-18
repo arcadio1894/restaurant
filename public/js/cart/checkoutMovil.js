@@ -74,8 +74,8 @@ $(document).ready(function() {
         $('#title-method').hide();
 
         // Cambiar el texto (ejemplo: #text-to-change)
-        //$('#btn-submit').text('RECLAMAR');
-        //$('#btn-submit-mobile').text('RECLAMAR');
+        $('#btn-submit').text('RECLAMAR');
+        $('#btn-submit-mobile').text('RECLAMAR');
     } else {
         $('#payment-slider').show();
         $('#title-method').show();
