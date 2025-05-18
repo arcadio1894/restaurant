@@ -678,6 +678,8 @@ class ProductController extends Controller
     public function show($slug)
     {
         $product = Product::where('slug', $slug)->firstOrFail();
+        //dump("Producto");
+        //dump($product);
 
         // Obtener los tipos relacionados al producto
         /*$productTypes = $product->productTypes()
@@ -690,6 +692,9 @@ class ProductController extends Controller
             ->with('type')
             ->get();
 
+        //dump("ProductTypes");
+        //dump($productTypes);
+
         // Verificar si el producto tiene solo un productType y si su type está inactivo
         if ($productTypes->count() === 1 && optional($productTypes->first()->type)->active == 0) {
             return redirect()->route('welcome'); // Redirigir si la condición se cumple
@@ -698,8 +703,19 @@ class ProductController extends Controller
         // Filtrar solo los tipos activos
         $productTypes = $productTypes->where('type.active', 1);
 
+        //dump("ProductTypes Activos");
+        //dump($productTypes);
+
         // Obtener el tipo por defecto
         $defaultProductType = $productTypes->where('default', true)->first();
+
+        // Si no existe un tipo por defecto y hay un solo tipo activo, asignamos ese
+        if (!$defaultProductType) {
+            $defaultProductType = $productTypes->first();
+        }
+
+        //dump("DefaultProductType");
+        //dump($defaultProductType);
 
         $options = Option::where('product_id', $product->id)
             ->where('active', 1) // Solo opciones activas
@@ -727,7 +743,7 @@ class ProductController extends Controller
             }
         }
 
-        //dd($options);
+        //dd();
         /*$adicionales = Product::whereHas('category', function ($query) {
             $query->where('visible', true);
         })->orWhere('category_id', 5)->orWhere('category_id', 6)->with('category')->get();*/

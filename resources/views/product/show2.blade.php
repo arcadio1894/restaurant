@@ -622,7 +622,7 @@
                                         <div class="pizza-options">
                                             @foreach($productTypes as $productType)
                                                 <div class="radio-button" data-value="{{ $productType->id }}">
-                                                    <input type="radio" name="pizza-size" value="{{ $productType->id }}" data-price="{{ $productType->price }}" {{ $productType->default ? 'checked' : '' }}>
+                                                    <input type="radio" name="pizza-size" value="{{ $productType->id }}" data-price="{{ $productType->price }}" {{ $defaultProductType && $productType->id == $defaultProductType->id ? 'checked' : '' }}>
                                                     <span class="check-icon"><i class="fas fa-check-circle"></i></span>
                                                     <div class="content">
                                                         <span class="size">{{ $productType->type->name }} </span>
