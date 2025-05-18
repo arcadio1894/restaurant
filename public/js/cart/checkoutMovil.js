@@ -954,8 +954,8 @@ function submitFormAjax(extraData = {}) {
                         "preventDuplicates": false,
                         "onclick": null,
                         "showDuration": "300",
-                        "hideDuration": "4000",
-                        "timeOut": "4000",
+                        "hideDuration": "2000",
+                        "timeOut": "2000",
                         "extendedTimeOut": "1000",
                         "showEasing": "swing",
                         "hideEasing": "linear",
@@ -963,7 +963,7 @@ function submitFormAjax(extraData = {}) {
                         "hideMethod": "fadeOut"
                     });
                 // Limpiar las claves específicas del Local Storage
-                /*localStorage.removeItem('cart');
+                localStorage.removeItem('cart');
                 localStorage.removeItem('observations');
                 setTimeout( function () {
                     //location.reload();
@@ -971,7 +971,7 @@ function submitFormAjax(extraData = {}) {
                     $('#btn-submit').attr("disabled", false);
                     $('#btn-continue').attr("disabled", false);
                     window.location.href = data.redirect_url;
-                }, 2000 )*/
+                }, 2000 )
             } else {
 
                 toastr.error('Hubo un problema con tu compra. Intenta de nuevo.', 'Error',
