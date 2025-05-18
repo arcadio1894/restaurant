@@ -1113,7 +1113,7 @@ class CartController extends Controller
                 $shippingCost = round((float)$shippingCost, 2);
 
                 // Realizamos la operación matemática y redondeamos a 2 decimales
-                $vuelto = round(($cashAmount - $totalAmount) - ($discountAmount + $shippingCost), 2);
+                $vuelto = round(($cashAmount) - ($totalAmount - $discountAmount + $shippingCost), 2);
 
                 dump("cashAmount");
                 dump($cashAmount);
