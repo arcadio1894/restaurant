@@ -74,13 +74,13 @@ $(document).ready(function() {
         $('#title-method').hide();
 
         // Cambiar el texto (ejemplo: #text-to-change)
-        $('#btn-submit').text('RECLAMAR');
-        $('#btn-submit-mobile').text('RECLAMAR');
+        //$('#btn-submit').text('RECLAMAR');
+        //$('#btn-submit-mobile').text('RECLAMAR');
     } else {
         $('#payment-slider').show();
         $('#title-method').show();
-        $('#btn-submit').text('COMPRAR');
-        $('#btn-submit-mobile').text('COMPRAR');
+        //$('#btn-submit').text('COMPRAR');
+        //$('#btn-submit-mobile').text('COMPRAR');
 
         // 1️⃣ Desmarcar todos los radios primero
         $('input[name="paymentMethod"]').prop('checked', false);
