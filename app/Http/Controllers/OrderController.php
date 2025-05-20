@@ -124,6 +124,11 @@ class OrderController extends Controller
         {
             $direccion = Address::find($order->shipping_address_id);
             $distrito = ShippingDistrict::find($order->shipping_district_id);
+            $cliente = $direccion->first_name." ".$direccion->last_name;
+            $address = $direccion->address_line. " - ".( (!isset($distrito)) ? 'N/A':$distrito->name);
+            //Hola {{Nombre del Cliente}} te escribimos de parte de Fuego y Masa para confirmar tu pedido para la direccion {{Direccion}}
+            $text = 'Hola '. $cliente .' te escribimos de parte de Fuego y Masa para confirmar tu pedido para la direccion '.$address;
+            $url = 'https://api.whatsapp.com/send?phone='.$direccion->phone.'&text='.$text;
             array_push($arrayGuides, [
                 "id" => $order->id,
                 "code" => "ORDEN - ".$order->id,
@@ -138,6 +143,7 @@ class OrderController extends Controller
                 "method" => ($order->payment_method_id == null) ? 'Sin método de pago':$order->payment_method->name ,
                 "state" => $order->status_name,
                 "data_payment" => $order->data_payment,
+                "url" => $url
             ]);
         }
 

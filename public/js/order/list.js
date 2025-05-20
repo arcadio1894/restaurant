@@ -614,6 +614,8 @@ function renderDataTable(data) {
     /*cloneBtnActive.querySelector("[data-generar_comprobante]").setAttribute("data-order-id", data.id);
     cloneBtnActive.querySelector("[data-imprimir_comprobante]").setAttribute("data-order-id", data.id);*/
 
+    cloneBtnActive.querySelector("[data-btn_whatsapp]").setAttribute("href", data.url);
+
     botones.append(cloneBtnActive);
 
     $("#body-table").append(clone);

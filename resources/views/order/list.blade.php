@@ -294,6 +294,8 @@
         <button data-ver_ruta_map data-id="" data-address="" data-latitude="" data-longitude="" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Ruta"><i class="fas fa-map-marker-alt" style="color: #e60a0a;"></i></button>
         <button data-anular data-id="" class="btn btn-outline-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Anular Orden"><i class="fas fa-trash-alt"></i></button>
 
+        <a href="" target="_blank" data-btn_whatsapp data-id="" class="btn btn-outline-success btn-sm" data-toggle="tooltip" data-placement="top" title="Enviar whatsapp"><i class="fab fa-whatsapp"></i></a>
+
         {{--<button data-generar_comprobante class="btn btn-primary btn-generar-comprobante" data-order-id="">
             Generar Comprobante
         </button>
