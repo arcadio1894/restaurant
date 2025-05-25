@@ -140,10 +140,10 @@ class OrderController extends Controller
             $text = 'Hola ' . $cliente . ' te escribimos de parte de Fuego y Masa para confirmar tu pedido para la direccion ' . $address;
 
             // Codificamos el texto para que funcione bien en la URL de WhatsApp
-            //$text = urlencode($text);
+            $textoCodificado = urlencode($text);
 
             // Generamos la URL para enviar el mensaje
-            $url = 'https://api.whatsapp.com/send?phone=' . $telefono . '&text=' . $text;
+            $url = 'https://api.whatsapp.com/send?phone=' . str_replace('+', '', $telefono) . '&text=' . $textoCodificado;
             array_push($arrayGuides, [
                 "id" => $order->id,
                 "code" => "ORDEN - ".$order->id,
