@@ -126,16 +126,31 @@ class OrderController extends Controller
             $distrito = ShippingDistrict::find($order->shipping_district_id);
             $cliente = $direccion->first_name." ".$direccion->last_name;
             $address = $direccion->address_line. " - ".( (!isset($distrito)) ? 'N/A':$distrito->name);
-            //Hola {{Nombre del Cliente}} te escribimos de parte de Fuego y Masa para confirmar tu pedido para la direccion {{Direccion}}
-            $text = 'Hola '. $cliente .' te escribimos de parte de Fuego y Masa para confirmar tu pedido para la direccion '.$address;
-            $url = 'https://api.whatsapp.com/send?phone='.$direccion->phone.'&text='.$text;
+            $telefono = $direccion->phone;
+
+            // Elimina espacios en blanco alrededor del número, por si acaso
+            $telefono = trim($telefono);
+
+            // Verifica si ya empieza con +, si no lo tiene, lo agregamos
+            if (strpos($telefono, '+') !== 0) {
+                $telefono = '+51' . $telefono;
+            }
+
+            // Preparamos el texto del mensaje
+            $text = 'Hola ' . $cliente . ' te escribimos de parte de Fuego y Masa para confirmar tu pedido para la direccion ' . $address;
+
+            // Codificamos el texto para que funcione bien en la URL de WhatsApp
+            $text = urlencode($text);
+
+            // Generamos la URL para enviar el mensaje
+            $url = 'https://api.whatsapp.com/send?phone=' . $telefono . '&text=' . $text;
             array_push($arrayGuides, [
                 "id" => $order->id,
                 "code" => "ORDEN - ".$order->id,
                 "date" => ($order->created_at != null) ? $order->formatted_created_date : "",
                 "date_delivery" => ($order->created_at != null) ? $order->formatted_date : "",
                 "customer" => $direccion->first_name." ".$direccion->last_name,
-                "phone" => $direccion->phone,
+                "phone" => $telefono,
                 "address" => $direccion->address_line. " - ".( (!isset($distrito)) ? 'N/A':$distrito->name),
                 "latitude" => $direccion->latitude,
                 "longitude" => $direccion->longitude,
