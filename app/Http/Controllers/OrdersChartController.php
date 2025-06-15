@@ -431,4 +431,38 @@ class OrdersChartController extends Controller
             'expense_total' => $expenseTotal
         ];
     }
+
+    public function getRegularizedSalesWithOrderAmounts()
+    {
+        $startDate = '2025-05-01';
+        $endDate = '2025-05-31';
+        $movements = CashMovement::with('order')
+            ->whereDate('created_at', '>=', $startDate)
+            ->whereDate('created_at', '<=', $endDate)
+            ->where('type', 'sale')
+            ->where('regularize', 1)
+            ->get();
+
+        $result = [];
+
+        foreach ($movements as $movement) {
+            $order = $movement->order;
+
+            // Asegúrate que el cash_movement tenga una orden asociada
+            if ($order) {
+                $result[] = [
+                    'cash_movement_id' => $movement->id,
+                    'order_id'         => $order->id,
+                    'amount'           => $movement->amount,
+                    'amount_pay'       => $order->amount_pay,
+                    'equal'            => $movement->amount == $order->amount_pay,
+                    'created_at'       => $movement->created_at,
+                    // Agrega otros campos que necesites del movimiento u orden
+                ];
+            }
+        }
+
+        dump($result);
+        dd();
+    }
 }

@@ -355,3 +355,6 @@ Route::get('/imprimir/comanda/{id}', [PrintController::class, 'generarComanda'])
 Route::get('/products/initialize-days', [ProductController::class, 'initializeProductDays']);
 
 Route::get('/reporte/cantidad-pizzas', [OrderController::class, 'reportePizzasFinde']);
+
+
+Route::get('/check/sales/vs/movements', [OrdersChartController::class, 'getRegularizedSalesWithOrderAmounts']);
