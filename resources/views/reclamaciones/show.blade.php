@@ -171,7 +171,8 @@
                             <!-- Canal de compra -->
                             <div class="form-group col-md-6">
                                 <label for="canal">Canal: </label>
-                                <input type="text" class="form-control" id="canal" name="canal" value="{{ ($reclamo->canal == 'web') ? 'Tienda Virtual (fuegoymasa.com)':($reclamo->canal == 'whatsapp') ? 'Whatsapp':'Aplicación Móvil'  }}" readonly>
+                                <input type="text" class="form-control" id="canal" name="canal"
+                                       value="{{ $reclamo->canal == 'web' ? 'Tienda Virtual (fuegoymasa.com)' : ($reclamo->canal == 'whatsapp' ? 'Whatsapp' : 'Aplicación Móvil') }}">
                             </div>
                         </div>
                         <!-- Motivo y Submotivo -->
