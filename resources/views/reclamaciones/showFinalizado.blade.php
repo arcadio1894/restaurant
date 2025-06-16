@@ -17,7 +17,7 @@
 @endsection
 
 @section('page-title')
-    <h2 class="font-weight-bold text-center">HOJA DE RECLAMACIÓN {{ $reclamo->codigo }} <span class="badge badge-info">{{ $reclamo->status }}</span></h2>
+    <h2 class="font-weight-bold text-center">HOJA DE RECLAMACIÓN {{ $reclamo->codigo }} <span class="badge badge-info">{{ $reclamo->status_name }}</span></h2>
 @endsection
 
 @section('styles')
