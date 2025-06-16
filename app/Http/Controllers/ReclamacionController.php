@@ -298,8 +298,10 @@ class ReclamacionController extends Controller
             $reclamo->estado = $request->input('estado');
             $reclamo->save();
 
+            $reclamacionSend = Reclamacion::find($reclamo->id);
+
             // Enviar notificación por correo electrónico
-            Mail::to($reclamo->email)->send(new CambioEstadoReclamo($reclamo));
+            Mail::to($reclamo->email)->send(new CambioEstadoReclamo($reclamacionSend));
 
             return response()->json(['message' => 'Respuesta guardada exitosamente.']);
         } catch (Exception $e) {

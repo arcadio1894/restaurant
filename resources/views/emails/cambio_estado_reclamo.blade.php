@@ -14,7 +14,7 @@ Su reclamo ha cambiado de estado.
 <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif;">
     <div style="border: 1px solid #ddd; border-radius: 5px; overflow: hidden/*; text-align: center;*/">
         <div style="background-color: #f8f9fa; padding: 15px; font-size: 18px; font-weight: bold;text-align: center;">
-            {{ $reclamacion->status }}
+            {{ $reclamacion->status_name }}
         </div>
         <div style="padding: 15px;">
             <p style="font-size: 16px; margin: 0;text-align: center;">RECLAMO ID: #{{ $reclamacion->codigo }}</p>
