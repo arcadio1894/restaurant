@@ -171,7 +171,7 @@ $(document).ready(function() {
     });
 
     $('#descripcion').on('input', function() {
-        const maxLength = 300;
+        const maxLength = 600;
         let value = $(this).val();
 
         // Si el valor supera la longitud máxima, recortarlo
@@ -184,7 +184,7 @@ $(document).ready(function() {
     });
 
     $('#detalle').on('input', function() {
-        const maxLength = 300;
+        const maxLength = 600;
         let value = $(this).val();
 
         // Si el valor supera la longitud máxima, recortarlo
@@ -197,7 +197,7 @@ $(document).ready(function() {
     });
 
     $('#pedido_cliente').on('input', function() {
-        const maxLength = 300;
+        const maxLength = 600;
         let value = $(this).val();
 
         // Si el valor supera la longitud máxima, recortarlo
@@ -209,8 +209,8 @@ $(document).ready(function() {
         $('#charCountPedidoCliente').text(`${maxLength - $(this).val().length} caracteres restantes`);
     });
 
-    $('#pedido_cliente').on('input', function() {
-        const maxLength = 300;
+    /*$('#pedido_cliente').on('input', function() {
+        const maxLength = 600;
         let value = $(this).val();
 
         // Si el valor supera la longitud máxima, recortarlo
@@ -220,7 +220,7 @@ $(document).ready(function() {
 
         // Mostrar los caracteres restantes
         $('#charCountPedidoCliente').text(`${maxLength - $(this).val().length} caracteres restantes`);
-    });
+    });*/
 
     $('#btn-submit').on('click', sendInfo);
 });
@@ -253,7 +253,13 @@ function sendInfo() {
                     // Recopilar datos del formulario
                     let form = new FormData(document.getElementById('form-identificacion'));
                     form.append('g-recaptcha-response', recaptchaResponse);
+
+                    dropzone.getAcceptedFiles().forEach(file => {
+                        form.append('comprobantes[]', file);
+                    });
+
                     let url = $("#form-identificacion").data('url');
+
                     // Enviar datos al backend usando AJAX
                     $.ajax({
                         url: url,

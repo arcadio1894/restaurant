@@ -5,7 +5,8 @@
 @section('styles')
     <link rel="stylesheet" href="{{ asset('admin/plugins/select2/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
-
+    <!-- Dropzone CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css">
     <link href="{{ asset('css/welcome/reclamaciones.css') }}" rel="stylesheet">
 @endsection
 
@@ -210,9 +211,9 @@
                             <!-- Descripción del bien contratado -->
                             <div class="form-group">
                                 <label for="descripcion">Descripción (Nombre del producto o servicio adquirido): <span class="right text-danger">(*)</span></label>
-                                <textarea class="form-control" id="descripcion" name="descripcion" rows="4" maxlength="300" placeholder="Especificar el producto o servicio adquirido" required></textarea>
-                                <small id="charCount" class="form-text text-muted">300 caracteres restantes</small>
-                                <small class="form-text text-danger">Máximo permitido 300 caracteres</small>
+                                <textarea class="form-control" id="descripcion" name="descripcion" rows="4" maxlength="600" placeholder="Especificar el producto o servicio adquirido" required></textarea>
+                                <small id="charCount" class="form-text text-muted">600 caracteres restantes</small>
+                                <small class="form-text text-danger">Máximo permitido 600 caracteres</small>
                             </div>
                         </div>
                     </div>
@@ -276,25 +277,28 @@
                             <!-- Detalle del Reclamo o Queja -->
                             <div class="form-group">
                                 <label for="detalle">Detalle: <span class="right text-danger">(*)</span></label>
-                                <textarea class="form-control" id="detalle" name="detalle" rows="4" maxlength="300" placeholder="Explicar el reclamo o queja" required></textarea>
-                                <small id="charCountDetalle" class="form-text text-muted">300 caracteres restantes</small>
-                                <small class="form-text text-danger">Máximo permitido 300 caracteres</small>
+                                <textarea class="form-control" id="detalle" name="detalle" rows="4" maxlength="600" placeholder="Explicar el reclamo o queja" required></textarea>
+                                <small id="charCountDetalle" class="form-text text-muted">600 caracteres restantes</small>
+                                <small class="form-text text-danger">Máximo permitido 600 caracteres</small>
                             </div>
 
                             <!-- Pedido del cliente -->
                             <div class="form-group">
                                 <label for="pedido_cliente">Pedido del cliente: <span class="right text-danger">(*)</span></label>
-                                <textarea class="form-control" id="pedido_cliente" name="pedido_cliente" rows="4" maxlength="300" placeholder="Detallar lo que solicita" required></textarea>
-                                <small id="charCountPedidoCliente" class="form-text text-muted">300 caracteres restantes</small>
-                                <small class="form-text text-danger">Máximo permitido 300 caracteres</small>
+                                <textarea class="form-control" id="pedido_cliente" name="pedido_cliente" rows="4" maxlength="600" placeholder="Detallar lo que solicita" required></textarea>
+                                <small id="charCountPedidoCliente" class="form-text text-muted">600 caracteres restantes</small>
+                                <small class="form-text text-danger">Máximo permitido 600 caracteres</small>
                             </div>
 
                             <!-- Subir comprobante de pago -->
                             <div class="form-group">
-                                <label for="comprobante">Adjuntar comprobante de pago (Opcional):</label>
-                                <input type="file" class="form-control-file" id="comprobante" name="comprobante" accept=".jpg,.png,.pdf">
-                                <small class="form-text text-muted">Peso máximo (2MB) en formato (jpg, png, pdf)</small>
+                                <label for="comprobante-dropzone">Adjuntar comprobante de pago y/o evidencia (Opcional):</label>
+                                <div id="comprobante-dropzone" class="dropzone border rounded p-3 bg-light"></div>
+                                <small class="form-text text-muted mt-2">
+                                    Puedes subir hasta 4 archivos (JPG, PNG, PDF) de máximo 4MB cada uno.
+                                </small>
                             </div>
+
 
                             <!-- Notas de reclamo y queja -->
                             <div class="mt-2">
@@ -327,6 +331,26 @@
     <!-- Select2 -->
     <script src="{{ asset('admin/plugins/select2/js/select2.full.min.js') }}"></script>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <!-- Dropzone JS (antes del cierre de </body>) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.js"></script>
+    <script>
+        Dropzone.autoDiscover = false;
 
+        const dropzone = new Dropzone("#comprobante-dropzone", {
+            url: "#", // No enviará nada automáticamente
+            autoProcessQueue: false,
+            uploadMultiple: true,
+            parallelUploads: 4,
+            paramName: "comprobantes[]",
+            maxFiles: 4,
+            maxFilesize: 4, // MB
+            acceptedFiles: ".jpg,.jpeg,.png,.pdf",
+            addRemoveLinks: true,
+            dictDefaultMessage: "Arrastra tus archivos aquí o haz clic para subir",
+            dictMaxFilesExceeded: "Solo puedes subir un máximo de 4 archivos.",
+            dictFileTooBig: "El archivo es muy grande (máx: 4MB).",
+            dictInvalidFileType: "Tipo de archivo no permitido."
+        });
+    </script>
     <script src="{{ asset('js/welcome/reclamaciones.js') }}"></script>
 @endsection

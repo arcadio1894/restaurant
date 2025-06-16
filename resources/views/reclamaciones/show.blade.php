@@ -17,7 +17,7 @@
 @endsection
 
 @section('page-title')
-    <h2 class="font-weight-bold text-center">HOJA DE RECLAMACIÓN {{ $reclamo->codigo }} <span class="badge badge-info">{{ $reclamo->status }}</span></h2>
+    <h2 class="font-weight-bold text-center">HOJA DE RECLAMACIÓN {{ $reclamo->codigo }} <span class="badge badge-info">{{ $reclamo->status_name }}</span></h2>
 @endsection
 
 @section('styles')
@@ -204,9 +204,15 @@
 
                         <!-- Subir comprobante de pago -->
                         <div class="form-group">
-                            <label for="comprobante">Adjuntar comprobante de pago (Opcional):</label>
-                            <div id="comprobante-container" data-comprobante="{{ asset($reclamo->comprobante) }}">
-                                <!-- Aquí se insertará dinámicamente el botón -->
+                            <label>Comprobantes adjuntos:</label>
+                            <div id="comprobante-container">
+                                <!-- Se llenará desde backend -->
+                                @foreach ($reclamo->comprobantes as $comprobante)
+                                    <div class="comprobante-item mb-2"
+                                         data-url="{{ asset($comprobante->archivo) }}"
+                                         data-extension="{{ pathinfo($comprobante->archivo, PATHINFO_EXTENSION) }}">
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
 
@@ -237,8 +243,21 @@
         </div>
     </div>
 
+    <!-- Modal para PDF o imagen -->
+    <div class="modal fade" id="comprobanteModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Visualización de comprobante</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body" id="comprobante-content"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal para mostrar comprobantes -->
-    <div class="modal fade" id="comprobanteModal" tabindex="-1" role="dialog" aria-labelledby="comprobanteModalLabel" aria-hidden="true">
+    {{--<div class="modal fade" id="comprobanteModal" tabindex="-1" role="dialog" aria-labelledby="comprobanteModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -253,6 +272,7 @@
             </div>
         </div>
     </div>
+--}}
 @endsection
 
 @section('scripts')

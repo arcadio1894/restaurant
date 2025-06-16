@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    // Suponiendo que $reclamo->comprobante se obtiene desde el backend
+    /*// Suponiendo que $reclamo->comprobante se obtiene desde el backend
     let comprobanteUrl = $('#comprobante-container').data('comprobante');  // Ruta al comprobante
     console.log(comprobanteUrl);
     let comprobanteExtension = comprobanteUrl.split('.').pop().toLowerCase();
@@ -29,7 +29,41 @@ $(document).ready(function () {
             `);
             $('#comprobanteModal').modal('show');
         });
-    }
+    }*/
+    $('.comprobante-item').each(function (index) {
+        let url = $(this).data('url');
+        let ext = $(this).data('extension').toLowerCase();
+
+        if (ext === 'pdf') {
+            $(this).html(`
+                <button class="btn btn-outline-danger btn-sm view-comprobante" data-url="${url}" data-type="pdf">
+                    Ver PDF #${index + 1}
+                </button>
+            `);
+        } else if (['jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
+            $(this).html(`
+                <img src="${url}" class="img-thumbnail view-comprobante" 
+                     data-url="${url}" data-type="image" 
+                     style="max-width: 100px; cursor: pointer;" title="Clic para ampliar">
+            `);
+        } else {
+            $(this).html(`<span class="text-muted">Archivo no compatible</span>`);
+        }
+    });
+
+    // Evento delegado para ver comprobantes
+    $(document).on('click', '.view-comprobante', function () {
+        let url = $(this).data('url');
+        let type = $(this).data('type');
+
+        if (type === 'pdf') {
+            $('#comprobante-content').html(`<iframe src="${url}" width="100%" height="500px"></iframe>`);
+        } else if (type === 'image') {
+            $('#comprobante-content').html(`<img src="${url}" class="img-fluid">`);
+        }
+
+        $('#comprobanteModal').modal('show');
+    });
 
     $(document).on('click', '#btn-submit', function () {
         let respuesta = $('#respuesta').val().trim();

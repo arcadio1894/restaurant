@@ -11,6 +11,8 @@ class Reclamacion extends Model
 
     protected $table = 'reclamaciones';
 
+    protected $appends = ['status_name'];
+
     protected $fillable = [
         'codigo',
         'nombre',
@@ -42,17 +44,19 @@ class Reclamacion extends Model
         'respuesta'
     ];
 
-    public function getStatusAttribute()
+    public function getStatusNameAttribute()
     {
         $statusNames = [
-            'pendiente' => 'PENDIENTE',
-            'revisado' => 'EN REVISION',
+            'pendiente'   => 'PENDIENTE',
+            'revisado'    => 'EN REVISION',
             'solucionado' => 'SOLUCIONADO',
-            'anulado' => 'ANULADO',
+            'anulado'     => 'ANULADO',
         ];
 
-        return array_key_exists($this->estado, $statusNames)
-            ? $statusNames[$this->estado]
+        $estado = strtolower(trim($this->estado));
+
+        return array_key_exists($estado, $statusNames)
+            ? $statusNames[$estado]
             : 'DESCONOCIDO';
     }
 
@@ -79,5 +83,10 @@ class Reclamacion extends Model
     public function submotive()
     {
         return $this->belongsTo(Submotivo::class, 'submotivo', 'id');
+    }
+
+    public function comprobantes()
+    {
+        return $this->hasMany(ComprobanteReclamacion::class);
     }
 }

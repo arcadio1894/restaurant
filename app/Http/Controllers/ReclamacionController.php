@@ -85,7 +85,7 @@ class ReclamacionController extends Controller
             $codigo = 'REC' . Str::upper(Str::random(6));
 
             // Manejar el archivo de comprobante
-            $comprobantePath = null;
+            /*$comprobantePath = null;
             if ($request->hasFile('comprobante')) {
                 $file = $request->file('comprobante');
                 $extension = $file->getClientOriginalExtension();
@@ -103,16 +103,50 @@ class ReclamacionController extends Controller
                 }
 
                 $comprobantePath = $fileName;
+            }*/
+
+
+            // Crear la reclamación primero (sin comprobante)
+            $reclamacion = Reclamacion::create(array_merge(
+                $request->except('comprobantes'),
+                [
+                    'codigo' => $codigo,
+                    'menor_edad' => $menorEdad,
+                ]
+            ));
+
+            // Guardar los archivos en la nueva tabla
+            if ($request->hasFile('comprobantes')) {
+                foreach ($request->file('comprobantes') as $index => $file) {
+                    $extension = $file->getClientOriginalExtension();
+                    $uniqueName = $codigo . "_{$index}." . $extension;
+                    $path = "reclamos/" . $uniqueName;
+
+                    if (in_array($extension, ['jpg', 'jpeg', 'png'])) {
+                        $image = Image::make($file->getRealPath());
+                        $image->save(public_path($path));
+                    } elseif ($extension === 'pdf') {
+                        $file->move(public_path('reclamos'), $uniqueName);
+                    } else {
+                        throw new Exception('Formato de archivo no permitido.');
+                    }
+
+                    // Guardar en la nueva tabla
+                    $reclamacion->comprobantes()->create([
+                        'archivo' => $path
+                    ]);
+                }
             }
 
             // Crear la reclamación en la base de datos
-            $reclamacion = Reclamacion::create(array_merge($request->all(), ['codigo' => $codigo, 'menor_edad' => $menorEdad, 'comprobante' => $comprobantePath]));
-
-            // Enviar correo electrónico al cliente
-            Mail::to($reclamacion->email)->send(new ReclamacionRecepcionada($reclamacion));
+            //$reclamacion = Reclamacion::create(array_merge($request->all(), ['codigo' => $codigo, 'menor_edad' => $menorEdad]));
 
             // Confirmar la transacción
             DB::commit();
+
+            $reclamacionSend = Reclamacion::find($reclamacion->id);
+            // Enviar correo electrónico al cliente
+            Mail::to($reclamacion->email)->send(new ReclamacionRecepcionada($reclamacionSend));
 
             return response()->json(['message' => 'Reclamo enviado con éxito.', 'codigo' => $codigo]);
 
@@ -225,7 +259,7 @@ class ReclamacionController extends Controller
                 "codigo" => $reclamo->codigo,
                 "fecha" => $reclamo->created_at->format('d/m/Y'),
                 "cliente" => $reclamo->nombre." ".$reclamo->apellido,
-                "estado" => $reclamo->status,
+                "estado" => $reclamo->status_name,
                 "solucion" => $reclamo->respuesta,
             ]);
         }
@@ -329,7 +363,7 @@ class ReclamacionController extends Controller
                 "codigo" => $reclamo->codigo,
                 "fecha" => $reclamo->created_at->format('d/m/Y'),
                 "cliente" => $reclamo->nombre." ".$reclamo->apellido,
-                "estado" => $reclamo->status,
+                "estado" => $reclamo->status_name,
                 "solucion" => $reclamo->respuesta,
             ]);
         }

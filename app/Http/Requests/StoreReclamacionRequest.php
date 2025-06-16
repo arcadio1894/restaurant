@@ -31,7 +31,9 @@ class StoreReclamacionRequest extends FormRequest
             'tipo_reclamacion' => 'required|string',
             'canal' => 'required|string',
             'motivo' => 'required|string',
-            'submotivo' => 'required|string'
+            'submotivo' => 'required|string',
+            'comprobantes'   => 'nullable|array|max:4',
+            'comprobantes.*' => 'file|mimes:jpg,jpeg,png,pdf|max:4096', // 4096 KB = 4 MB
         ];
     }
 
