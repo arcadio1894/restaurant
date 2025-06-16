@@ -285,7 +285,7 @@ class ReclamacionController extends Controller
     public function guardarRespuesta(Request $request)
     {
         $request->validate([
-            'respuesta' => 'required|string|max:300',
+            'respuesta' => 'required|string',
             'estado' => 'required|string|in:revisado,solucionado,anulado',
         ]);
 
