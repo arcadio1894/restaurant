@@ -227,7 +227,7 @@
                         <!-- Detalle del Reclamo o Queja -->
                         <div class="form-group">
                             <label for="respuesta">Respuesta: </label>
-                            <textarea class="form-control" id="respuesta" name="respuesta" rows="4" maxlength="300" placeholder="Escriba la respuesta corta del reclamo">{{ $reclamo->respuesta }}</textarea>
+                            <textarea class="form-control" id="respuesta" name="respuesta" rows="4" placeholder="Escriba la respuesta corta del reclamo">{{ $reclamo->respuesta }}</textarea>
                         </div>
 
                     </div>
