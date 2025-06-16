@@ -171,7 +171,8 @@
                             <!-- Canal de compra -->
                             <div class="form-group col-md-6">
                                 <label for="canal">Canal: </label>
-                                <input type="text" class="form-control" id="canal" name="canal" value="{{ ($reclamo->canal == 'web') ? 'Tienda Virtual (fuegoymasa.com)':($reclamo->canal == 'whatsapp') ? 'Whatsapp':'Aplicación Móvil'  }}" readonly>
+                                <input type="text" class="form-control" id="canal" name="canal"
+                                       value="{{ $reclamo->canal == 'web' ? 'Tienda Virtual (fuegoymasa.com)' : ($reclamo->canal == 'whatsapp' ? 'Whatsapp' : 'Aplicación Móvil') }}">
                             </div>
                         </div>
                         <!-- Motivo y Submotivo -->
@@ -203,9 +204,15 @@
 
                         <!-- Subir comprobante de pago -->
                         <div class="form-group">
-                            <label for="comprobante">Adjuntar comprobante de pago (Opcional):</label>
-                            <div id="comprobante-container" data-comprobante="{{ asset($reclamo->comprobante) }}">
-                                <!-- Aquí se insertará dinámicamente el botón -->
+                            <label>Comprobantes adjuntos:</label>
+                            <div id="comprobante-container">
+                                <!-- Se llenará desde backend -->
+                                @foreach ($reclamo->comprobantes as $comprobante)
+                                    <div class="comprobante-item mb-2"
+                                         data-url="{{ asset($comprobante->archivo) }}"
+                                         data-extension="{{ pathinfo($comprobante->archivo, PATHINFO_EXTENSION) }}">
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
 
