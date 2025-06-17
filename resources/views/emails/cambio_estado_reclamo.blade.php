@@ -18,7 +18,7 @@ Su reclamo ha cambiado de estado.
         </div>
         <div style="padding: 15px;">
             <p style="font-size: 16px; margin: 0;text-align: center;">RECLAMO ID: #{{ $reclamacion->codigo }}</p>
-            <p><strong>Respuesta:</strong> {{ $reclamacion->respuesta }}</p>
+            <p>{!! nl2br(e($reclamacion->respuesta)) !!}</p>
         </div>
     </div>
 </div>
