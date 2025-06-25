@@ -122,6 +122,18 @@ $(document).ready(function () {
             }
         });
     });
+
+    $('#respuesta').summernote({
+        height: 600,
+        lang: 'es-ES', // Establecer idioma español
+        placeholder: 'Escriba la respuesta corta del reclamo',
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['insert', ['link']],
+            ['view', ['codeview']]
+        ]
+    });
 });
 
 function enviarRespuesta(estado) {

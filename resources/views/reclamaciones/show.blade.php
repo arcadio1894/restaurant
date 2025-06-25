@@ -23,6 +23,8 @@
 @section('styles')
     <link rel="stylesheet" href="{{ asset('admin/plugins/select2/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+    <!-- Summernote CSS -->
+    <link href="{{ asset('admin/plugins/summernote/summernote-bs4.min.css') }}" rel="stylesheet">
 
     <link href="{{ asset('css/welcome/reclamacionShow.css') }}" rel="stylesheet">
 @endsection
@@ -226,8 +228,8 @@
                     <div class="card-body">
                         <!-- Detalle del Reclamo o Queja -->
                         <div class="form-group">
-                            <label for="respuesta">Respuesta: </label>
-                            <textarea class="form-control" id="respuesta" name="respuesta" rows="4" placeholder="Escriba la respuesta corta del reclamo">{{ $reclamo->respuesta }}</textarea>
+                            {{--<label for="respuesta">Respuesta: </label>--}}
+                            <textarea class="form-control" id="respuesta" name="respuesta" rows="20" placeholder="Escriba la respuesta corta del reclamo">{!! $reclamo->respuesta !!}</textarea>
                         </div>
 
                     </div>
@@ -276,5 +278,11 @@
 @endsection
 
 @section('scripts')
+    <!-- Summernote JS -->
+    <script src="{{ asset('admin/plugins/summernote/summernote-bs4.min.js') }}"></script>
+
+    <!-- Summernote español -->
+    <script src="{{ asset('admin/plugins/summernote/lang/summernote-es-ES.min.js') }}"></script>
+
     <script src="{{ asset('js/reclamaciones/reclamacionShow.js') }}"></script>
 @endsection
