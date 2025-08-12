@@ -75,6 +75,8 @@ $(document).ready(function () {
         const orderId = $(this).data('order-id');
         window.open(`/factura/imprimir/${orderId}`, '_blank');
     });
+
+    $(document).on('click', '[data-ver_pop_up]', verDatosOrder);
 });
 
 var $formDelete;
@@ -84,6 +86,60 @@ var $formDecimals;
 
 var $permissions;
 var $modalDetraction;
+
+function verDatosOrder() {
+    console.log("Botón clicado"); // Asegúrate de que este mensaje aparezca en la consola
+    let latitude = $(this).data("latitude");
+    let longitude = $(this).data("longitude");
+    let googleMapsUrl = "";
+
+    if (latitude && longitude) {
+        // Construir la URL de Google Maps
+        googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}&z=15`;
+    } else {
+        googleMapsUrl = "No se encontraron coordenadas.";
+    }
+    let address = $(this).data("address");
+    let phone = $(this).data("phone");
+    let customer = $(this).data("customer");
+    let state = $(this).data("state");
+
+    let textToCopy = `${address}\n${phone}\n${customer}\n${state}\n${googleMapsUrl}`;
+
+    $.confirm({
+        title: 'Datos del Pedido',
+        content: `<pre style="white-space: pre-wrap; word-wrap: break-word;">${textToCopy}</pre>`,
+        buttons: {
+            copiar: {
+                text: 'Copiar',
+                btnClass: 'btn-blue',
+                action: function(){
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        // Método moderno
+                        navigator.clipboard.writeText(textToCopy).then(function() {
+                            $.alert('Datos copiados al portapapeles');
+                        }).catch(function(err) {
+                            $.alert('Error al copiar: ' + err);
+                        });
+                    } else {
+                        // Método alternativo (más compatible)
+                        let tempInput = $('<textarea>');
+                        $('body').append(tempInput);
+                        tempInput.val(textToCopy).select();
+                        document.execCommand("copy");
+                        tempInput.remove();
+                        $.alert('Datos copiados al portapapeles');
+                    }
+                }
+            },
+            cerrar: {
+                text: 'Cerrar',
+                btnClass: 'btn-secondary'
+            }
+        }
+    });
+
+}
 
 function anularOrder() {
     var order_id = $(this).data('id');
@@ -586,10 +642,18 @@ function renderDataTable(data) {
     var cloneBtnActive = activateTemplate('#template-active');
     cloneBtnActive.querySelector("[data-ver_detalles]").setAttribute("data-id", data.id);
 
-    cloneBtnActive.querySelector("[data-ver_ruta]").setAttribute("data-id", data.id);
+    /*cloneBtnActive.querySelector("[data-ver_ruta]").setAttribute("data-id", data.id);
     cloneBtnActive.querySelector("[data-ver_ruta]").setAttribute("data-address", data.address);
     cloneBtnActive.querySelector("[data-ver_ruta]").setAttribute("data-latitude", data.latitude);
     cloneBtnActive.querySelector("[data-ver_ruta]").setAttribute("data-longitude", data.longitude);
+*/
+    cloneBtnActive.querySelector("[data-ver_pop_up]").setAttribute("data-id", data.id);
+    cloneBtnActive.querySelector("[data-ver_pop_up]").setAttribute("data-address", data.address);
+    cloneBtnActive.querySelector("[data-ver_pop_up]").setAttribute("data-latitude", data.latitude);
+    cloneBtnActive.querySelector("[data-ver_pop_up]").setAttribute("data-longitude", data.longitude);
+    cloneBtnActive.querySelector("[data-ver_pop_up]").setAttribute("data-phone", data.phone);
+    cloneBtnActive.querySelector("[data-ver_pop_up]").setAttribute("data-customer", data.customer);
+    cloneBtnActive.querySelector("[data-ver_pop_up]").setAttribute("data-state", data.state);
 
     cloneBtnActive.querySelector("[data-ver_ruta_map]").setAttribute("data-id", data.id);
     cloneBtnActive.querySelector("[data-ver_ruta_map]").setAttribute("data-address", data.address);

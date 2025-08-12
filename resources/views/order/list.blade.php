@@ -290,7 +290,10 @@
         <button data-enviando data-id="" data-state="shipped" data-state_name="ENVIADO" class="btn btn-outline-warning btn-sm" data-toggle="tooltip" data-placement="top" title="Enviando"><i class="fa fa-truck"></i></button>
         <button data-completado data-id="" data-state="completed" data-state_name="COMPLETADO" class="btn btn-outline-success btn-sm" data-toggle="tooltip" data-placement="top" title="Completado"><i class="fas fa-home"></i></button>
         <button data-ver_detalles data-id="" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Detalles"><i class="fas fa-list-ol"></i></button>
-        <button data-ver_ruta data-id="" data-address="" data-latitude="" data-longitude="" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Ruta"><i class="fas fa-map-marker-alt"></i></button>
+        {{--<button data-ver_ruta data-id="" data-address="" data-latitude="" data-longitude="" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Ruta"><i class="fas fa-map-marker-alt"></i></button>
+        --}}
+        <button data-ver_pop_up data-id="" data-address="" data-latitude="" data-longitude="" data-phone="" data-customer="" data-state="" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Datos"><i class="fas fa-search"></i></button>
+
         <button data-ver_ruta_map data-id="" data-address="" data-latitude="" data-longitude="" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Ruta"><i class="fas fa-map-marker-alt" style="color: #e60a0a;"></i></button>
         <button data-anular data-id="" class="btn btn-outline-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Anular Orden"><i class="fas fa-trash-alt"></i></button>
 
