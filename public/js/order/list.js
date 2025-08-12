@@ -653,7 +653,7 @@ function renderDataTable(data) {
     cloneBtnActive.querySelector("[data-ver_pop_up]").setAttribute("data-longitude", data.longitude);
     cloneBtnActive.querySelector("[data-ver_pop_up]").setAttribute("data-phone", data.phone);
     cloneBtnActive.querySelector("[data-ver_pop_up]").setAttribute("data-customer", data.customer);
-    cloneBtnActive.querySelector("[data-ver_pop_up]").setAttribute("data-state", data.state);
+    cloneBtnActive.querySelector("[data-ver_pop_up]").setAttribute("data-state", data.method);
 
     cloneBtnActive.querySelector("[data-ver_ruta_map]").setAttribute("data-id", data.id);
     cloneBtnActive.querySelector("[data-ver_ruta_map]").setAttribute("data-address", data.address);
