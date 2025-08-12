@@ -292,7 +292,7 @@
         <button data-ver_detalles data-id="" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Detalles"><i class="fas fa-list-ol"></i></button>
         {{--<button data-ver_ruta data-id="" data-address="" data-latitude="" data-longitude="" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Ruta"><i class="fas fa-map-marker-alt"></i></button>
         --}}
-        <button data-ver_pop_up data-id="" data-address="" data-latitude="" data-longitude="" data-phone="" data-customer="" data-state="" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Datos"><i class="fas fa-search"></i></button>
+        <button data-ver_pop_up data-id="" data-address="" data-latitude="" data-longitude="" data-phone="" data-customer="" data-state="" data-referencia="" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Datos"><i class="fas fa-search"></i></button>
 
         <button data-ver_ruta_map data-id="" data-address="" data-latitude="" data-longitude="" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver Ruta"><i class="fas fa-map-marker-alt" style="color: #e60a0a;"></i></button>
         <button data-anular data-id="" class="btn btn-outline-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Anular Orden"><i class="fas fa-trash-alt"></i></button>

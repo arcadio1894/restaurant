@@ -103,8 +103,9 @@ function verDatosOrder() {
     let phone = $(this).data("phone");
     let customer = $(this).data("customer");
     let state = $(this).data("state");
+    let referencia = $(this).data("referencia");
 
-    let textToCopy = `${address}\n${phone}\n${customer}\n${state}\n${googleMapsUrl}`;
+    let textToCopy = `${address}\n${referencia}\n${phone}\n${customer}\n${state}\n${googleMapsUrl}`;
 
     $.confirm({
         title: 'Datos del Pedido',
@@ -654,6 +655,7 @@ function renderDataTable(data) {
     cloneBtnActive.querySelector("[data-ver_pop_up]").setAttribute("data-phone", data.phone);
     cloneBtnActive.querySelector("[data-ver_pop_up]").setAttribute("data-customer", data.customer);
     cloneBtnActive.querySelector("[data-ver_pop_up]").setAttribute("data-state", data.method);
+    cloneBtnActive.querySelector("[data-ver_pop_up]").setAttribute("data-referencia", data.referencia);
 
     cloneBtnActive.querySelector("[data-ver_ruta_map]").setAttribute("data-id", data.id);
     cloneBtnActive.querySelector("[data-ver_ruta_map]").setAttribute("data-address", data.address);
