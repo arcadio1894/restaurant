@@ -269,6 +269,26 @@
                     <input type="hidden" name="coupon_name" id="coupon_name" value="">
 
 
+                    <div class="mb-3">
+                        <label for="address">Dirección</label>
+                        {{--<input type="text" class="form-control" id="address" name="address" placeholder=""
+                               required value="{{ $defaultAddress ? $defaultAddress->address_line : '' }}">--}}
+                        <input type="text" class="form-control" id="address" name="address" placeholder=""
+                               required value="" readonly>
+                        {{--<button type="button" class="btn btn-link" id="btn-selectAddress">
+                            Encuentra tu dirección
+                        </button>--}}
+                        <a href="{{ route('showlocals') }}" class="btn btn-link">
+                            Cambia tu dirección
+                        </a>
+                        <div class="invalid-feedback">
+                            Por favor ingrese su dirección de envío.
+                        </div>
+                        <input type="hidden" id="latitude" name="latitude">
+                        <input type="hidden" id="longitude" name="longitude">
+                        <input type="hidden" id="costShipping" name="costShipping">
+                        <input type="hidden" id="shopId" name="shopId">
+                    </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -330,26 +350,7 @@
                         </div>
                     </div>--}}
 
-                    <div class="mb-3">
-                        <label for="address">Dirección</label>
-                        {{--<input type="text" class="form-control" id="address" name="address" placeholder=""
-                               required value="{{ $defaultAddress ? $defaultAddress->address_line : '' }}">--}}
-                        <input type="text" class="form-control" id="address" name="address" placeholder=""
-                               required value="" readonly>
-                        {{--<button type="button" class="btn btn-link" id="btn-selectAddress">
-                            Encuentra tu dirección
-                        </button>--}}
-                        <a href="{{ route('showlocals') }}" class="btn btn-link">
-                            Cambia tu dirección
-                        </a>
-                        <div class="invalid-feedback">
-                            Por favor ingrese su dirección de envío.
-                        </div>
-                        <input type="hidden" id="latitude" name="latitude">
-                        <input type="hidden" id="longitude" name="longitude">
-                        <input type="hidden" id="costShipping" name="costShipping">
-                        <input type="hidden" id="shopId" name="shopId">
-                    </div>
+
 
                     <div class="mb-3">
                         <label for="address2">Referencia <span class="text-muted">(Optional)</span></label>
