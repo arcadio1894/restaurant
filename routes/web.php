@@ -50,7 +50,7 @@ Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-Route::get('/menu', [WelcomeController::class, 'menu'])->name('menu');
+/*Route::get('/menu', [WelcomeController::class, 'menu'])->name('menu');*/
 Route::get('/nosotros', [WelcomeController::class, 'about'])->name('about');
 
 Route::get('/reclamaciones', [ReclamacionController::class, 'reclamaciones'])->name('reclamaciones');
