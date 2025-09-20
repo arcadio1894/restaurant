@@ -14,15 +14,15 @@
     <meta name="keywords" content="" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <link rel="shortcut icon" href="{{ asset('landing/images/favicon.png') }}" type="">
+    <link rel="shortcut icon" href="{{ secure_secure_asset('landing/images/favicon.png') }}" type="">
 
     <title> Fuego y Masa </title>
 
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
 
-    <link href="{{ asset('landing/css/fontawesome-all.min.css') }}" rel="stylesheet" />
+    <link href="{{ secure_asset('landing/css/fontawesome-all.min.css') }}" rel="stylesheet" />
 
-    <link rel="stylesheet" href="{{ asset('auth/css/style.css') }}">
+    <link rel="stylesheet" href="{{ secure_asset('auth/css/style.css') }}">
 
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Open+Sans:wght@400;600;700&display=swap");
@@ -65,7 +65,7 @@
             <div class="col-md-12 col-lg-10">
                 <div class="wrap d-md-flex">
                     <div class="img" style="
-                            background-image: url({{ asset('landing/images/about-img1.png') }});
+                            background-image: url({{ secure_asset('landing/images/about-img1.png') }});
                             min-height: 350px;
                             background-size: contain;
                             background-repeat: no-repeat;
@@ -90,10 +90,10 @@
 </section>
 
 <!-- jQery -->
-<script src="{{ asset('auth/js/jquery.min.js') }}"></script>
-<script src="{{ asset('auth/js/popper.js') }}"></script>
-<script src="{{ asset('auth/js/bootstrap.min.js') }}"></script>
-<script src="{{ asset('auth/js/main.js') }}"></script>
+<script src="{{ secure_asset('auth/js/jquery.min.js') }}"></script>
+<script src="{{ secure_asset('auth/js/popper.js') }}"></script>
+<script src="{{ secure_asset('auth/js/bootstrap.min.js') }}"></script>
+<script src="{{ secure_asset('auth/js/main.js') }}"></script>
 
 </body>
 </html>
