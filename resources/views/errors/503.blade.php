@@ -14,7 +14,7 @@
     <meta name="keywords" content="" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <link rel="shortcut icon" href="{{ secure_secure_asset('landing/images/favicon.png') }}" type="">
+    <link rel="shortcut icon" href="{{ secure_asset('landing/images/favicon.png') }}" type="">
 
     <title> Fuego y Masa </title>
 
